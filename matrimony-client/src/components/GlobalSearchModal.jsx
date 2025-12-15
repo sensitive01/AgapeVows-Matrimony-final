@@ -95,7 +95,7 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
             <div className="flex justify-center mb-4">
               <div className="flex flex-col sm:flex-row items-center gap-2 w-full max-w-md bg-gray-50 p-3 rounded-lg border border-gray-200">
                 <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-                  Search by BNR ID:
+                  Search by AGWID ID:
                 </span>
                 <input
                   type="text"
