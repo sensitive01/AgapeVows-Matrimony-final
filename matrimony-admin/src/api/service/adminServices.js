@@ -6,7 +6,7 @@ export const registerAdmin = async () => {
 };
 
 export const verifyAdmin = async (loginData) => {
-  const response = await adminInstance.post(`/verify-admin`,{loginData});
+  const response = await adminInstance.post(`/verify-admin`, { loginData });
   return response;
 };
 
@@ -33,11 +33,11 @@ export const getPaidUserData = async () => {
 
 
 export const addNewPlanData = async (planData) => {
-  const response = await adminInstance.post(`/add-new-plan-data`,{planData});
+  const response = await adminInstance.post(`/add-new-plan-data`, { planData });
   return response;
 };
-export const editPlanData = async (planId,planData) => {
-  const response = await adminInstance.put(`/edit-plan-data/${planId}`,{planData});
+export const editPlanData = async (planId, planData) => {
+  const response = await adminInstance.put(`/edit-plan-data/${planId}`, { planData });
   return response;
 };
 
@@ -46,7 +46,33 @@ export const getAllPlanData = async () => {
   return response;
 };
 
-export const changePlanStatus = async (planId,planStatus) => {
-  const response = await adminInstance.put(`/edit-plan-status/${planId}`,{planStatus});
+export const changePlanStatus = async (planId, planStatus) => {
+  const response = await adminInstance.put(`/edit-plan-status/${planId}`, { planStatus });
+  return response;
+};
+
+// Event Services
+export const getAllEvents = async () => {
+  const response = await adminInstance.get(`/get-all-events`);
+  return response;
+};
+
+export const addNewEvent = async (eventData) => {
+  // eventData should be FormData object
+  const response = await adminInstance.post(`/add-new-event`, eventData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response;
+};
+
+export const editEvent = async (eventId, eventData) => {
+  const response = await adminInstance.put(`/edit-event/${eventId}`, eventData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response;
+};
+
+export const deleteEventData = async (eventId) => {
+  const response = await adminInstance.delete(`/delete-event/${eventId}`);
   return response;
 };

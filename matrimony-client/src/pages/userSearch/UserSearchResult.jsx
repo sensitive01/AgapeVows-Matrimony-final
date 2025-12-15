@@ -36,9 +36,29 @@ const UserSearchResult = () => {
       setLoading(true);
       try {
         // Combine initial search state with current filters
+        const { formData, ...restState } = state || {};
+
+        // Transform sidebar filters to match backend fields
+        const transformedFilters = { ...filterParams };
+
+        // Parse Age Range (e.g., "18-30")
+        if (filterParams.age && filterParams.age.includes("-")) {
+          const [min, max] = filterParams.age.split("-");
+          transformedFilters.ageFrom = min;
+          transformedFilters.ageTo = max;
+          delete transformedFilters.age;
+        }
+
+        // Map Location to districtCity (matching backend expectation)
+        if (filterParams.location) {
+          transformedFilters.districtCity = filterParams.location;
+          delete transformedFilters.location;
+        }
+
         const requestData = {
-          ...state, // Initial search parameters
-          ...filterParams, // Current filter values
+          ...restState,
+          ...(formData || {}),
+          ...transformedFilters,
         };
 
         // Call your filter API endpoint
@@ -61,7 +81,13 @@ const UserSearchResult = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetchSearchedProfileData(state);
+        const { formData, ...restState } = state || {};
+        const requestData = {
+          ...restState,
+          ...(formData || {}),
+        };
+
+        const response = await fetchSearchedProfileData(requestData);
         if (response.status === 200) {
           setUsers(response.data.data);
         }
@@ -71,7 +97,10 @@ const UserSearchResult = () => {
         setLoading(false);
       }
     };
-    fetchData();
+
+    if (state) {
+      fetchData();
+    }
   }, [state]);
 
   // Debounced filter effect - calls API when filters change

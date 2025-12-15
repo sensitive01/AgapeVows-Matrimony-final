@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Search,
   Phone,
@@ -14,45 +15,30 @@ import logo from "../../../assets/images/agapevows - logo.webp";
 import { getUserProfile } from "../../../api/axiosService/userAuthService";
 import profileImg from "../../../assets/images/profiles/1.jpg";
 import PreLoader from "../../PreLoader";
+import GlobalSearchModal from "../../GlobalSearchModal";
 
-// ExploreDropdown Component
+// ExploreDropdown Component - Redesigned as List
 const ExploreDropdown = ({ isVisible }) => {
   const categories = [
     {
-      title: "Browse profiles",
-      subtitle: "1200+ VERIFIED PROFILES",
-      buttonText: "MORE DETAILS",
-      bgColor: "bg-gradient-to-br from-pink-500 to-purple-600",
-      image:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=300&h=200&fit=crop&crop=face",
-      path: "/user/show-all-profiles/all-profiles",
+      title: "Personalized Matrimony",
+      path: "#",
     },
     {
-      title: "Wedding page",
-      subtitle: "MAKE RESERVATION",
-      buttonText: "MORE DETAILS",
-      bgColor: "bg-gradient-to-br from-purple-600 to-blue-600",
-      image:
-        "https://images.unsplash.com/photo-1519741497674-611481863552?w=300&h=200&fit=crop",
-      path: "/user/user-wedding-page",
+      title: "NRI Matrimony",
+      path: "#",
     },
     {
-      title: "All Services",
-      subtitle: "LOREM IPSUM DUMMY",
-      buttonText: "MORE DETAILS",
-      bgColor: "bg-gradient-to-br from-green-500 to-teal-600",
-      image:
-        "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=300&h=200&fit=crop",
-      path: "/user/user-service-page",
+      title: "Churches - Partner with Us",
+      path: "#",
     },
     {
-      title: "Join Now",
-      subtitle: "LOREM IPSUM DUMMY",
-      buttonText: "MORE DETAILS",
-      bgColor: "bg-gradient-to-br from-yellow-500 to-orange-600",
-      image:
-        "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=300&h=200&fit=crop",
-      path: "/user/user-sign-up",
+      title: "Become a Matrimonial Advisor",
+      path: "#",
+    },
+    {
+      title: "Pre-Marital and Marital Counseling",
+      path: "#",
     },
   ];
 
@@ -62,48 +48,21 @@ const ExploreDropdown = ({ isVisible }) => {
 
   return (
     <div
-      className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-screen max-w-5xl bg-white shadow-2xl rounded-lg p-8 z-50 border border-gray-100 transition-all duration-300 ${
+      className={`absolute top-full left-0 mt-2 w-72 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${
         isVisible
           ? "opacity-100 visible translate-y-0"
           : "opacity-0 invisible translate-y-2"
       }`}
     >
-      <h3 className="text-xl font-bold text-gray-800 mb-6">
-        EXPLORE CATEGORIES
-      </h3>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {categories.map((category, index) => (
-          <div
-            key={index}
-            className={`${category.bgColor} text-white rounded-lg p-6 min-h-48 flex flex-col justify-between relative overflow-hidden hover:scale-105 transition-transform duration-300 cursor-pointer`}
-            onClick={() => handleNavigate(category.path)}
-          >
-            <div className="absolute inset-0 opacity-30">
-              <img
-                src={category.image}
-                alt={category.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="absolute inset-0 opacity-20">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white rounded-full transform translate-x-12 -translate-y-12"></div>
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white rounded-full transform -translate-x-8 translate-y-8"></div>
-            </div>
-
-            <div className="relative z-10">
-              <h4 className="text-lg font-bold mb-1">{category.title}</h4>
-              <p className="text-xs opacity-90 mb-4">{category.subtitle}</p>
-            </div>
-
-            <button className="bg-black text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors self-start relative z-10">
-              {category.buttonText}
-            </button>
-          </div>
-        ))}
-      </div>
+      {categories.map((category, index) => (
+        <button
+          key={index}
+          onClick={() => handleNavigate(category.path)}
+          className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors font-medium border-b border-gray-50 last:border-0"
+        >
+          {category.title}
+        </button>
+      ))}
     </div>
   );
 };
@@ -114,7 +73,7 @@ const ProfileDropdown = ({ isVisible, onLogout }) => {
     { label: "My Profile", path: "/user/user-profile-page" },
     // { label: "My Chatss", path: "/user/show-all-profiles/all-profile" },
     { label: "Change Password", path: "/reset-password/:userId" },
-    { label: "User Settings", path: "/user/user-settings-page" }
+    { label: "User Settings", path: "/user/user-settings-page" },
   ];
 
   const handleNavigate = (path) => {
@@ -149,11 +108,9 @@ const ProfileDropdown = ({ isVisible, onLogout }) => {
   );
 };
 
-
-
-
 const MainLayout = () => {
   const userId = localStorage.getItem("userId");
+  const location = useLocation();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isExploreDropdownVisible, setIsExploreDropdownVisible] =
@@ -163,6 +120,7 @@ const MainLayout = () => {
   const [isUserActive, setIsUserActive] = useState(false);
   const [userName, setUserName] = useState();
   const [userImage, setUserImage] = useState(profileImg);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   useEffect(() => {
     setIsUserActive(Boolean(userId));
@@ -206,8 +164,15 @@ const MainLayout = () => {
           <div className="hidden md:flex justify-between items-center">
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-1 cursor-pointer hover:text-purple-200">
-                <Search className="w-4 h-4" />
-                <button onClick={() => handleNavigate("/about-us")}>ABOUT</button>
+                <div
+                  onClick={() => setIsSearchModalOpen(true)}
+                  className="flex items-center space-x-1"
+                >
+                  <Search className="w-4 h-4" />
+                </div>
+                <button onClick={() => handleNavigate("/about-us")}>
+                  ABOUT
+                </button>
               </div>
               <button
                 onClick={() => handleNavigate("/faq-page")}
@@ -242,7 +207,12 @@ const MainLayout = () => {
           {/* Mobile */}
           <div className="md:hidden flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <Search className="w-4 h-4" />
+              <div
+                onClick={() => setIsSearchModalOpen(true)}
+                className="cursor-pointer"
+              >
+                <Search className="w-4 h-4" />
+              </div>
               <button
                 onClick={() => handleNavigate("/about")}
                 className="text-xs hover:text-purple-200"
@@ -300,10 +270,19 @@ const MainLayout = () => {
                 onMouseLeave={() => setIsExploreDropdownVisible(false)}
               >
                 <button className="text-gray-800 hover:text-purple-600 font-medium flex items-center py-2">
-                  EXPLORE <ChevronDown className="w-4 h-4 ml-1" />
+                  SERVICE <ChevronDown className="w-4 h-4 ml-1" />
                 </button>
-                <ExploreDropdown isVisible={isExploreDropdownVisible} />
+                <ExploreDropdown
+                  isVisible={isExploreDropdownVisible}
+                  isUserActive={isUserActive}
+                />
               </div>
+              <button
+                onClick={() => handleNavigate("/user/events-page")}
+                className="text-gray-800 hover:text-purple-600 font-medium"
+              >
+                EVENTS
+              </button>
               <button
                 onClick={() => handleNavigate("/user/user-plan-selection")}
                 className="text-gray-800 hover:text-purple-600 font-medium"
@@ -406,7 +385,16 @@ const MainLayout = () => {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="text-gray-800 hover:text-purple-600 font-medium text-left"
                 >
-                  EXPLORE
+                  SERVICES
+                </button>
+                <button
+                  onClick={() => {
+                    handleNavigate("/user/events-page");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-gray-800 hover:text-purple-600 font-medium text-left"
+                >
+                  EVENTS
                 </button>
                 <button
                   onClick={() => {
@@ -536,6 +524,39 @@ const MainLayout = () => {
           )}
         </div>
       </header>
+
+      {/* Global Search Bar - Added as per request for global visibility */}
+      {location.pathname !== "/" && (
+        <div
+          className="bg-purple-50 border-b border-purple-100 py-3 cursor-pointer hover:bg-purple-100 transition-colors"
+          onClick={() => setIsSearchModalOpen(true)}
+        >
+          <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
+            <div className="flex items-center text-gray-700 flex-1 min-w-0 mr-2">
+              <div className="bg-white p-2 rounded-full shadow-sm mr-3 text-purple-600 shrink-0">
+                <Search className="w-5 h-5" />
+              </div>
+              <span className="font-medium truncate text-sm md:text-base">
+                <span className="hidden md:inline">
+                  Click here to Search Profiles / Search by Reference ID
+                </span>
+                <span className="md:hidden">Search Profiles / ID</span>
+              </span>
+            </div>
+            <div className="text-purple-600 text-xs md:text-sm font-semibold flex items-center shrink-0">
+              <span className="hidden xs:inline">ADVANCED SEARCH</span>
+              <span className="xs:hidden">ADVANCED</span>
+              <ChevronDown className="w-4 h-4 ml-1" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Global Search Modal */}
+      <GlobalSearchModal
+        isOpen={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
+      />
     </>
   );
 };

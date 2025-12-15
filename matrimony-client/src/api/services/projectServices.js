@@ -178,7 +178,7 @@ export const postJob = async (jobData) => {
 
 export const getAllEvents = async () => {
   try {
-    const response = await projectServices.get("/employer/getallevents");
+    const response = await projectServices.get("/admin/get-all-events");
     return response.data;
   } catch (error) {
     console.error("Error fetching events:", error);

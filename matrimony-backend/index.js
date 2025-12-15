@@ -10,6 +10,7 @@ const userAuthRoutes = require("./routes/userRoutes/userAuthRoute");
 const adminAuthRoutes = require("./routes/adminRoutes/adminRoutes");
 const initializeSocket = require("./utils/socketConnection"); // ✅ your socket handler
 
+
 const port = PORT || 3001;
 const server = http.createServer(app);
 
@@ -48,6 +49,7 @@ app.use(cors(corsOptions));
 app.use("/user", signUpRoute);
 app.use("/user-auth", userAuthRoutes);
 app.use("/admin", adminAuthRoutes);
+
 
 app.disable("x-powered-by");
 

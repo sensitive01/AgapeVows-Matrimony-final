@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import GlobalSearchModal from "../../components/GlobalSearchModal";
 
 // Communities data (same as your hero section)
 const communities = [
@@ -189,6 +190,7 @@ const DashboardSearchComponent = ({ onSearch, loading = false }) => {
     community: "",
     location: "",
   });
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -391,11 +393,26 @@ const DashboardSearchComponent = ({ onSearch, loading = false }) => {
                 >
                   <i className="fa fa-refresh"></i>
                 </button>
+                <button
+                  type="button"
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={() => setShowAdvancedSearch(true)}
+                  style={{ fontSize: "12px" }}
+                  title="Advanced / Global Search"
+                >
+                  <i className="fa fa-sliders"></i>
+                </button>
               </div>
             </div>
           </div>
         </form>
       </div>
+
+      {/* Global Search Modal Triggered from Dashboard */}
+      <GlobalSearchModal
+        isOpen={showAdvancedSearch}
+        onClose={() => setShowAdvancedSearch(false)}
+      />
     </div>
   );
 };

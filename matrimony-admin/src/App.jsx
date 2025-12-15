@@ -14,6 +14,7 @@ import AdminAllPayments from "./components/admin/AdminAllPayments";
 import AdminPricingPlans from "./components/admin/AdminPricingPlans";
 import AdminPaymentGateWay from "./components/admin/AdminPaymentGateWay";
 import AdminSettings from "./components/admin/AdminSettings";
+import AdminEvents from "./components/admin/AdminEvents";
 import AdminLayout from "./components/mainLayouts/AdminLayout";
 
 function App() {
@@ -138,6 +139,14 @@ function App() {
           element={
             <AdminLayout>
               <AdminSettings />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/events"
+          element={
+            <AdminLayout>
+              <AdminEvents />
             </AdminLayout>
           }
         />

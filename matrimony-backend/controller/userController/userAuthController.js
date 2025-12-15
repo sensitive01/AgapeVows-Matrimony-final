@@ -13,6 +13,7 @@ const interestModel = require("../../model/user/interestModel");
 const planModel = require("../../model/admin/planModel");
 const paymentModel = require("../../model/user/planBookings");
 const shortListedSchema = require("../../model/user/shortListedProfile");
+const Event = require("../../model/admin/eventModel")
 const fs = require("fs");
 
 cloudinary.config({
@@ -278,8 +279,8 @@ const getUserProfileImage = async (req, res) => {
     const userImage = await userModel.findOne(
       { _id: userId },
       {
-      
-       userPassword: 0,
+
+        userPassword: 0,
       }
     );
 
@@ -561,29 +562,35 @@ const getNewProfileMatches = async (req, res) => {
 
     const {
       gender,
-      desiredAgeFrom,
-      desiredAgeTo,
-      desiredReligion,
-      desiredCaste,
-      desiredLocation,
-      desiredHeightFrom,
-      desiredHeightTo,
+      partnerAgeFrom,
+      partnerAgeTo,
+      partnerCaste,
+      partnerDistrict,
+      partnerHeight,
+      religion,
     } = currentUser;
 
     const oppositeGender = gender === "Male" ? "Female" : "Male";
 
+    // Defaults to avoid Invalid Date
+    const ageFrom = partnerAgeFrom ? Number(partnerAgeFrom) : 18;
+    const ageTo = partnerAgeTo ? Number(partnerAgeTo) : 100;
+
     // Calculate DOB range
     const currentYear = new Date().getFullYear();
-    const minDOB = new Date(currentYear - Number(desiredAgeTo), 0, 1);
-    const maxDOB = new Date(currentYear - Number(desiredAgeFrom), 11, 31);
+    const minDOB = new Date(currentYear - ageTo, 0, 1);
+    const maxDOB = new Date(currentYear - ageFrom, 11, 31);
+
+    // Convert height to number logic
+    const heightFrom = partnerHeight ? parseFloat(partnerHeight) : null;
 
     const filters = [
       { dateOfBirth: { $gte: minDOB, $lte: maxDOB } },
-      desiredReligion ? { religion: desiredReligion } : null,
-      desiredCaste ? { caste: desiredCaste } : null,
-      desiredLocation ? { city: desiredLocation } : null,
-      desiredHeightFrom && desiredHeightTo
-        ? { height: { $gte: desiredHeightFrom, $lte: desiredHeightTo } }
+      religion ? { religion: religion } : null,
+      partnerCaste ? { caste: partnerCaste } : null,
+      partnerDistrict ? { city: partnerDistrict } : null,
+      (heightFrom && !isNaN(heightFrom))
+        ? { $expr: { $gte: [{ $toDouble: "$height" }, heightFrom] } }
         : null,
     ].filter(Boolean);
 
@@ -618,62 +625,97 @@ const getNewProfileMatches = async (req, res) => {
 
 const getSearchedProfileData = async (req, res) => {
   try {
-    console.log(req.body);
-    const { formData } = req.body;
-    let { lookingFor, age, community, city } = formData;
-
-    let person;
-
-    if (lookingFor === "Bride") {
-      person = "Female";
-    } else {
-      person = "Male";
+    const {
+      ageFrom,
+      ageTo,
+      heightFrom,
+      heightTo,
+      gender,
+      maritalStatus,
+      motherTongue,
+      caste,
+      denomination,
+      religion,
+      country,
+      state,
+      districtCity,
+      education,
+      occupation,
+      annualIncomeFrom,
+      annualIncomeTo,
+      physicalStatus,
+      familyStatus,
+      showWithPhoto
+    } = req.body;
+    const query = {
+      isApproved: true,
+    };
+    if (gender && gender !== "all" && gender !== "I'm looking for") {
+      if (gender === "Men") query.gender = "Male";
+      else if (gender === "Women") query.gender = "Female";
+      else query.gender = gender;
     }
-
-    // Always include only approved users
-    const filters = {};
-
-    // Dynamically add filters only if values are present
-    if (person) filters.gender = person;
-    if (community) filters.religion = community;
-    if (city) filters.city = city;
-    if (age) filters.age = parseInt(age); // exact age match
-
-    console.log("filters", filters);
-
-    const users = await userModel.find(filters, {
-      _id: 1,
-      userName: 1,
-      profileImage: 1,
-      city: 1,
-      age: 1,
-      gender: 1,
-      religion: 1,
-      height: 1,
-      degree: 1,
-      jobType: 1,
+    if (ageFrom || ageTo) {
+      query.age = {};
+      if (ageFrom) query.age.$gte = parseInt(ageFrom);
+      if (ageTo) query.age.$lte = parseInt(ageTo);
+    }
+    if (heightFrom || heightTo) {
+      query.height = {};
+      if (heightFrom) query.height.$gte = heightFrom;
+      if (heightTo) query.height.$lte = heightTo;
+    }
+    if (religion && religion !== "Any" && religion !== "all") query.religion = religion;
+    if (motherTongue) query.motherTongue = motherTongue;
+    if (caste) query.caste = caste;
+    if (denomination) query.denomination = denomination;
+    if (education) query.education = education;
+    if (occupation) query.occupation = occupation;
+    if (country) query.citizenOf = country;
+    if (state) query.state = state;
+    if (districtCity) query.city = districtCity;
+    if (maritalStatus) {
+      if (Array.isArray(maritalStatus) && maritalStatus.length > 0) {
+        if (!maritalStatus.includes("Any")) {
+          query.maritalStatus = { $in: maritalStatus };
+        }
+      } else if (typeof maritalStatus === "string" && maritalStatus !== "Any") {
+        query.maritalStatus = maritalStatus;
+      }
+    }
+    if (physicalStatus) {
+      if (Array.isArray(physicalStatus) && physicalStatus.length > 0) {
+        if (!physicalStatus.includes("Doesn't Matter")) {
+          query.physicalStatus = { $in: physicalStatus };
+        }
+      } else if (typeof physicalStatus === "string" && physicalStatus !== "Doesn't Matter") {
+        query.physicalStatus = physicalStatus;
+      }
+    }
+    if (familyStatus && Array.isArray(familyStatus) && familyStatus.length > 0) {
+      query.familyStatus = { $in: familyStatus };
+    }
+    if (showWithPhoto) {
+      query.profileImage = { $exists: true, $ne: "" };
+    }
+    const users = await userModel.find(query)
+      .select("-userPassword -__v")
+      .sort({ createdAt: -1 });
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      data: users,
     });
-
-    const results = users.map((user) => ({
-      _id: user._id,
-      userName: user.userName,
-      profileImage: user.profileImage,
-      city: user.city,
-      age: user.age,
-      gender: user.gender,
-      religion: user.religion,
-      height: user.height,
-      degree: user.degree,
-      jobType: user.jobType,
-    }));
-    console.log("results", results);
-
-    res.status(200).json({ success: true, data: results });
-  } catch (err) {
-    console.error("Error in getSearchedProfileData:", err);
-    res.status(500).json({ success: false, message: "Server error" });
+  } catch (error) {
+    console.error("Error in getSearchedProfileData:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error fetching search results",
+      error: error.message
+    });
   }
 };
+
 
 const getPlanDetails = async (req, res) => {
   try {
@@ -905,7 +947,28 @@ const getShortListedProfileData = async (req, res) => {
   }
 };
 
+
+const getAllEvents = async (req, res) => {
+    try {
+        const events = await Event.find().sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: events });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
 module.exports = {
+  getAllEvents,
   getShortListedProfileData,
   shortListTheProfile,
   getMyActivePlanDetails,

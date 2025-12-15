@@ -35,6 +35,7 @@ import ShortListedProfile from "./pages/shortlist/ShortListedProfile";
 import WhoViewedYou from "./hooks/whoviewedyou/WhoViewedYou";
 import BlockedProfile from "./pages/blockedprofile/BlockedProfile";
 import IgnoredProfile from "./pages/ignoredprofile/IgnoredProfile";
+import Events from "./pages/public/Events"; // Import Events page
 
 // Component to handle page reloads
 function ReloadHandler() {
@@ -54,7 +55,7 @@ function ReloadHandler() {
       sessionStorage.setItem("previousPath", currentPath);
     }
   }, [location.pathname]);
- 
+
   return null;
 }
 
@@ -101,10 +102,7 @@ function App() {
           path="/user/short-listed-profiles-page"
           element={<ShortListedProfile />}
         />
-        <Route
-          path="/user/who-viewed-you-page"
-          element={<WhoViewedYou />}
-        />
+        <Route path="/user/who-viewed-you-page" element={<WhoViewedYou />} />
         <Route
           path="/user/blocked-profiles-page"
           element={<BlockedProfile />}
@@ -126,6 +124,7 @@ function App() {
         <Route path="/contact-page" element={<ContactPage />} />
         <Route path="/faq-page" element={<FaqPage />} />
         <Route path="/about-us" element={<AboutPage />} />
+        <Route path="/user/events-page" element={<Events />} />
       </Routes>
     </Router>
   );

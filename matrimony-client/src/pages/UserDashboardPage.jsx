@@ -314,14 +314,15 @@ const UserDashboardPage = () => {
                 style={{ paddingLeft: "20px", paddingRight: "15px" }}
               >
                 {/* Search Component */}
-                <div className="row">
+                {/* Search Component Removed as per request (replaced by Global Search in Header) */}
+                {/* <div className="row">
                   <div className="col-md-12">
-                    <DashboardSearchComponent
+                     <DashboardSearchComponent
                       onSearch={handleSearch}
                       loading={searchLoading}
-                    />
+                    /> 
                   </div>
-                </div>
+                </div> */}
 
                 {/* Profile Matches Section */}
                 <div className="row">

@@ -20,7 +20,7 @@ userAuthRoutes.get("/get-plan-details",userAuthController.getPlanDetails)
 userAuthRoutes.get("/get-my-active-plan-details/:userId",userAuthController.getMyActivePlanDetails)
 userAuthRoutes.get("/get-short-listed-profile-data/:userId",userAuthController.getShortListedProfileData)
 
-
+userAuthRoutes.get("/get-events",userAuthController.getAllEvents)
 
 userAuthRoutes.get("/get-all-chat-done-by-the-users/:senderId/:receiverId",userChatController.getAllChatDoneByTheUsers)
 userAuthRoutes.get("/send-my-chat-list/:senderId",userChatController.getMyChatList)

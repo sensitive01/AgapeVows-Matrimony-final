@@ -29,3 +29,8 @@ export const resetPasswordRequest = async ({ newPassword, userId }) => {
   const response = await axiosInstance.post(`/user/save-new-password/${userId}`, {newPassword});
   return response;
 };
+
+export const getAllEvents = async () => {
+  const  response = await axiosInstance.get(`/user-auth/get-events`);
+  return response;
+};

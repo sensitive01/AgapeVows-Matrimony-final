@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 
 // import logoImg from "../../../matrimony-app/public/assets";
-import logoImg from "../../public/agapevows - logo-CAviFpbC.png"
+import logoImg from "../assets/images/agapevows - logo.webp";
 import profImg1 from "../assets/images/profiles/1.jpg";
 
 // "D:\sensitiveLiveProject\Matrimony\Matrimony-App\matrimony-client\public\agapevows - logo-CAviFpbC.png"
