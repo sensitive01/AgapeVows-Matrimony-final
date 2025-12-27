@@ -96,142 +96,142 @@ const RecentCouples = () => {
     return () => clearInterval(interval);
   }, [totalSlides]);
 
-  return (
-    <section>
-      <div className="hom-couples-all">
-        <div className="container">
-          <div className="row">
-            <div className="home-tit">
-              <p style={{ color: "black" }}>trusted brand</p>
-              <h2>
-                <span>Recent Couples</span>
-              </h2>
-              <span className="leaf1" />
-              <span className="tit-ani-" />
-            </div>
-          </div>
-        </div>
-        <div className="hom-coup-test" style={{ position: 'relative' }}>
-          {/* Navigation Arrows */}
-          <button 
-            onClick={prevSlide}
-            className="slider-nav-btn slider-prev"
-            style={{
-              position: 'absolute',
-              left: '20px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 10,
-              background: 'rgba(0, 0, 0, 0.5)',
-              border: 'none',
-              borderRadius: '50%',
-              width: '50px',
-              height: '50px',
-              cursor: 'pointer',
-              color: 'white',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <ChevronLeft size={24} />
-          </button>
+  // return (
+  //   <section>
+  //     <div className="hom-couples-all">
+  //       <div className="container">
+  //         <div className="row">
+  //           <div className="home-tit">
+  //             <p style={{ color: "black" }}>trusted brand</p>
+  //             <h2>
+  //               <span>Recent Couples</span>
+  //             </h2>
+  //             <span className="leaf1" />
+  //             <span className="tit-ani-" />
+  //           </div>
+  //         </div>
+  //       </div>
+  //       <div className="hom-coup-test" style={{ position: 'relative' }}>
+  //         {/* Navigation Arrows */}
+  //         <button 
+  //           onClick={prevSlide}
+  //           className="slider-nav-btn slider-prev"
+  //           style={{
+  //             position: 'absolute',
+  //             left: '20px',
+  //             top: '50%',
+  //             transform: 'translateY(-50%)',
+  //             zIndex: 10,
+  //             background: 'rgba(0, 0, 0, 0.5)',
+  //             border: 'none',
+  //             borderRadius: '50%',
+  //             width: '50px',
+  //             height: '50px',
+  //             cursor: 'pointer',
+  //             color: 'white',
+  //             display: 'flex',
+  //             alignItems: 'center',
+  //             justifyContent: 'center'
+  //           }}
+  //         >
+  //           <ChevronLeft size={24} />
+  //         </button>
 
-          <button 
-            onClick={nextSlide}
-            className="slider-nav-btn slider-next"
-            style={{
-              position: 'absolute',
-              right: '20px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 10,
-              background: 'rgba(0, 0, 0, 0.5)',
-              border: 'none',
-              borderRadius: '50%',
-              width: '50px',
-              height: '50px',
-              cursor: 'pointer',
-              color: 'white',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <ChevronRight size={24} />
-          </button>
+  //         <button 
+  //           onClick={nextSlide}
+  //           className="slider-nav-btn slider-next"
+  //           style={{
+  //             position: 'absolute',
+  //             right: '20px',
+  //             top: '50%',
+  //             transform: 'translateY(-50%)',
+  //             zIndex: 10,
+  //             background: 'rgba(0, 0, 0, 0.5)',
+  //             border: 'none',
+  //             borderRadius: '50%',
+  //             width: '50px',
+  //             height: '50px',
+  //             cursor: 'pointer',
+  //             color: 'white',
+  //             display: 'flex',
+  //             alignItems: 'center',
+  //             justifyContent: 'center'
+  //           }}
+  //         >
+  //           <ChevronRight size={24} />
+  //         </button>
 
-          {/* Slider Container */}
-          <div className="slider-container" style={{ overflow: 'hidden' }}>
-            <ul 
-              className="couple-sli"
-              style={{
-                display: 'flex',
-                transition: 'transform 0.5s ease-in-out',
-                transform: `translateX(-${currentSlide * 100}%)`,
-                margin: 0,
-                padding: 0,
-                listStyle: 'none'
-              }}
-            >
-              {Array.from({ length: totalSlides }).map((_, slideIndex) => (
-                <div key={slideIndex} className="slide-group" style={{ 
-                  display: 'flex', 
-                  minWidth: '100%'
-                }}>
-                  {couples
-                    .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide)
-                    .map((couple, index) => (
-                      <li key={slideIndex * itemsPerSlide + index} style={{ 
-                        flex: `0 0 ${100 / itemsPerSlide}%`
-                      }}>
-                        <div className="hom-coup-box">
-                          <span className="leaf" />
-                          <img src={couple.image} alt="" loading="lazy" />
-                          <div className="bx">
-                            <h4>
-                              {couple.names} <span>{couple.location}</span>
-                            </h4>
-                            <a href="#" className="sml-cta cta-dark">
-                              View more
-                            </a>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                </div>
-              ))}
-            </ul>
-          </div>
+  //         {/* Slider Container */}
+  //         <div className="slider-container" style={{ overflow: 'hidden' }}>
+  //           <ul 
+  //             className="couple-sli"
+  //             style={{
+  //               display: 'flex',
+  //               transition: 'transform 0.5s ease-in-out',
+  //               transform: `translateX(-${currentSlide * 100}%)`,
+  //               margin: 0,
+  //               padding: 0,
+  //               listStyle: 'none'
+  //             }}
+  //           >
+  //             {Array.from({ length: totalSlides }).map((_, slideIndex) => (
+  //               <div key={slideIndex} className="slide-group" style={{ 
+  //                 display: 'flex', 
+  //                 minWidth: '100%'
+  //               }}>
+  //                 {couples
+  //                   .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide)
+  //                   .map((couple, index) => (
+  //                     <li key={slideIndex * itemsPerSlide + index} style={{ 
+  //                       flex: `0 0 ${100 / itemsPerSlide}%`
+  //                     }}>
+  //                       <div className="hom-coup-box">
+  //                         <span className="leaf" />
+  //                         <img src={couple.image} alt="" loading="lazy" />
+  //                         <div className="bx">
+  //                           <h4>
+  //                             {couple.names} <span>{couple.location}</span>
+  //                           </h4>
+  //                           <a href="#" className="sml-cta cta-dark">
+  //                             View more
+  //                           </a>
+  //                         </div>
+  //                       </div>
+  //                     </li>
+  //                   ))}
+  //               </div>
+  //             ))}
+  //           </ul>
+  //         </div>
 
-          {/* Pagination Dots */}
-          <div className="slider-dots" style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            marginTop: '30px',
-            gap: '10px'
-          }}>
-            {Array.from({ length: totalSlides }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`slider-dot ${currentSlide === index ? 'active' : ''}`}
-                style={{
-                  width: currentSlide === index ? '30px' : '12px',
-                  height: '12px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: currentSlide === index ? '#D4AF37' : 'rgba(0, 0, 0, 0.3)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+  //         {/* Pagination Dots */}
+  //         <div className="slider-dots" style={{ 
+  //           display: 'flex', 
+  //           justifyContent: 'center', 
+  //           marginTop: '30px',
+  //           gap: '10px'
+  //         }}>
+  //           {Array.from({ length: totalSlides }).map((_, index) => (
+  //             <button
+  //               key={index}
+  //               onClick={() => goToSlide(index)}
+  //               className={`slider-dot ${currentSlide === index ? 'active' : ''}`}
+  //               style={{
+  //                 width: currentSlide === index ? '30px' : '12px',
+  //                 height: '12px',
+  //                 borderRadius: '6px',
+  //                 border: 'none',
+  //                 background: currentSlide === index ? '#D4AF37' : 'rgba(0, 0, 0, 0.3)',
+  //                 cursor: 'pointer',
+  //                 transition: 'all 0.3s ease'
+  //               }}
+  //             />
+  //           ))}
+  //         </div>
+  //       </div>
+  //     </div>
+  //   </section>
+  // );
 };
 
 export default RecentCouples;

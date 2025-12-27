@@ -114,171 +114,171 @@ const QuickAccess = () => {
     return () => clearInterval(interval);
   }, [totalSlides]);
 
-  return (
-    <section style={{ 
-      background: 'white', 
-      backgroundColor: 'white',
-      backgroundImage: 'none',
-      padding: '60px 0',
-      position: 'relative'
-    }}>
-      <div className="str home-acces-main" style={{ 
-        background: 'white', 
-        backgroundColor: 'white',
-        backgroundImage: 'none',
-        position: 'relative'
-      }}>
-        {/* Override any pseudo-elements */}
-        <style>{`
-          .str.home-acces-main::before,
-          .str.home-acces-main::after,
-          .home-acces::before,
-          .home-acces::after,
-          .row::before,
-          .row::after {
-            display: none !important;
-            background: none !important;
-          }
-        `}</style>
+  // return (
+  //   <section style={{ 
+  //     background: 'white', 
+  //     backgroundColor: 'white',
+  //     backgroundImage: 'none',
+  //     padding: '60px 0',
+  //     position: 'relative'
+  //   }}>
+  //     <div className="str home-acces-main" style={{ 
+  //       background: 'white', 
+  //       backgroundColor: 'white',
+  //       backgroundImage: 'none',
+  //       position: 'relative'
+  //     }}>
+  //       {/* Override any pseudo-elements */}
+  //       <style>{`
+  //         .str.home-acces-main::before,
+  //         .str.home-acces-main::after,
+  //         .home-acces::before,
+  //         .home-acces::after,
+  //         .row::before,
+  //         .row::after {
+  //           display: none !important;
+  //           background: none !important;
+  //         }
+  //       `}</style>
         
-        <div className="container" style={{ 
-          background: 'white', 
-          backgroundColor: 'white',
-          backgroundImage: 'none',
-          position: 'relative'
-        }}>
-          <div className="row" style={{ 
-            background: 'white', 
-            backgroundColor: 'white',
-            backgroundImage: 'none',
-            position: 'relative'
-          }}>
-            {/* BACKGROUND SHAPE - Hidden for white background */}
-            <div className="wedd-shap" style={{ display: 'none' }}>
-              <span className="abo-shap-1" />
-              <span className="abo-shap-4" />
-            </div>
-            {/* END BACKGROUND SHAPE */}
-            <div className="home-tit">
-              <p style={{ color: "#333" }}>Quick Access</p>
-              <h2>
-                <span style={{ color: "#9333ea" }}>Our Services</span>
-              </h2>
-              <span className="leaf1" style={{ display: 'none' }} />
-              <span className="tit-ani-" style={{ display: 'none' }} />
-            </div>
-            <div className="home-acces" style={{ position: 'relative' }}>
-              {/* Navigation Arrows */}
-              <button 
-                onClick={prevSlide}
-                className="slider-nav-btn slider-prev"
-                style={{
-                  position: 'absolute',
-                  left: '-60px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  zIndex: 10,
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: '#333',
-                  fontSize: '24px'
-                }}
-              >
-                <ChevronLeft size={30} />
-              </button>
+  //       <div className="container" style={{ 
+  //         background: 'white', 
+  //         backgroundColor: 'white',
+  //         backgroundImage: 'none',
+  //         position: 'relative'
+  //       }}>
+  //         <div className="row" style={{ 
+  //           background: 'white', 
+  //           backgroundColor: 'white',
+  //           backgroundImage: 'none',
+  //           position: 'relative'
+  //         }}>
+  //           {/* BACKGROUND SHAPE - Hidden for white background */}
+  //           <div className="wedd-shap" style={{ display: 'none' }}>
+  //             <span className="abo-shap-1" />
+  //             <span className="abo-shap-4" />
+  //           </div>
+  //           {/* END BACKGROUND SHAPE */}
+  //           <div className="home-tit">
+  //             <p style={{ color: "#333" }}>Quick Access</p>
+  //             <h2>
+  //               <span style={{ color: "#9333ea" }}>Our Services</span>
+  //             </h2>
+  //             <span className="leaf1" style={{ display: 'none' }} />
+  //             <span className="tit-ani-" style={{ display: 'none' }} />
+  //           </div>
+  //           <div className="home-acces" style={{ position: 'relative' }}>
+  //             {/* Navigation Arrows */}
+  //             <button 
+  //               onClick={prevSlide}
+  //               className="slider-nav-btn slider-prev"
+  //               style={{
+  //                 position: 'absolute',
+  //                 left: '-60px',
+  //                 top: '50%',
+  //                 transform: 'translateY(-50%)',
+  //                 zIndex: 10,
+  //                 background: 'none',
+  //                 border: 'none',
+  //                 cursor: 'pointer',
+  //                 color: '#333',
+  //                 fontSize: '24px'
+  //               }}
+  //             >
+  //               <ChevronLeft size={30} />
+  //             </button>
 
-              <button 
-                onClick={nextSlide}
-                className="slider-nav-btn slider-next"
-                style={{
-                  position: 'absolute',
-                  right: '-60px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  zIndex: 10,
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: '#333',
-                  fontSize: '24px'
-                }}
-              >
-                <ChevronRight size={30} />
-              </button>
+  //             <button 
+  //               onClick={nextSlide}
+  //               className="slider-nav-btn slider-next"
+  //               style={{
+  //                 position: 'absolute',
+  //                 right: '-60px',
+  //                 top: '50%',
+  //                 transform: 'translateY(-50%)',
+  //                 zIndex: 10,
+  //                 background: 'none',
+  //                 border: 'none',
+  //                 cursor: 'pointer',
+  //                 color: '#333',
+  //                 fontSize: '24px'
+  //               }}
+  //             >
+  //               <ChevronRight size={30} />
+  //             </button>
 
-              {/* Slider Container */}
-              <div className="slider-container" style={{ overflow: 'hidden' }}>
-                <ul 
-                  className="hom-qui-acc-sli" 
-                  style={{
-                    display: 'flex',
-                    transition: 'transform 0.5s ease-in-out',
-                    transform: `translateX(-${currentSlide * 100}%)`,
-                    margin: 0,
-                    padding: 0,
-                    listStyle: 'none'
-                  }}
-                >
-                  {Array.from({ length: totalSlides }).map((_, slideIndex) => (
-                    <div key={slideIndex} className="slide-group" style={{ 
-                      display: 'flex', 
-                      minWidth: '100%'
-                    }}>
-                      {services
-                        .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide)
-                        .map((service, index) => (
-                          <li key={slideIndex * itemsPerSlide + index} style={{ 
-                            flex: `0 0 ${100 / itemsPerSlide}%`
-                          }}>
-                            <div
-                              className={`wow fadeInUp hacc ${service.className}`}
-                              data-wow-delay={service.delay}
-                            >
-                              <div className="con">
-                                <img src={service.icon} alt="" loading="lazy" />
-                                <h4>{service.title}</h4>
-                                <p>{service.subtitle}</p>
-                                <a href={service.link}>{service.linkText}</a>
-                              </div>
-                            </div>
-                          </li>
-                        ))}
-                    </div>
-                  ))}
-                </ul>
-              </div>
+  //             {/* Slider Container */}
+  //             <div className="slider-container" style={{ overflow: 'hidden' }}>
+  //               <ul 
+  //                 className="hom-qui-acc-sli" 
+  //                 style={{
+  //                   display: 'flex',
+  //                   transition: 'transform 0.5s ease-in-out',
+  //                   transform: `translateX(-${currentSlide * 100}%)`,
+  //                   margin: 0,
+  //                   padding: 0,
+  //                   listStyle: 'none'
+  //                 }}
+  //               >
+  //                 {Array.from({ length: totalSlides }).map((_, slideIndex) => (
+  //                   <div key={slideIndex} className="slide-group" style={{ 
+  //                     display: 'flex', 
+  //                     minWidth: '100%'
+  //                   }}>
+  //                     {services
+  //                       .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide)
+  //                       .map((service, index) => (
+  //                         <li key={slideIndex * itemsPerSlide + index} style={{ 
+  //                           flex: `0 0 ${100 / itemsPerSlide}%`
+  //                         }}>
+  //                           <div
+  //                             className={`wow fadeInUp hacc ${service.className}`}
+  //                             data-wow-delay={service.delay}
+  //                           >
+  //                             <div className="con">
+  //                               <img src={service.icon} alt="" loading="lazy" />
+  //                               <h4>{service.title}</h4>
+  //                               <p>{service.subtitle}</p>
+  //                               <a href={service.link}>{service.linkText}</a>
+  //                             </div>
+  //                           </div>
+  //                         </li>
+  //                       ))}
+  //                   </div>
+  //                 ))}
+  //               </ul>
+  //             </div>
 
-              {/* Pagination Dots */}
-              <div className="slider-dots" style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                marginTop: '30px',
-                gap: '10px'
-              }}>
-                {Array.from({ length: totalSlides }).map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => goToSlide(index)}
-                    className={`slider-dot ${currentSlide === index ? 'active' : ''}`}
-                    style={{
-                      width: currentSlide === index ? '30px' : '12px',
-                      height: '12px',
-                      borderRadius: '6px',
-                      border: 'none',
-                      background: currentSlide === index ? '#9333ea' : 'rgba(147, 51, 234, 0.3)',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease'
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+  //             {/* Pagination Dots */}
+  //             <div className="slider-dots" style={{ 
+  //               display: 'flex', 
+  //               justifyContent: 'center', 
+  //               marginTop: '30px',
+  //               gap: '10px'
+  //             }}>
+  //               {Array.from({ length: totalSlides }).map((_, index) => (
+  //                 <button
+  //                   key={index}
+  //                   onClick={() => goToSlide(index)}
+  //                   className={`slider-dot ${currentSlide === index ? 'active' : ''}`}
+  //                   style={{
+  //                     width: currentSlide === index ? '30px' : '12px',
+  //                     height: '12px',
+  //                     borderRadius: '6px',
+  //                     border: 'none',
+  //                     background: currentSlide === index ? '#9333ea' : 'rgba(147, 51, 234, 0.3)',
+  //                     cursor: 'pointer',
+  //                     transition: 'all 0.3s ease'
+  //                   }}
+  //                 />
+  //               ))}
+  //             </div>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   </section>
+  // );
 };
 
 export default QuickAccess;

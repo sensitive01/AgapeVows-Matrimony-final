@@ -110,9 +110,9 @@ const Footer = () => {
           <p style={{ color: "white" }}>
             Company name Site - Trusted by over thousands of Boys &amp; Girls
             for successfull marriage.
-            <a href="/user/user-sign-up" className="btn btn-primary btn-sm">
+            {/* <a href="/user/user-sign-up" className="btn btn-primary btn-sm">
               Join us today !
-            </a>
+            </a> */}
           </p>
         </div>
       </div>

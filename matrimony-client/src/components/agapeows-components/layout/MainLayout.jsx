@@ -240,11 +240,11 @@ const MainLayout = () => {
 
       {/* Main Header */}
       <header className="bg-white shadow-md relative">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo - YOUR EXACT IMPLEMENTATION */}
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4">
+          <div className="flex items-center justify-between gap-4 md:gap-8">
+            {/* Logo - Aligned to Left */}
             <div
-              className="flex items-center cursor-pointer"
+              className="flex items-center cursor-pointer shrink-0"
               onClick={() => handleNavigate("/")}
             >
               <div className="text-2xl font-bold">
@@ -257,12 +257,24 @@ const MainLayout = () => {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
+            <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 flex-1">
               <button
                 onClick={() => handleNavigate("/")}
                 className="text-gray-800 hover:text-purple-600 font-medium"
               >
                 HOME
+              </button>
+              <button
+                onClick={() => handleNavigate("/about-us")}
+                className="text-gray-800 hover:text-purple-600 font-medium"
+              >
+                ABOUT US
+              </button>
+              <button
+                onClick={() => handleNavigate("/show-searched-result")}
+                className="text-gray-800 hover:text-purple-600 font-medium"
+              >
+                SEARCH
               </button>
               <div
                 className="relative"
@@ -289,28 +301,28 @@ const MainLayout = () => {
               >
                 PLANS
               </button>
-              <button
+              {/* <button
                 onClick={() => handleNavigate("/success-stories")}
                 className="text-gray-800 hover:text-purple-600 font-medium"
               >
                 SUCCESS STORIES
-              </button>
+              </button> */}
               <button
                 onClick={() => handleNavigate("/help-support")}
                 className="text-gray-800 hover:text-purple-600 font-medium"
               >
                 HELP & SUPPORT
               </button>
-              <button
+              {/* <button
                 onClick={() => handleNavigate("/about-us")}
                 className="text-gray-800 hover:text-purple-600 font-medium"
               >
                 ABOUT US
-              </button>
+              </button> */}
             </nav>
 
             {/* User Profile or Auth Buttons */}
-            <div className="hidden md:flex items-center space-x-3">
+            <div className="hidden md:flex items-center space-x-3 justify-end">
               {isUserActive ? (
                 <div
                   className="relative"

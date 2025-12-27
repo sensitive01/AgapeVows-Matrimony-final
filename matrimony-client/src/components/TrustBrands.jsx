@@ -254,166 +254,166 @@ const TrustBrands = () => {
     },
   };
 
-  return (
-    <section style={styles.section}>
-      <div style={styles.container}>
-        {/* Header */}
-        <div style={styles.header} className="home-tit">
-          <p style={styles.subtitle}>Trusted Brand</p>
-          <h2 style={styles.title}>
-            Trust by <span style={styles.highlight}>1500</span>+ Couples
-          </h2>
-          <div style={styles.divider}></div>
-        </div>
+  // return (
+  //   <section style={styles.section}>
+  //     <div style={styles.container}>
+  //       {/* Header */}
+  //       <div style={styles.header} className="home-tit">
+  //         <p style={styles.subtitle}>Trusted Brand</p>
+  //         <h2 style={styles.title}>
+  //           Trust by <span style={styles.highlight}>1500</span>+ Couples
+  //         </h2>
+  //         <div style={styles.divider}></div>
+  //       </div>
 
-        {/* Slider Container */}
-        <div style={styles.sliderContainer}>
-          {/* Previous Button - Left Side */}
-          <button
-            onClick={prevSlide}
-            style={{ ...styles.navButton, ...styles.prevButton }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "#8b1fa3";
-              e.target.style.transform = "translateY(-50%) scale(1.1)";
-              e.target.style.boxShadow =
-                "0 6px 12px -2px rgba(160, 32, 240, 0.4)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "#a020f0";
-              e.target.style.transform = "translateY(-50%) scale(1)";
-              e.target.style.boxShadow =
-                "0 4px 6px -1px rgba(160, 32, 240, 0.3)";
-            }}
-          >
-            <svg
-              width="24"
-              height="24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2.5"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
+  //       {/* Slider Container */}
+  //       <div style={styles.sliderContainer}>
+  //         {/* Previous Button - Left Side */}
+  //         <button
+  //           onClick={prevSlide}
+  //           style={{ ...styles.navButton, ...styles.prevButton }}
+  //           onMouseEnter={(e) => {
+  //             e.target.style.backgroundColor = "#8b1fa3";
+  //             e.target.style.transform = "translateY(-50%) scale(1.1)";
+  //             e.target.style.boxShadow =
+  //               "0 6px 12px -2px rgba(160, 32, 240, 0.4)";
+  //           }}
+  //           onMouseLeave={(e) => {
+  //             e.target.style.backgroundColor = "#a020f0";
+  //             e.target.style.transform = "translateY(-50%) scale(1)";
+  //             e.target.style.boxShadow =
+  //               "0 4px 6px -1px rgba(160, 32, 240, 0.3)";
+  //           }}
+  //         >
+  //           <svg
+  //             width="24"
+  //             height="24"
+  //             fill="none"
+  //             stroke="white"
+  //             strokeWidth="2.5"
+  //             viewBox="0 0 24 24"
+  //           >
+  //             <path
+  //               strokeLinecap="round"
+  //               strokeLinejoin="round"
+  //               d="M15 19l-7-7 7-7"
+  //             />
+  //           </svg>
+  //         </button>
 
-          {/* Slider */}
-          <div style={styles.sliderWrapper}>
-            <div style={styles.slideContainer}>
-              {users.map((user) => (
-                <div key={user.id} style={styles.slide}>
-                  <div style={styles.reviewCard}>
-                    <div style={styles.imageContainer}>
-                      <img
-                        src={user.image}
-                        alt={user.name}
-                        style={styles.profileImage}
-                        loading="lazy"
-                      />
-                      <div style={styles.verifiedBadge}>
-                        <svg
-                          width={isMobile ? "16" : "12"}
-                          height={isMobile ? "16" : "12"}
-                          fill="white"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <p style={styles.reviewText}>
-                      "Amazing experience! The service exceeded our expectations
-                      and made our special day even more memorable. Highly
-                      recommend to all couples!"
-                    </p>
-                    <h5 style={styles.reviewerName}>{user.name}</h5>
-                    <span style={styles.reviewerLocation}>{user.location}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+  //         {/* Slider */}
+  //         <div style={styles.sliderWrapper}>
+  //           <div style={styles.slideContainer}>
+  //             {users.map((user) => (
+  //               <div key={user.id} style={styles.slide}>
+  //                 <div style={styles.reviewCard}>
+  //                   <div style={styles.imageContainer}>
+  //                     <img
+  //                       src={user.image}
+  //                       alt={user.name}
+  //                       style={styles.profileImage}
+  //                       loading="lazy"
+  //                     />
+  //                     <div style={styles.verifiedBadge}>
+  //                       <svg
+  //                         width={isMobile ? "16" : "12"}
+  //                         height={isMobile ? "16" : "12"}
+  //                         fill="white"
+  //                         viewBox="0 0 20 20"
+  //                       >
+  //                         <path
+  //                           fillRule="evenodd"
+  //                           d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+  //                           clipRule="evenodd"
+  //                         />
+  //                       </svg>
+  //                     </div>
+  //                   </div>
+  //                   <p style={styles.reviewText}>
+  //                     "Amazing experience! The service exceeded our expectations
+  //                     and made our special day even more memorable. Highly
+  //                     recommend to all couples!"
+  //                   </p>
+  //                   <h5 style={styles.reviewerName}>{user.name}</h5>
+  //                   <span style={styles.reviewerLocation}>{user.location}</span>
+  //                 </div>
+  //               </div>
+  //             ))}
+  //           </div>
+  //         </div>
 
-          {/* Next Button - Right Side */}
-          <button
-            onClick={nextSlide}
-            style={{ ...styles.navButton, ...styles.nextButton }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "#8b1fa3";
-              e.target.style.transform = "translateY(-50%) scale(1.1)";
-              e.target.style.boxShadow =
-                "0 6px 12px -2px rgba(160, 32, 240, 0.4)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "#a020f0";
-              e.target.style.transform = "translateY(-50%) scale(1)";
-              e.target.style.boxShadow =
-                "0 4px 6px -1px rgba(160, 32, 240, 0.3)";
-            }}
-          >
-            <svg
-              width="24"
-              height="24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2.5"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-        </div>
+  //         {/* Next Button - Right Side */}
+  //         <button
+  //           onClick={nextSlide}
+  //           style={{ ...styles.navButton, ...styles.nextButton }}
+  //           onMouseEnter={(e) => {
+  //             e.target.style.backgroundColor = "#8b1fa3";
+  //             e.target.style.transform = "translateY(-50%) scale(1.1)";
+  //             e.target.style.boxShadow =
+  //               "0 6px 12px -2px rgba(160, 32, 240, 0.4)";
+  //           }}
+  //           onMouseLeave={(e) => {
+  //             e.target.style.backgroundColor = "#a020f0";
+  //             e.target.style.transform = "translateY(-50%) scale(1)";
+  //             e.target.style.boxShadow =
+  //               "0 4px 6px -1px rgba(160, 32, 240, 0.3)";
+  //           }}
+  //         >
+  //           <svg
+  //             width="24"
+  //             height="24"
+  //             fill="none"
+  //             stroke="white"
+  //             strokeWidth="2.5"
+  //             viewBox="0 0 24 24"
+  //           >
+  //             <path
+  //               strokeLinecap="round"
+  //               strokeLinejoin="round"
+  //               d="M9 5l7 7-7 7"
+  //             />
+  //           </svg>
+  //         </button>
+  //       </div>
 
-        {/* Dots Indicator - Centered Below */}
-        <div style={styles.dotsContainer}>
-          <div style={styles.dots}>
-            {users.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                style={{
-                  ...styles.dot,
-                  backgroundColor:
-                    index === currentSlide ? "#a020f0" : "#d1d5db",
-                  transform:
-                    index === currentSlide ? "scale(1.1)" : "scale(1)",
-                }}
-              />
-            ))}
-          </div>
-        </div>
+  //       {/* Dots Indicator - Centered Below */}
+  //       <div style={styles.dotsContainer}>
+  //         <div style={styles.dots}>
+  //           {users.map((_, index) => (
+  //             <button
+  //               key={index}
+  //               onClick={() => goToSlide(index)}
+  //               style={{
+  //                 ...styles.dot,
+  //                 backgroundColor:
+  //                   index === currentSlide ? "#a020f0" : "#d1d5db",
+  //                 transform:
+  //                   index === currentSlide ? "scale(1.1)" : "scale(1)",
+  //               }}
+  //             />
+  //           ))}
+  //         </div>
+  //       </div>
 
-        {/* CTA Button */}
-        <div style={styles.ctaContainer}>
-          <button
-            style={styles.ctaButton}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "#8b1fa3";
-              e.target.style.transform = "scale(1.05)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "#a020f0";
-              e.target.style.transform = "scale(1)";
-            }}
-          >
-            More Customer Reviews
-          </button>
-        </div>
-      </div>
-    </section>
-  );
+  //       {/* CTA Button */}
+  //       <div style={styles.ctaContainer}>
+  //         <button
+  //           style={styles.ctaButton}
+  //           onMouseEnter={(e) => {
+  //             e.target.style.backgroundColor = "#8b1fa3";
+  //             e.target.style.transform = "scale(1.05)";
+  //           }}
+  //           onMouseLeave={(e) => {
+  //             e.target.style.backgroundColor = "#a020f0";
+  //             e.target.style.transform = "scale(1)";
+  //           }}
+  //         >
+  //           More Customer Reviews
+  //         </button>
+  //       </div>
+  //     </div>
+  //   </section>
+  // );
 };
 
 export default TrustBrands;

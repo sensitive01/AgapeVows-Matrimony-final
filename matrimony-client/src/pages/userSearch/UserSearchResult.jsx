@@ -231,10 +231,10 @@ const UserSearchResult = () => {
           <div className="container">
             <div className="row">
               <h1>Lakhs of Happy Marriages</h1>
-              <a href="#">
+              {/* <a href="#">
                 Join now for Free{" "}
                 <i className="fa fa-handshake-o" aria-hidden="true"></i>
-              </a>
+              </a> */}
             </div>
           </div>
         </div>
