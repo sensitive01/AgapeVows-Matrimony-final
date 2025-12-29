@@ -36,6 +36,7 @@ import WhoViewedYou from "./hooks/whoviewedyou/WhoViewedYou";
 import BlockedProfile from "./pages/blockedprofile/BlockedProfile";
 import IgnoredProfile from "./pages/ignoredprofile/IgnoredProfile";
 import Events from "./pages/public/Events"; // Import Events page
+import GlobalSearchModal from "./components/GlobalSearchModal";
 
 // Component to handle page reloads
 function ReloadHandler() {
@@ -112,7 +113,7 @@ function App() {
           element={<IgnoredProfile />}
         />
 
-        <Route path="/show-searched-result" element={<UserSearchResult />} />
+        <Route path="/show-searched-result" element={<GlobalSearchModal />} />
         <Route path="/reset-password/:userId" element={<ChangePassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route

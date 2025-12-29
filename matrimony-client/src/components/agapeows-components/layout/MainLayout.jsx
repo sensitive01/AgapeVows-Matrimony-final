@@ -258,12 +258,12 @@ const MainLayout = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 flex-1">
-              <button
+              {/* <button
                 onClick={() => handleNavigate("/")}
                 className="text-gray-800 hover:text-purple-600 font-medium"
               >
                 HOME
-              </button>
+              </button> */}
               <button
                 onClick={() => handleNavigate("/about-us")}
                 className="text-gray-800 hover:text-purple-600 font-medium"
@@ -543,7 +543,7 @@ const MainLayout = () => {
           className="bg-purple-50 border-b border-purple-100 py-3 cursor-pointer hover:bg-purple-100 transition-colors"
           onClick={() => setIsSearchModalOpen(true)}
         >
-          <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
+          {/* <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
             <div className="flex items-center text-gray-700 flex-1 min-w-0 mr-2">
               <div className="bg-white p-2 rounded-full shadow-sm mr-3 text-purple-600 shrink-0">
                 <Search className="w-5 h-5" />
@@ -560,7 +560,7 @@ const MainLayout = () => {
               <span className="xs:hidden">ADVANCED</span>
               <ChevronDown className="w-4 h-4 ml-1" />
             </div>
-          </div>
+          </div> */}
         </div>
       )}
 

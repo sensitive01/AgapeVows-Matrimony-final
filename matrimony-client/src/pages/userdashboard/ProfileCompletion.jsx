@@ -39,12 +39,12 @@ const ProfileCompletion = () => {
           </span>
         </div>
         <ul className="pro-stat-ic">
-          <li>
+          {/* <li>
             <span>
               <i className="fa fa-heart-o like" aria-hidden="true"></i>
               <b>12</b>Likes
             </span>
-          </li>
+          </li> */}
           <li>
             <span>
               <i className="fa fa-eye view" aria-hidden="true"></i>
@@ -57,12 +57,12 @@ const ProfileCompletion = () => {
               <b>12</b>Interests
             </span>
           </li>
-          <li>
+          {/* <li>
             <span>
               <i className="fa fa-hand-pointer-o clic" aria-hidden="true"></i>
               <b>12</b>Clicks
             </span>
-          </li>
+          </li> */}
         </ul>
       </div>
     </div>
