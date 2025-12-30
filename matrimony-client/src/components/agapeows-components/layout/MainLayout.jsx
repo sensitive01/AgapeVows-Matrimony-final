@@ -245,10 +245,10 @@ const MainLayout = () => {
       {/* Main Header */}
       <header className="bg-white shadow-md relative">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4">
-          <div className="flex items-center justify-between gap-4 md:gap-8">
+          <div className="flex items-center gap-4 md:gap-8">
             {/* Logo - Aligned to Left */}
             <div
-              className="flex items-center cursor-pointer shrink-0"
+              className="flex items-center cursor-pointer shrink-0 mr-auto"
               onClick={() => handleNavigate("/")}
             >
               <div className="text-2xl font-bold">
@@ -261,7 +261,7 @@ const MainLayout = () => {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 flex-1">
+            <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
               {/* <button
                 onClick={() => handleNavigate("/")}
                 className="text-gray-800 hover:text-purple-600 font-medium"
