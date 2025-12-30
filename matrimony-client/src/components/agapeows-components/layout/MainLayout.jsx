@@ -48,10 +48,11 @@ const ExploreDropdown = ({ isVisible }) => {
 
   return (
     <div
-      className={`absolute top-full left-0 mt-2 w-72 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${isVisible
-        ? "opacity-100 visible translate-y-0"
-        : "opacity-0 invisible translate-y-2"
-        }`}
+      className={`absolute top-full left-0 mt-2 w-72 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${
+        isVisible
+          ? "opacity-100 visible translate-y-0"
+          : "opacity-0 invisible translate-y-2"
+      }`}
     >
       {categories.map((category, index) => (
         <button
@@ -81,10 +82,11 @@ const ProfileDropdown = ({ isVisible, onLogout }) => {
 
   return (
     <div
-      className={`absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${isVisible
-        ? "opacity-100 visible translate-y-0"
-        : "opacity-0 invisible translate-y-2"
-        }`}
+      className={`absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${
+        isVisible
+          ? "opacity-100 visible translate-y-0"
+          : "opacity-0 invisible translate-y-2"
+      }`}
     >
       {profileLinks.map((link, index) => (
         <button
@@ -162,12 +164,14 @@ const MainLayout = () => {
           <div className="hidden md:flex justify-between items-center">
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-1 cursor-pointer hover:text-purple-200">
-                <div
-                  onClick={() => handleNavigate("/user/find-matches")}
-                  className="flex items-center space-x-1"
-                >
-                  <Search className="w-4 h-4" />
-                </div>
+                {isUserActive && (
+                  <div
+                    onClick={() => handleNavigate("/user/find-matches")}
+                    className="flex items-center space-x-1"
+                  >
+                    <Search className="w-4 h-4" />
+                  </div>
+                )}
                 <button onClick={() => handleNavigate("/about-us")}>
                   ABOUT
                 </button>
@@ -205,12 +209,14 @@ const MainLayout = () => {
           {/* Mobile */}
           <div className="md:hidden flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div
-                onClick={() => handleNavigate("/user/find-matches")}
-                className="cursor-pointer"
-              >
-                <Search className="w-4 h-4" />
-              </div>
+              {isUserActive && (
+                <div
+                  onClick={() => handleNavigate("/user/find-matches")}
+                  className="cursor-pointer"
+                >
+                  <Search className="w-4 h-4" />
+                </div>
+              )}
               <button
                 onClick={() => handleNavigate("/about")}
                 className="text-xs hover:text-purple-200"
@@ -268,12 +274,14 @@ const MainLayout = () => {
               >
                 ABOUT US
               </button>
-              <button
-                onClick={() => handleNavigate("/user/find-matches")}
-                className="text-gray-800 hover:text-purple-600 font-medium"
-              >
-                SEARCH
-              </button>
+              {isUserActive && (
+                <button
+                  onClick={() => handleNavigate("/user/find-matches")}
+                  className="text-gray-800 hover:text-purple-600 font-medium"
+                >
+                  SEARCH
+                </button>
+              )}
               <div
                 className="relative"
                 onMouseEnter={() => setIsExploreDropdownVisible(true)}
