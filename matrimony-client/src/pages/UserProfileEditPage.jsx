@@ -392,29 +392,37 @@ const FormInput = ({
       )}
     </label>
     {type === "select" ? (
-      <select
-        name={name}
-        value={value || ""}
-        onChange={onChange}
-        required={required}
-        style={{
-          width: "100%",
-          padding: "10px 14px",
-          border: "2px solid #e5e7eb",
-          borderRadius: "6px",
-          fontSize: "14px",
-          color: "#374151",
-          background: "#fff",
-          transition: "border-color 0.2s ease",
-        }}
-      >
-        <option value="">Select {label}</option>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "12px 20px" }}>
         {options.map((option) => (
-          <option key={option} value={option}>
+          <label
+            key={option}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              fontSize: "14px",
+              color: "#374151",
+            }}
+          >
+            <input
+              type="radio"
+              name={name}
+              value={option}
+              checked={value === option}
+              onChange={onChange}
+              required={required}
+              style={{
+                width: "16px",
+                height: "16px",
+                marginRight: "8px",
+                accentColor: "#667eea",
+                cursor: "pointer",
+              }}
+            />
             {option}
-          </option>
+          </label>
         ))}
-      </select>
+      </div>
     ) : type === "textarea" ? (
       <textarea
         name={name}
@@ -1014,7 +1022,7 @@ const UserProfileEditPage = () => {
         <LayoutComponent />
       </div>
 
-      <div style={{ paddingTop: "220px", paddingBottom: "40px" }}>
+      <div style={{ paddingTop: "50px", paddingBottom: "40px" }}>
         <div
           style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 20px" }}
         >
@@ -1044,8 +1052,8 @@ const UserProfileEditPage = () => {
           >
             {/* Sidebar */}
             <div
-              className="col-md-4 col-lg-3"
-              style={{ paddingLeft: 0, marginLeft: "-10px" }}
+              className="col-md-3 col-lg-2"
+              style={{ paddingLeft: 0, marginLeft: "0px" }}
             >
               <UserSideBar />
             </div>
@@ -1182,24 +1190,24 @@ const UserProfileEditPage = () => {
 
                     {(formData.maritalStatus === "Divorced" ||
                       formData.maritalStatus === "Awaiting Divorce") && (
-                      <>
-                        <FormInput
-                          label="Divorced Month & Year"
-                          name="divorcedMonthYear"
-                          value={formData.divorcedMonthYear}
-                          onChange={handleInputChange}
-                        />
-                        <div style={{ gridColumn: "1 / -1" }}>
+                        <>
                           <FormInput
-                            label="Reason for Divorce"
-                            name="reasonForDivorce"
-                            type="textarea"
-                            value={formData.reasonForDivorce}
+                            label="Divorced Month & Year"
+                            name="divorcedMonthYear"
+                            value={formData.divorcedMonthYear}
                             onChange={handleInputChange}
                           />
-                        </div>
-                      </>
-                    )}
+                          <div style={{ gridColumn: "1 / -1" }}>
+                            <FormInput
+                              label="Reason for Divorce"
+                              name="reasonForDivorce"
+                              type="textarea"
+                              value={formData.reasonForDivorce}
+                              onChange={handleInputChange}
+                            />
+                          </div>
+                        </>
+                      )}
 
                     {formData.maritalStatus &&
                       formData.maritalStatus !== "Never Married" && (

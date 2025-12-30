@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import LayoutComponent from "../../components/layouts/LayoutComponent";
 import ShowInterest from "./ShowInterest";
 import Footer from "../../components/Footer";
@@ -8,6 +8,234 @@ import {
   fetchSearchedProfileData,
   saveTheProfileAsShortlisted,
 } from "../../api/axiosService/userAuthService.js";
+import defaultProfileImg from "../../assets/images/blue-circle-with-white-user_78370-4707.avif";
+import maleDefault from "../../assets/images/profiles/men1.jpg";
+import femaleDefault from "../../assets/images/profiles/12.jpg";
+
+const UserCardImageSlider = ({ user }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
+
+  const allImages = useMemo(() => {
+    const defaultImg =
+      user.gender === "Male" || user.gender === "Groom"
+        ? maleDefault
+        : user.gender === "Female" || user.gender === "Bride"
+          ? femaleDefault
+          : defaultProfileImg;
+
+    const images = [user.profileImage || defaultImg];
+    if (user.additionalImages && user.additionalImages.length > 0) {
+      images.push(...user.additionalImages);
+    }
+    return images;
+  }, [user]);
+
+  const nextImage = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? allImages.length - 1 : prev - 1
+    );
+  };
+
+  const openZoom = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsZoomOpen(true);
+  };
+
+  return (
+    <>
+      <div style={{ position: "relative", width: "100%", height: "220px" }}>
+        <div
+          onClick={openZoom}
+          style={{ display: "block", height: "100%", cursor: "pointer" }}
+        >
+          <img
+            src={allImages[currentImageIndex]}
+            alt={user.userName}
+            onError={(e) => {
+              const defaultImg =
+                user.gender === "Male" || user.gender === "Groom"
+                  ? maleDefault
+                  : user.gender === "Female" || user.gender === "Bride"
+                    ? femaleDefault
+                    : defaultProfileImg;
+              e.target.src = defaultImg;
+            }}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
+            }}
+          />
+        </div>
+
+        {allImages.length > 1 && (
+          <>
+            <button
+              onClick={prevImage}
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "5px",
+                transform: "translateY(-50%)",
+                background: "rgba(0, 0, 0, 0.5)",
+                color: "white",
+                border: "none",
+                borderRadius: "50%",
+                width: "25px",
+                height: "25px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 10,
+              }}
+            >
+              <i
+                className="fa fa-chevron-left"
+                style={{ fontSize: "12px" }}
+              ></i>
+            </button>
+            <button
+              onClick={nextImage}
+              style={{
+                position: "absolute",
+                top: "50%",
+                right: "5px",
+                transform: "translateY(-50%)",
+                background: "rgba(0, 0, 0, 0.5)",
+                color: "white",
+                border: "none",
+                borderRadius: "50%",
+                width: "25px",
+                height: "25px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 10,
+              }}
+            >
+              <i
+                className="fa fa-chevron-right"
+                style={{ fontSize: "12px" }}
+              ></i>
+            </button>
+          </>
+        )}
+      </div>
+
+      {isZoomOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.9)",
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsZoomOpen(false);
+          }}
+        >
+          <div
+            style={{ position: "relative", maxWidth: "90%", maxHeight: "90%" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={allImages[currentImageIndex]}
+              style={{
+                maxWidth: "100%",
+                maxHeight: "90vh",
+                objectFit: "contain",
+              }}
+            />
+            <button
+              onClick={() => setIsZoomOpen(false)}
+              style={{
+                position: "fixed",
+                top: "20px",
+                right: "30px",
+                background: "rgba(0,0,0,0.5)",
+                border: "none",
+                color: "white",
+                fontSize: "40px",
+                cursor: "pointer",
+                padding: "0 10px",
+                borderRadius: "5px",
+                zIndex: 100000,
+              }}
+            >
+              &times;
+            </button>
+
+            {allImages.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "-60px",
+                    transform: "translateY(-50%)",
+                    background: "rgba(255,255,255,0.1)",
+                    border: "none",
+                    color: "white",
+                    fontSize: "30px",
+                    cursor: "pointer",
+                    padding: "10px",
+                    borderRadius: "5px",
+                  }}
+                >
+                  &#10094;
+                </button>
+                <button
+                  onClick={nextImage}
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    right: "-60px",
+                    transform: "translateY(-50%)",
+                    background: "rgba(255,255,255,0.1)",
+                    border: "none",
+                    color: "white",
+                    fontSize: "30px",
+                    cursor: "pointer",
+                    padding: "10px",
+                    borderRadius: "5px",
+                  }}
+                >
+                  &#10095;
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
 
 const UserSearchResult = () => {
   const { state } = useLocation();
@@ -249,206 +477,10 @@ const UserSearchResult = () => {
         <div className="all-weddpro all-jobs all-serexp chosenini">
           <div className="container">
             <div className="row">
-              <div className="col-md-3 fil-mob-view">
-                <span className="filter-clo">+</span>
-
-                {/* Reset Filters Button */}
-                <div className="filt-com">
-                  <button
-                    onClick={resetFilters}
-                    className="btn btn-secondary btn-sm mb-3"
-                    style={{ width: "100%" }}
-                  >
-                    Reset Filters
-                  </button>
-                </div>
-
-                <div className="filt-com lhs-cate">
-                  <h4>
-                    <i className="fa fa-search" aria-hidden="true"></i> I'm
-                    looking for
-                  </h4>
-                  <div className="form-group">
-                    <select
-                      className="chosen-select"
-                      name="gender"
-                      value={filters.gender}
-                      onChange={handleFilterChange}
-                    >
-                      <option value="">I'm looking for</option>
-                      <option value="Male">Men</option>
-                      <option value="Female">Women</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="filt-com lhs-cate">
-                  <h4>
-                    <i className="fa fa-clock-o" aria-hidden="true"></i>Age
-                  </h4>
-                  <div className="form-group">
-                    <select
-                      className="chosen-select"
-                      name="age"
-                      value={filters.age}
-                      onChange={handleFilterChange}
-                    >
-                      <option value="">Select age</option>
-                      <option value="18-30">18 to 30</option>
-                      <option value="31-40">31 to 40</option>
-                      <option value="41-50">41 to 50</option>
-                      <option value="51-60">51 to 60</option>
-                      <option value="61-70">61 to 70</option>
-                      <option value="71-80">71 to 80</option>
-                      <option value="81-90">81 to 90</option>
-                      <option value="91-100">91 to 100</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="filt-com lhs-cate">
-                  <h4>
-                    <i className="fa fa-bell-o" aria-hidden="true"></i>Select
-                    Religion
-                  </h4>
-                  <div className="form-group">
-                    <select
-                      className="chosen-select"
-                      name="religion"
-                      value={filters.religion}
-                      onChange={handleFilterChange}
-                    >
-                      <option value="">Religion</option>
-                      <option value="Any">Any</option>
-                      <option value="Hindu">Hindu</option>
-                      <option value="Muslim">Muslim</option>
-                      <option value="Jain">Jain</option>
-                      <option value="Christian">Christian</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="filt-com lhs-cate">
-                  <h4>
-                    <i className="fa fa-map-marker" aria-hidden="true"></i>
-                    Location
-                  </h4>
-                  <div className="form-group">
-                    <select
-                      className="chosen-select"
-                      name="location"
-                      value={filters.location}
-                      onChange={handleFilterChange}
-                    >
-                      <option value="">All Locations</option>
-                      <option value="Chennai">Chennai</option>
-                      <option value="Bangalore">Bangalore</option>
-                      <option value="Delhi">Delhi</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="filt-com lhs-rati lhs-avail lhs-cate">
-                  <h4>
-                    <i className="fa fa-thumbs-o-up" aria-hidden="true"></i>{" "}
-                    Availability
-                  </h4>
-                  <ul>
-                    <li>
-                      <div className="rbbox">
-                        <input
-                          type="radio"
-                          name="expert_avail"
-                          className="rating_check"
-                          id="exav1"
-                          checked={filters.availability === "1"}
-                          onChange={handleAvailabilityChange}
-                        />
-                        <label htmlFor="exav1">All</label>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="rbbox">
-                        <input
-                          type="radio"
-                          name="expert_avail"
-                          className="rating_check"
-                          id="exav2"
-                          checked={filters.availability === "2"}
-                          onChange={handleAvailabilityChange}
-                        />
-                        <label htmlFor="exav2">Available</label>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="rbbox">
-                        <input
-                          type="radio"
-                          name="expert_avail"
-                          className="rating_check"
-                          id="exav3"
-                          checked={filters.availability === "3"}
-                          onChange={handleAvailabilityChange}
-                        />
-                        <label htmlFor="exav3">Offline</label>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="filt-com lhs-rati lhs-ver lhs-cate">
-                  <h4>
-                    <i className="fa fa-shield" aria-hidden="true"></i>Profile
-                  </h4>
-                  <ul>
-                    <li>
-                      <div className="rbbox">
-                        <input
-                          type="radio"
-                          name="expert_veri"
-                          className="rating_check"
-                          id="exver1"
-                          checked={filters.profileType === "1"}
-                          onChange={handleProfileTypeChange}
-                        />
-                        <label htmlFor="exver1">All</label>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="rbbox">
-                        <input
-                          type="radio"
-                          name="expert_veri"
-                          className="rating_check"
-                          id="exver2"
-                          checked={filters.profileType === "2"}
-                          onChange={handleProfileTypeChange}
-                        />
-                        <label htmlFor="exver2">Premium</label>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="rbbox">
-                        <input
-                          type="radio"
-                          name="expert_veri"
-                          className="rating_check"
-                          id="exver3"
-                          checked={filters.profileType === "3"}
-                          onChange={handleProfileTypeChange}
-                        />
-                        <label htmlFor="exver3">Free</label>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-                <div className="filt-com filt-send-query">
-                  <div className="send-query">
-                    <h5>What are you looking for?</h5>
-                    <p>We will help you to arrange the best match to you.</p>
-                    <a href="#!" data-toggle="modal" data-target="#expfrm">
-                      Send your queries
-                    </a>
-                  </div>
-                </div>
+              {/* Left Sidebar Filter - Removed as per user request */}
+              <div className="d-none col-md-3 fil-mob-view">
               </div>
-              <div className="col-md-9">
+              <div className="col-md-12">
                 <div className="short-all">
                   <div className="short-lhs">
                     Showing <b>{users.length}</b> profiles
@@ -494,9 +526,8 @@ const UserSearchResult = () => {
                     {users.map((user) => (
                       <li key={user._id}>
                         <div
-                          className={`all-pro-box ${
-                            Math.random() > 0.5 ? "user-avil-onli" : ""
-                          }`}
+                          className={`all-pro-box ${Math.random() > 0.5 ? "user-avil-onli" : ""
+                            }`}
                           data-useravil={
                             Math.random() > 0.5 ? "avilyes" : "avilno"
                           }
@@ -505,26 +536,14 @@ const UserSearchResult = () => {
                           }
                         >
                           <div className="pro-img">
-                            <a href="#">
-                              <img
-                                src={
-                                  user.profileImage ||
-                                  "images/default-profile.jpg"
-                                }
-                                alt={user.userName}
-                                onError={(e) => {
-                                  e.target.src = "images/default-profile.jpg";
-                                }}
-                              />
-                            </a>
+                            <UserCardImageSlider user={user} />
                             <div
                               className="pro-ave"
                               title="User currently available"
                             >
                               <span
-                                className={`pro-ave-${
-                                  Math.random() > 0.5 ? "yes" : "no"
-                                }`}
+                                className={`pro-ave-${Math.random() > 0.5 ? "yes" : "no"
+                                  }`}
                               ></span>
                             </div>
                             <div className="pro-avl-status">
@@ -576,7 +595,7 @@ const UserSearchResult = () => {
                                 Send interest
                               </a>
                               <span
-                                className="cta-chat"
+                                className="cta"
                                 onClick={() => shortListProfile(user)}
                               >
                                 Short List

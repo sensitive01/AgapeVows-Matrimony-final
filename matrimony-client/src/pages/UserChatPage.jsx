@@ -224,16 +224,16 @@ const UserChatPage = () => {
   // Profile data for ChatUi
   const profileData = selectedChat
     ? {
-        userName: selectedChat.participant.name,
-        profileImage: selectedChat.participant.profileImage || profile1,
-        receiverId: selectedChat.participant._id,
-        isOnline: onlineUsers.includes(selectedChat.participant._id),
-      }
+      userName: selectedChat.participant.name,
+      profileImage: selectedChat.participant.profileImage || profile1,
+      receiverId: selectedChat.participant._id,
+      isOnline: onlineUsers.includes(selectedChat.participant._id),
+    }
     : {
-        userName: "User",
-        profileImage: profile1,
-        isOnline: false,
-      };
+      userName: "User",
+      profileImage: profile1,
+      isOnline: false,
+    };
 
   if (loading) {
     return (
@@ -263,16 +263,16 @@ const UserChatPage = () => {
             className="container-fluid"
             style={{ paddingLeft: 0, paddingRight: 0 }}
           >
-            <div className="row" style={{ marginLeft: 45, marginRight: 0 }}>
+            <div className="row" style={{ marginLeft: 0, marginRight: 0 }}>
               <div
-                className="col-md-4 col-lg-3"
-                style={{ paddingLeft: 0, marginLeft: "-10px" }}
+                className="col-md-3 col-lg-2"
+                style={{ paddingLeft: 0, marginLeft: "0px" }}
               >
                 <UserSideBar />
               </div>
 
               <div
-                className="col-md-8 col-lg-9"
+                className="col-md-9 col-lg-10"
                 style={{ paddingLeft: "20px", paddingRight: "15px" }}
               >
                 <div className="row">
@@ -312,19 +312,19 @@ const UserChatPage = () => {
                                   {onlineUsers.includes(
                                     chat.participant._id
                                   ) && (
-                                    <div
-                                      style={{
-                                        position: "absolute",
-                                        bottom: "2px",
-                                        right: "2px",
-                                        width: "12px",
-                                        height: "12px",
-                                        backgroundColor: "#4CAF50",
-                                        borderRadius: "50%",
-                                        border: "2px solid white",
-                                      }}
-                                    />
-                                  )}
+                                      <div
+                                        style={{
+                                          position: "absolute",
+                                          bottom: "2px",
+                                          right: "2px",
+                                          width: "12px",
+                                          height: "12px",
+                                          backgroundColor: "#4CAF50",
+                                          borderRadius: "50%",
+                                          border: "2px solid white",
+                                        }}
+                                      />
+                                    )}
                                 </div>
                                 <div className="db-chat-bio">
                                   <h5>{chat.participant.name}</h5>

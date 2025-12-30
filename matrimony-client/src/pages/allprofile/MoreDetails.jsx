@@ -12,9 +12,12 @@ import CopyRights from "../../components/CopyRights";
 import ShowInterest from "./ShowInterest";
 import ChatUi from "./ChatUi";
 import DisPlayProfileDetails from "./DisPlayProfileDetails";
+import defaultProfileImg from "../../assets/images/blue-circle-with-white-user_78370-4707.avif";
+import maleDefault from "../../assets/images/profiles/men1.jpg";
+import femaleDefault from "../../assets/images/profiles/12.jpg";
 
 const ImageSlider = React.memo(
-  ({ allImages, currentImageIndex, setCurrentImageIndex }) => {
+  ({ allImages, currentImageIndex, setCurrentImageIndex, defaultImage }) => {
     const nextImage = useCallback(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
     }, [allImages.length, setCurrentImageIndex]);
@@ -32,7 +35,76 @@ const ImageSlider = React.memo(
           loading="lazy"
           className="pro"
           alt="Profile"
+          style={{
+            width: "100%",
+            height: "750px",
+            objectFit: "cover",
+            objectPosition: "center",
+          }}
+          onError={(e) => {
+            if (defaultImage) e.target.src = defaultImage;
+          }}
         />
+
+        {/* Navigation Arrows */}
+        {allImages.length > 1 && (
+          <>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                prevImage();
+              }}
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "10px",
+                transform: "translateY(-50%)",
+                background: "rgba(0, 0, 0, 0.5)",
+                color: "white",
+                border: "none",
+                borderRadius: "50%",
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 10,
+                transition: "background 0.3s",
+              }}
+              className="slider-arrow"
+            >
+              <i className="fa fa-chevron-left"></i>
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                nextImage();
+              }}
+              style={{
+                position: "absolute",
+                top: "50%",
+                right: "10px",
+                transform: "translateY(-50%)",
+                background: "rgba(0, 0, 0, 0.5)",
+                color: "white",
+                border: "none",
+                borderRadius: "50%",
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 10,
+                transition: "background 0.3s",
+              }}
+              className="slider-arrow"
+            >
+              <i className="fa fa-chevron-right"></i>
+            </button>
+          </>
+        )}
 
         {/* Image Indicators - Only show if multiple images */}
         {allImages.length > 1 && (
@@ -176,27 +248,34 @@ const MoreDetails = () => {
   }, [profileId]);
 
   // Get all images (profile + additional) - memoized to prevent recalculation
+  const defaultImage = useMemo(() => {
+    if (!profileData) return defaultProfileImg;
+    return profileData.gender === "Male" || profileData.gender === "Groom"
+      ? maleDefault
+      : profileData.gender === "Female" || profileData.gender === "Bride"
+        ? femaleDefault
+        : defaultProfileImg;
+  }, [profileData]);
+
   const allImages = useMemo(() => {
     if (!profileData) return [];
-    const images = [
-      profileData.profileImage || "images/profiles/profile-large.jpg",
-    ];
+    const images = [profileData.profileImage || defaultImage];
     if (profileData.additionalImages?.length > 0) {
       images.push(...profileData.additionalImages);
     }
     return images;
-  }, [profileData]);
+  }, [profileData, defaultImage]);
 
-  // Auto-slider effect
-  useEffect(() => {
-    if (allImages.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
-      }, 3000); // Change image every 3 seconds
-
-      return () => clearInterval(interval);
-    }
-  }, [allImages.length]);
+  // Auto-slider effect removed as per user request (manual swipe only)
+  // useEffect(() => {
+  //   if (allImages.length > 1) {
+  //     const interval = setInterval(() => {
+  //       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
+  //     }, 3000); // Change image every 3 seconds
+  //
+  //     return () => clearInterval(interval);
+  //   }
+  // }, [allImages.length]);
 
   // Memoized calculated values
   const calculatedAge = useMemo(() => {
@@ -381,6 +460,7 @@ const MoreDetails = () => {
                     allImages={allImages}
                     currentImageIndex={currentImageIndex}
                     setCurrentImageIndex={setCurrentImageIndex}
+                    defaultImage={defaultImage}
                   />
                   <div className="s3">
                     <button

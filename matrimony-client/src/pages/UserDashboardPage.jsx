@@ -299,18 +299,18 @@ const UserDashboardPage = () => {
             className="container-fluid"
             style={{ paddingLeft: 0, paddingRight: 0 }}
           >
-            <div className="row" style={{ marginLeft: 45, marginRight: 0 }}>
+            <div className="row" style={{ marginLeft: 0, marginRight: 0 }}>
               {/* Sidebar - Left Column */}
               <div
-                className="col-md-4 col-lg-3"
-                style={{ paddingLeft: 0, marginLeft: "-10px" }}
+                className="col-md-3 col-lg-2"
+                style={{ paddingLeft: 0, marginLeft: "0px" }}
               >
                 <UserSideBar />
               </div>
 
               {/* Dashboard Content - Right Column */}
               <div
-                className="col-md-8 col-lg-9"
+                className="col-md-9 col-lg-10"
                 style={{ paddingLeft: "20px", paddingRight: "15px" }}
               >
                 {/* Search Component */}

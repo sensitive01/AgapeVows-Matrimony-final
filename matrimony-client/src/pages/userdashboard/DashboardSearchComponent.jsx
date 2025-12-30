@@ -267,11 +267,9 @@ const DashboardSearchComponent = ({ onSearch, loading = false }) => {
                     className="w-100 slider"
                     style={{
                       height: "12px",
-                      background: `linear-gradient(to right, #9333ea 0%, #9333ea ${
-                        ((formData.age - 18) / (70 - 18)) * 100
-                      }%, #e5e7eb ${
-                        ((formData.age - 18) / (70 - 18)) * 100
-                      }%, #e5e7eb 100%)`,
+                      background: `linear-gradient(to right, #9333ea 0%, #9333ea ${((formData.age - 18) / (70 - 18)) * 100
+                        }%, #e5e7eb ${((formData.age - 18) / (70 - 18)) * 100
+                        }%, #e5e7eb 100%)`,
                       borderRadius: "8px",
                       appearance: "none",
                       cursor: "pointer",
@@ -396,7 +394,7 @@ const DashboardSearchComponent = ({ onSearch, loading = false }) => {
                 <button
                   type="button"
                   className="btn btn-outline-primary btn-sm"
-                  onClick={() => setShowAdvancedSearch(true)}
+                  onClick={() => navigate("/user/find-matches")}
                   style={{ fontSize: "12px" }}
                   title="Advanced / Global Search"
                 >
@@ -409,10 +407,7 @@ const DashboardSearchComponent = ({ onSearch, loading = false }) => {
       </div>
 
       {/* Global Search Modal Triggered from Dashboard */}
-      <GlobalSearchModal
-        isOpen={showAdvancedSearch}
-        onClose={() => setShowAdvancedSearch(false)}
-      />
+      {/* Global Search Page Link - Component removed */}
     </div>
   );
 };

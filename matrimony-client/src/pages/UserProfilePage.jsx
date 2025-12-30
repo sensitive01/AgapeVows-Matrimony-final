@@ -139,20 +139,20 @@ const UserProfilePage = () => {
             className="container-fluid"
             style={{ paddingLeft: 0, paddingRight: 0 }}
           >
-            <div className="row" style={{ marginLeft: 45, marginRight: 0 }}>
+            <div className="row" style={{ marginLeft: 0, marginRight: 0 }}>
               {/* Sidebar - Left Column */}
               <div
-                className="col-md-4 col-lg-3"
-                style={{ paddingLeft: 0, marginLeft: "-10px" }}
+                className="col-md-3 col-lg-2"
+                style={{ paddingLeft: 0, marginLeft: "0px" }}
               >
                 <UserSideBar />
               </div>
 
               {/* Profile Content - Right Column with Vertical Scroll */}
               <div
-                className="col-md-8 col-lg-9"
-                style={{ 
-                  paddingLeft: "20px", 
+                className="col-md-9 col-lg-10"
+                style={{
+                  paddingLeft: "20px",
                   paddingRight: "15px",
                   height: "calc(100vh - 80px)",
                   overflowY: "auto",
@@ -335,13 +335,12 @@ const UserProfilePage = () => {
                               }}
                             >
                               <span
-                                className={`badge ${
-                                  userInfo?.profileStatus === "Approved"
-                                    ? "bg-success"
-                                    : userInfo?.profileStatus === "Pending"
+                                className={`badge ${userInfo?.profileStatus === "Approved"
+                                  ? "bg-success"
+                                  : userInfo?.profileStatus === "Pending"
                                     ? "bg-warning text-dark"
                                     : "bg-secondary"
-                                }`}
+                                  }`}
                                 style={{
                                   padding: "8px 16px",
                                   fontSize: "0.9rem",
@@ -426,14 +425,14 @@ const UserProfilePage = () => {
                       value={
                         userInfo?.dateOfBirth
                           ? `${calculateAge(
-                              userInfo.dateOfBirth
-                            )} years / ${new Date(
-                              userInfo.dateOfBirth
-                            ).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}`
+                            userInfo.dateOfBirth
+                          )} years / ${new Date(
+                            userInfo.dateOfBirth
+                          ).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}`
                           : null
                       }
                     />
@@ -484,17 +483,17 @@ const UserProfilePage = () => {
 
                     {(userInfo?.maritalStatus === "Divorced" ||
                       userInfo?.maritalStatus === "Awaiting Divorce") && (
-                      <>
-                        <InfoRow
-                          label="Divorced Month & Year"
-                          value={userInfo?.divorcedMonthYear}
-                        />
-                        <InfoRow
-                          label="Reason for Divorce"
-                          value={userInfo?.reasonForDivorce}
-                        />
-                      </>
-                    )}
+                        <>
+                          <InfoRow
+                            label="Divorced Month & Year"
+                            value={userInfo?.divorcedMonthYear}
+                          />
+                          <InfoRow
+                            label="Reason for Divorce"
+                            value={userInfo?.reasonForDivorce}
+                          />
+                        </>
+                      )}
 
                     <InfoRow
                       label="Eating Habits"

@@ -60,23 +60,29 @@ const UserSideBar = () => {
   const styles = {
     sidebarSticky: {
       position: "sticky",
-      top: "20px",
-    },
-    dbNav: {
+      top: "60px",
+      marginTop: "-40px",
+      width: "85%", // Reduced width from both sides
+      marginLeft: "auto", // Centered
+      marginRight: "auto", // Centered
+      // height and overflow removed to eliminate scrolling and let it fit naturally
       background: "#fff",
       border: "1px solid #e9ecef",
       borderRadius: "8px",
-      overflow: "hidden",
       boxShadow: "0 2px 4px rgba(0, 0, 0, 0.08)",
+      zIndex: 40,
+    },
+    dbNav: {
+      width: "100%",
     },
     dbNavPro: {
       width: "100%",
-      padding: "20px",
+      padding: "5px", // Further reduced padding
       background: "#fff",
       borderBottom: "1px solid #e9ecef",
     },
     imageWrapper: {
-      position: "relative", // important for absolute arrows
+      position: "relative",
       width: "100%",
     },
     dbNavProImg: {
@@ -129,7 +135,7 @@ const UserSideBar = () => {
     link: {
       display: "flex",
       alignItems: "center",
-      padding: "14px 20px",
+      padding: "5px 10px", // Minimal padding
       color: "#333",
       textDecoration: "none",
       fontSize: "14px",

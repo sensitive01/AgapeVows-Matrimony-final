@@ -113,7 +113,8 @@ function App() {
           element={<IgnoredProfile />}
         />
 
-        <Route path="/show-searched-result" element={<GlobalSearchModal />} />
+        <Route path="/show-searched-result" element={<UserSearchResult />} />
+        <Route path="/user/find-matches" element={<GlobalSearchModal />} />
         <Route path="/reset-password/:userId" element={<ChangePassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route

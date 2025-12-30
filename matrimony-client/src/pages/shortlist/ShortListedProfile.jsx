@@ -147,16 +147,16 @@ const ShortListedProfile = () => {
             className="container-fluid"
             style={{ paddingLeft: 0, paddingRight: 0 }}
           >
-            <div className="row" style={{ marginLeft: 45, marginRight: 0 }}>
+            <div className="row" style={{ marginLeft: 0, marginRight: 0 }}>
               <div
-                className="col-md-4 col-lg-3"
-                style={{ paddingLeft: 0, marginLeft: "-10px" }}
+                className="col-md-3 col-lg-2"
+                style={{ paddingLeft: 0, marginLeft: "0px" }}
               >
                 <UserSideBar />
               </div>
 
               <div
-                className="col-md-8 col-lg-9"
+                className="col-md-9 col-lg-10"
                 style={{ paddingLeft: "20px", paddingRight: "15px" }}
               >
                 <div className="row">
@@ -169,9 +169,8 @@ const ShortListedProfile = () => {
                         <ul className="nav nav-tabs" role="tablist">
                           <li className="nav-item" role="presentation">
                             <button
-                              className={`nav-link ${
-                                activeTab === "byYou" ? "active" : ""
-                              }`}
+                              className={`nav-link ${activeTab === "byYou" ? "active" : ""
+                                }`}
                               onClick={() => setActiveTab("byYou")}
                               type="button"
                               role="tab"
@@ -182,9 +181,8 @@ const ShortListedProfile = () => {
                           </li>
                           <li className="nav-item" role="presentation">
                             <button
-                              className={`nav-link ${
-                                activeTab === "whoShortlisted" ? "active" : ""
-                              }`}
+                              className={`nav-link ${activeTab === "whoShortlisted" ? "active" : ""
+                                }`}
                               onClick={() => setActiveTab("whoShortlisted")}
                               type="button"
                               role="tab"
@@ -200,20 +198,18 @@ const ShortListedProfile = () => {
                         <div className="tab-content">
                           {/* Shortlisted By You Tab */}
                           <div
-                            className={`tab-pane fade ${
-                              activeTab === "byYou" ? "show active" : ""
-                            }`}
+                            className={`tab-pane fade ${activeTab === "byYou" ? "show active" : ""
+                              }`}
                           >
                             {renderProfileList(profileDataByYou)}
                           </div>
 
                           {/* Who Shortlisted You Tab */}
                           <div
-                            className={`tab-pane fade ${
-                              activeTab === "whoShortlisted"
-                                ? "show active"
-                                : ""
-                            }`}
+                            className={`tab-pane fade ${activeTab === "whoShortlisted"
+                              ? "show active"
+                              : ""
+                              }`}
                           >
                             {renderProfileList(profileDataWhoShortlisted)}
                           </div>

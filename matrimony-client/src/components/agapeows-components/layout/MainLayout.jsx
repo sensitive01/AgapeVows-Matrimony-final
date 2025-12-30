@@ -48,11 +48,10 @@ const ExploreDropdown = ({ isVisible }) => {
 
   return (
     <div
-      className={`absolute top-full left-0 mt-2 w-72 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${
-        isVisible
-          ? "opacity-100 visible translate-y-0"
-          : "opacity-0 invisible translate-y-2"
-      }`}
+      className={`absolute top-full left-0 mt-2 w-72 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${isVisible
+        ? "opacity-100 visible translate-y-0"
+        : "opacity-0 invisible translate-y-2"
+        }`}
     >
       {categories.map((category, index) => (
         <button
@@ -82,11 +81,10 @@ const ProfileDropdown = ({ isVisible, onLogout }) => {
 
   return (
     <div
-      className={`absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${
-        isVisible
-          ? "opacity-100 visible translate-y-0"
-          : "opacity-0 invisible translate-y-2"
-      }`}
+      className={`absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${isVisible
+        ? "opacity-100 visible translate-y-0"
+        : "opacity-0 invisible translate-y-2"
+        }`}
     >
       {profileLinks.map((link, index) => (
         <button
@@ -165,7 +163,7 @@ const MainLayout = () => {
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-1 cursor-pointer hover:text-purple-200">
                 <div
-                  onClick={() => setIsSearchModalOpen(true)}
+                  onClick={() => handleNavigate("/user/find-matches")}
                   className="flex items-center space-x-1"
                 >
                   <Search className="w-4 h-4" />
@@ -208,7 +206,7 @@ const MainLayout = () => {
           <div className="md:hidden flex justify-between items-center">
             <div className="flex items-center space-x-3">
               <div
-                onClick={() => setIsSearchModalOpen(true)}
+                onClick={() => handleNavigate("/user/find-matches")}
                 className="cursor-pointer"
               >
                 <Search className="w-4 h-4" />
@@ -217,7 +215,7 @@ const MainLayout = () => {
                 onClick={() => handleNavigate("/about")}
                 className="text-xs hover:text-purple-200"
               >
-                ABOUT
+                ABOUTs
               </button>
               <button
                 onClick={() => handleNavigate("/faq")}
@@ -271,7 +269,7 @@ const MainLayout = () => {
                 ABOUT US
               </button>
               <button
-                onClick={() => handleNavigate("/show-searched-result")}
+                onClick={() => handleNavigate("/user/find-matches")}
                 className="text-gray-800 hover:text-purple-600 font-medium"
               >
                 SEARCH
@@ -541,7 +539,7 @@ const MainLayout = () => {
       {location.pathname !== "/" && (
         <div
           className="bg-purple-50 border-b border-purple-100 py-3 cursor-pointer hover:bg-purple-100 transition-colors"
-          onClick={() => setIsSearchModalOpen(true)}
+          onClick={() => handleNavigate("/user/find-matches")}
         >
           {/* <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
             <div className="flex items-center text-gray-700 flex-1 min-w-0 mr-2">
@@ -563,12 +561,6 @@ const MainLayout = () => {
           </div> */}
         </div>
       )}
-
-      {/* Global Search Modal */}
-      <GlobalSearchModal
-        isOpen={isSearchModalOpen}
-        onClose={() => setIsSearchModalOpen(false)}
-      />
     </>
   );
 };
