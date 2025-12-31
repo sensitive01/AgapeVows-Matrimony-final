@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { sendInterestData } from "../../api/axiosService/userAuthService";
 
-const ShowInterest = ({ selectedUser,userId }) => {
+const ShowInterest = ({ selectedUser, userId, onSuccess }) => {
   const modalRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPermissions, setSelectedPermissions] = useState({
@@ -39,10 +39,12 @@ const ShowInterest = ({ selectedUser,userId }) => {
       console.log("Sending interest data:", interestData); // Debug log
 
       // Call the parent function with the data
-      await sendInterestData(interestData,userId);
+      await sendInterestData(interestData, userId);
 
-      // Show success message
-      alert("Interest sent successfully!");
+      // Call onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
 
       // Close modal programmatically
       if (modalRef.current) {
@@ -70,7 +72,7 @@ const ShowInterest = ({ selectedUser,userId }) => {
       });
     } catch (error) {
       console.error("Error sending interest:", error);
-      alert(`Failed to send interest: ${error.message || "Please try again."}`);
+      alert(`Failed to send interest: ${error.message || "Please try again."} `);
     } finally {
       setIsLoading(false);
     }

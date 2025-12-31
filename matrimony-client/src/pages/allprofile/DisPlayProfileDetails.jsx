@@ -1,68 +1,94 @@
 import React from "react";
 import RelatedProfiles from "./RelatedProfiles";
 
-const DisPlayProfileDetails = ({profileData,calculatedAge,setCurrentImageIndex,formatDate}) => {
+const DisPlayProfileDetails = ({
+  profileData,
+  calculatedAge,
+  setCurrentImageIndex,
+  formatDate,
+  isAccepted,
+}) => {
   return (
     <div className="profile-details-scrollable">
       <div className="profi-pg profi-bio">
         <div className="lhs">
           <div className="pro-pg-intro">
-            <h1>{profileData.userName || "Name not available"}</h1>
-            <div className="pro-info-status">
-              <span className="stat-1">
-                <b>100</b> viewers
-              </span>
-              <span className="stat-2">
-                <b>Available</b> online
-              </span>
+            <h1>
+              {isAccepted
+                ? profileData.userName || "Name not available"
+                : profileData.agwid || "ID Hidden"}
+            </h1>
+            <div
+              style={{
+                filter: isAccepted ? "none" : "blur(5px)",
+                userSelect: isAccepted ? "auto" : "none",
+                opacity: isAccepted ? 1 : 0.7,
+                pointerEvents: isAccepted ? "auto" : "none",
+              }}
+            >
+              <div className="pro-info-status">
+                <span className="stat-1">
+                  <b>100</b> viewers
+                </span>
+                <span className="stat-2">
+                  <b>Available</b> online
+                </span>
+              </div>
+              <ul>
+                <li>
+                  <div>
+                    <img src="images/icon/pro-city.png" loading="lazy" alt="" />
+                    <span>
+                      City:{" "}
+                      <strong>{profileData.city || "Not specified"}</strong>
+                    </span>
+                  </div>
+                </li>
+                <li>
+                  <div>
+                    <img src="images/icon/pro-age.png" loading="lazy" alt="" />
+                    <span>
+                      Age:{" "}
+                      <strong>
+                        {calculatedAge || profileData.age || "Not specified"}
+                      </strong>
+                    </span>
+                  </div>
+                </li>
+                <li>
+                  <div>
+                    <img src="images/icon/pro-city.png" loading="lazy" alt="" />
+                    <span>
+                      Height:{" "}
+                      <strong>
+                        {profileData.height
+                          ? `${profileData.height}cm`
+                          : "Not specified"}
+                      </strong>
+                    </span>
+                  </div>
+                </li>
+                <li>
+                  <div>
+                    <img src="images/icon/pro-city.png" loading="lazy" alt="" />
+                    <span>
+                      Job:{" "}
+                      <strong>{profileData.jobType || "Not specified"}</strong>
+                    </span>
+                  </div>
+                </li>
+              </ul>
             </div>
-            <ul>
-              <li>
-                <div>
-                  <img src="images/icon/pro-city.png" loading="lazy" alt="" />
-                  <span>
-                    City: <strong>{profileData.city || "Not specified"}</strong>
-                  </span>
-                </div>
-              </li>
-              <li>
-                <div>
-                  <img src="images/icon/pro-age.png" loading="lazy" alt="" />
-                  <span>
-                    Age:{" "}
-                    <strong>
-                      {calculatedAge || profileData.age || "Not specified"}
-                    </strong>
-                  </span>
-                </div>
-              </li>
-              <li>
-                <div>
-                  <img src="images/icon/pro-city.png" loading="lazy" alt="" />
-                  <span>
-                    Height:{" "}
-                    <strong>
-                      {profileData.height
-                        ? `${profileData.height}cm`
-                        : "Not specified"}
-                    </strong>
-                  </span>
-                </div>
-              </li>
-              <li>
-                <div>
-                  <img src="images/icon/pro-city.png" loading="lazy" alt="" />
-                  <span>
-                    Job:{" "}
-                    <strong>{profileData.jobType || "Not specified"}</strong>
-                  </span>
-                </div>
-              </li>
-            </ul>
           </div>
 
           {/* PROFILE ABOUT */}
-          <div className="pr-bio-c pr-bio-abo">
+          <div
+            className="pr-bio-c pr-bio-abo"
+            style={{
+              filter: isAccepted ? "none" : "blur(5px)",
+              userSelect: isAccepted ? "auto" : "none",
+            }}
+          >
             <h3>About</h3>
             <p>
               {profileData.aboutMe ||
@@ -70,11 +96,17 @@ const DisPlayProfileDetails = ({profileData,calculatedAge,setCurrentImageIndex,f
             </p>
           </div>
 
-          <div className="pr-bio-c pr-bio-gal" id="gallery">
+          <div
+            className="pr-bio-c pr-bio-gal"
+            id="gallery"
+            style={{
+              pointerEvents: isAccepted ? "auto" : "none",
+            }}
+          >
             <h3>Photo gallery</h3>
             <div id="image-gallery">
               {profileData.additionalImages &&
-              profileData.additionalImages.length > 0 ? (
+                profileData.additionalImages.length > 0 ? (
                 profileData.additionalImages.map((image, index) => (
                   <div key={index} className="pro-gal-imag">
                     <div className="img-wrapper">
@@ -103,36 +135,44 @@ const DisPlayProfileDetails = ({profileData,calculatedAge,setCurrentImageIndex,f
             </div>
           </div>
 
-          {/* Contact Info */}
-          <div className="pr-bio-c pr-bio-conta">
-            <h3>Contact info</h3>
-            <ul>
-              <li>
-                <span>
-                  <i className="fa fa-mobile" aria-hidden="true" />
-                  <b>Phone:</b>
-                  {profileData.userMobile || "Not provided"}
-                </span>
-              </li>
-              <li>
-                <span>
-                  <i className="fa fa-envelope-o" aria-hidden="true" />
-                  <b>Email:</b>
-                  {profileData.userEmail || "Not provided"}
-                </span>
-              </li>
-              <li>
-                <span>
-                  <i className="fa fa fa-map-marker" aria-hidden="true" />
-                  <b>Address: </b>
-                  {profileData.address || "Not provided"}
-                </span>
-              </li>
-            </ul>
-          </div>
+          {/* Contact Info - Hidden if not accepted */}
+          {isAccepted && (
+            <div className="pr-bio-c pr-bio-conta">
+              <h3>Contact info</h3>
+              <ul>
+                <li>
+                  <span>
+                    <i className="fa fa-mobile" aria-hidden="true" />
+                    <b>Phone:</b>
+                    {profileData.userMobile || "Not provided"}
+                  </span>
+                </li>
+                <li>
+                  <span>
+                    <i className="fa fa-envelope-o" aria-hidden="true" />
+                    <b>Email:</b>
+                    {profileData.userEmail || "Not provided"}
+                  </span>
+                </li>
+                <li>
+                  <span>
+                    <i className="fa fa fa-map-marker" aria-hidden="true" />
+                    <b>Address: </b>
+                    {profileData.address || "Not provided"}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          )}
 
           {/* Personal Information */}
-          <div className="pr-bio-c pr-bio-info">
+          <div
+            className="pr-bio-c pr-bio-info"
+            style={{
+              filter: isAccepted ? "none" : "blur(5px)",
+              userSelect: isAccepted ? "auto" : "none",
+            }}
+          >
             <h3>Personal information</h3>
             <ul>
               <li>
@@ -197,7 +237,13 @@ const DisPlayProfileDetails = ({profileData,calculatedAge,setCurrentImageIndex,f
           </div>
 
           {/* Hobbies */}
-          <div className="pr-bio-c pr-bio-hob">
+          <div
+            className="pr-bio-c pr-bio-hob"
+            style={{
+              filter: isAccepted ? "none" : "blur(5px)",
+              userSelect: isAccepted ? "auto" : "none",
+            }}
+          >
             <h3>Hobbies</h3>
             <ul>
               {profileData.hobbies && profileData.hobbies.length > 0 ? (
@@ -214,84 +260,86 @@ const DisPlayProfileDetails = ({profileData,calculatedAge,setCurrentImageIndex,f
             </ul>
           </div>
 
-          {/* Social Media */}
-          <div className="pr-bio-c menu-pop-soci pr-bio-soc">
-            <h3>Social media</h3>
-            <ul>
-              {profileData.facebook && (
-                <li>
-                  <a
-                    href={profileData.facebook}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <i className="fa fa-facebook" aria-hidden="true" />
-                  </a>
-                </li>
-              )}
-              {profileData.x && (
-                <li>
-                  <a
-                    href={profileData.x}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <i className="fa fa-twitter" aria-hidden="true" />
-                  </a>
-                </li>
-              )}
-              {profileData.whatsapp && (
-                <li>
-                  <a
-                    href={`https://wa.me/${profileData.whatsapp}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <i className="fa fa-whatsapp" aria-hidden="true" />
-                  </a>
-                </li>
-              )}
-              {profileData.linkedin && (
-                <li>
-                  <a
-                    href={profileData.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <i className="fa fa-linkedin" aria-hidden="true" />
-                  </a>
-                </li>
-              )}
-              {profileData.youtube && (
-                <li>
-                  <a
-                    href={profileData.youtube}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <i className="fa fa-youtube-play" aria-hidden="true" />
-                  </a>
-                </li>
-              )}
-              {profileData.instagram && (
-                <li>
-                  <a
-                    href={profileData.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <i className="fa fa-instagram" aria-hidden="true" />
-                  </a>
-                </li>
-              )}
-            </ul>
-            {!profileData.facebook &&
-              !profileData.x &&
-              !profileData.whatsapp &&
-              !profileData.linkedin &&
-              !profileData.youtube &&
-              !profileData.instagram && <p>No social media links provided</p>}
-          </div>
+          {/* Social Media - Hidden if not accepted */}
+          {isAccepted && (
+            <div className="pr-bio-c menu-pop-soci pr-bio-soc">
+              <h3>Social media</h3>
+              <ul>
+                {profileData.facebook && (
+                  <li>
+                    <a
+                      href={profileData.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i className="fa fa-facebook" aria-hidden="true" />
+                    </a>
+                  </li>
+                )}
+                {profileData.x && (
+                  <li>
+                    <a
+                      href={profileData.x}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i className="fa fa-twitter" aria-hidden="true" />
+                    </a>
+                  </li>
+                )}
+                {profileData.whatsapp && (
+                  <li>
+                    <a
+                      href={`https://wa.me/${profileData.whatsapp}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i className="fa fa-whatsapp" aria-hidden="true" />
+                    </a>
+                  </li>
+                )}
+                {profileData.linkedin && (
+                  <li>
+                    <a
+                      href={profileData.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i className="fa fa-linkedin" aria-hidden="true" />
+                    </a>
+                  </li>
+                )}
+                {profileData.youtube && (
+                  <li>
+                    <a
+                      href={profileData.youtube}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i className="fa fa-youtube-play" aria-hidden="true" />
+                    </a>
+                  </li>
+                )}
+                {profileData.instagram && (
+                  <li>
+                    <a
+                      href={profileData.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i className="fa fa-instagram" aria-hidden="true" />
+                    </a>
+                  </li>
+                )}
+              </ul>
+              {!profileData.facebook &&
+                !profileData.x &&
+                !profileData.whatsapp &&
+                !profileData.linkedin &&
+                !profileData.youtube &&
+                !profileData.instagram && <p>No social media links provided</p>}
+            </div>
+          )}
         </div>
 
         {/* PROFILE RHS */}

@@ -16,10 +16,8 @@ const UserLoginPage = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [success, setSuccess] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
-  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -69,12 +67,8 @@ const UserLoginPage = () => {
       const response = await verifyUser(formData);
       console.log(response);
       if (response.status === 200) {
-        setLoginSuccess(true);
-        setSuccess(response.data.message);
         localStorage.setItem("userId", response.data.userId);
-        setTimeout(() => {
-          navigate("/user/user-dashboard-page");
-        }, 1500);
+        navigate("/user/user-dashboard-page");
       } else if (response.status === 401) {
         setLoginError(response.response.data.message);
       }
@@ -82,7 +76,7 @@ const UserLoginPage = () => {
       console.error("Login error:", error.response.data.message);
       setLoginError(
         error.response.data.message ||
-          "Network error. Please check your connection and try again."
+        "Network error. Please check your connection and try again."
       );
     } finally {
       setIsLoading(false);
@@ -132,19 +126,14 @@ const UserLoginPage = () => {
                             {loginError}
                           </div>
                         )}
-                        {loginSuccess && (
-                          <div className="alert alert-success" role="alert">
-                            {success}
-                          </div>
-                        )}
+
 
                         <div className="form-group">
                           <label className="lb">Email:</label>
                           <input
                             type="email"
-                            className={`form-control ${
-                              errors.email ? "is-invalid" : ""
-                            }`}
+                            className={`form-control ${errors.email ? "is-invalid" : ""
+                              }`}
                             id="email"
                             placeholder="Enter email"
                             name="email"
@@ -163,9 +152,8 @@ const UserLoginPage = () => {
                           <label className="lb">Password:</label>
                           <input
                             type="password"
-                            className={`form-control ${
-                              errors.password ? "is-invalid" : ""
-                            }`}
+                            className={`form-control ${errors.password ? "is-invalid" : ""
+                              }`}
                             id="pwd"
                             placeholder="Enter password"
                             name="password"

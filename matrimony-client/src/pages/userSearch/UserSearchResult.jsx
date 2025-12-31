@@ -12,7 +12,7 @@ import defaultProfileImg from "../../assets/images/blue-circle-with-white-user_7
 import maleDefault from "../../assets/images/profiles/men1.jpg";
 import femaleDefault from "../../assets/images/profiles/12.jpg";
 
-const UserCardImageSlider = ({ user }) => {
+const UserCardImageSlider = ({ user, isAccepted }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
 
@@ -52,7 +52,9 @@ const UserCardImageSlider = ({ user }) => {
   const openZoom = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsZoomOpen(true);
+    if (isAccepted) {
+      setIsZoomOpen(true);
+    }
   };
 
   return (
@@ -60,7 +62,7 @@ const UserCardImageSlider = ({ user }) => {
       <div style={{ position: "relative", width: "100%", height: "220px" }}>
         <div
           onClick={openZoom}
-          style={{ display: "block", height: "100%", cursor: "pointer" }}
+          style={{ display: "block", height: "100%", cursor: isAccepted ? "pointer" : "default" }}
         >
           <img
             src={allImages[currentImageIndex]}
@@ -287,6 +289,7 @@ const UserSearchResult = () => {
           ...restState,
           ...(formData || {}),
           ...transformedFilters,
+          userId, // Add userId to request
         };
 
         // Call your filter API endpoint
@@ -313,6 +316,7 @@ const UserSearchResult = () => {
         const requestData = {
           ...restState,
           ...(formData || {}),
+          userId, // Add userId to request
         };
 
         const response = await fetchSearchedProfileData(requestData);
@@ -536,7 +540,7 @@ const UserSearchResult = () => {
                           }
                         >
                           <div className="pro-img">
-                            <UserCardImageSlider user={user} />
+                            <UserCardImageSlider user={user} isAccepted={user.interestStatus === 'accepted'} />
                             <div
                               className="pro-ave"
                               title="User currently available"
@@ -563,9 +567,16 @@ const UserSearchResult = () => {
 
                           <div className="pro-detail">
                             <h4>
-                              <a href="#">{user.userName}</a>
+                              <a href="#">{user.agwid}</a>
                             </h4>
-                            <div className="pro-bio">
+                            <div
+                              className="pro-bio"
+                              style={{
+                                filter: user.interestStatus === 'accepted' ? "none" : "blur(5px)",
+                                userSelect: user.interestStatus === 'accepted' ? "auto" : "none",
+                                opacity: user.interestStatus === 'accepted' ? 1 : 0.6
+                              }}
+                            >
                               <span>{user.degree || "Not specified"}</span>
                               <span>{user.jobType || "Not specified"}</span>
                               <span>
@@ -576,24 +587,31 @@ const UserSearchResult = () => {
                               </span>
                             </div>
                             <div className="links">
-                              {/* <span
-                                className="cta-chat"
-                                onClick={() => openChat(user)}
-                              >
-                                Chat now
-                              </span> */}
-                              <a href={`https://wa.me/${user.whatsapp}`}>
-                                WhatsApp
-                              </a>
-                              <a
-                                href="#!"
-                                className="cta cta-sendint"
-                                data-bs-toggle="modal"
-                                data-bs-target="#sendInter"
-                                onClick={() => setSelectedUser(user)}
-                              >
-                                Send interest
-                              </a>
+                              {user.interestStatus === "pending" ? (
+                                <span
+                                  className="cta cta-sendint"
+                                  style={{ cursor: "default", opacity: 0.8 }}
+                                >
+                                  Request Sent
+                                </span>
+                              ) : user.interestStatus === "accepted" ? (
+                                <span
+                                  className="cta cta-sendint"
+                                  style={{ cursor: "default", backgroundColor: "#4caf50", borderColor: "#4caf50" }}
+                                >
+                                  Request Accepted
+                                </span>
+                              ) : (
+                                <a
+                                  href="#!"
+                                  className="cta cta-sendint"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#sendInter"
+                                  onClick={() => setSelectedUser(user)}
+                                >
+                                  Send interest
+                                </a>
+                              )}
                               <span
                                 className="cta"
                                 onClick={() => shortListProfile(user)}
@@ -601,7 +619,7 @@ const UserSearchResult = () => {
                                 Short List
                               </span>
                               <a href={`/profile-more-details/${user._id}`}>
-                                More details
+                                View Profile
                               </a>
                             </div>
                           </div>
@@ -632,223 +650,241 @@ const UserSearchResult = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Send Interest Modal */}
-      {selectedUser && (
-        <ShowInterest selectedUser={selectedUser} userId={userId} />
-      )}
+      {
+        selectedUser && (
+          <ShowInterest
+            selectedUser={selectedUser}
+            userId={userId}
+            onSuccess={() => {
+              setUsers(prevUsers =>
+                prevUsers.map(u =>
+                  u._id === selectedUser._id
+                    ? { ...u, interestStatus: 'pending' }
+                    : u
+                )
+              );
+            }}
+          />
+        )
+      }
 
       {/* Enhanced Chat Box */}
-      {isChatOpen && selectedUser && (
-        <div
-          className="chatbox"
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            right: "20px",
-            width: "350px",
-            height: "500px",
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-            boxShadow: "0 0 20px rgba(0,0,0,0.2)",
-            display: "flex",
-            flexDirection: "column",
-            zIndex: 1000,
-            overflow: "hidden",
-          }}
-        >
+      {
+        isChatOpen && selectedUser && (
           <div
-            className="chat-header"
+            className="chatbox"
             style={{
-              padding: "15px",
-              backgroundColor: "#f8f9fa",
-              borderBottom: "1px solid #eee",
+              position: "fixed",
+              bottom: "20px",
+              right: "20px",
+              width: "350px",
+              height: "500px",
+              backgroundColor: "#fff",
+              borderRadius: "8px",
+              boxShadow: "0 0 20px rgba(0,0,0,0.2)",
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              flexDirection: "column",
+              zIndex: 1000,
+              overflow: "hidden",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img
-                src={selectedUser.profileImage || "images/default-profile.jpg"}
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  marginRight: "10px",
-                }}
-                alt={selectedUser.userName}
-              />
-              <h4 style={{ margin: 0 }}>{selectedUser.userName}</h4>
-            </div>
-            <span
-              className="comm-msg-pop-clo"
-              onClick={closeChat}
+            <div
+              className="chat-header"
               style={{
-                cursor: "pointer",
-                fontSize: "20px",
-                color: "#999",
+                padding: "15px",
+                backgroundColor: "#f8f9fa",
+                borderBottom: "1px solid #eee",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              <i className="fa fa-times" aria-hidden="true"></i>
-            </span>
-          </div>
-
-          <div
-            className="chat-messages"
-            style={{
-              flex: 1,
-              padding: "15px",
-              overflowY: "auto",
-            }}
-          >
-            {chatMessages.length === 0 ? (
-              <div
-                className="chat-welcome"
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img
+                  src={selectedUser.profileImage || "images/default-profile.jpg"}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    marginRight: "10px",
+                  }}
+                  alt={selectedUser.userName}
+                />
+                <h4 style={{ margin: 0 }}>{selectedUser.userName}</h4>
+              </div>
+              <span
+                className="comm-msg-pop-clo"
+                onClick={closeChat}
                 style={{
-                  textAlign: "center",
+                  cursor: "pointer",
+                  fontSize: "20px",
                   color: "#999",
-                  marginTop: "50%",
                 }}
               >
-                Start a new conversation with {selectedUser.userName}
-              </div>
-            ) : (
-              chatMessages.map((msg, index) => (
+                <i className="fa fa-times" aria-hidden="true"></i>
+              </span>
+            </div>
+
+            <div
+              className="chat-messages"
+              style={{
+                flex: 1,
+                padding: "15px",
+                overflowY: "auto",
+              }}
+            >
+              {chatMessages.length === 0 ? (
                 <div
-                  key={index}
+                  className="chat-welcome"
                   style={{
-                    marginBottom: "10px",
-                    textAlign: msg.sender === "me" ? "right" : "left",
+                    textAlign: "center",
+                    color: "#999",
+                    marginTop: "50%",
                   }}
                 >
+                  Start a new conversation with {selectedUser.userName}
+                </div>
+              ) : (
+                chatMessages.map((msg, index) => (
                   <div
+                    key={index}
                     style={{
-                      display: "inline-block",
-                      padding: "8px 12px",
-                      borderRadius:
-                        msg.sender === "me"
-                          ? "18px 18px 0 18px"
-                          : "18px 18px 18px 0",
-                      backgroundColor:
-                        msg.sender === "me" ? "#007bff" : "#f1f1f1",
-                      color: msg.sender === "me" ? "#fff" : "#333",
-                      maxWidth: "80%",
-                    }}
-                  >
-                    {msg.message}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "11px",
-                      color: "#999",
-                      marginTop: "4px",
+                      marginBottom: "10px",
                       textAlign: msg.sender === "me" ? "right" : "left",
                     }}
                   >
-                    {new Date(msg.timestamp).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    <div
+                      style={{
+                        display: "inline-block",
+                        padding: "8px 12px",
+                        borderRadius:
+                          msg.sender === "me"
+                            ? "18px 18px 0 18px"
+                            : "18px 18px 18px 0",
+                        backgroundColor:
+                          msg.sender === "me" ? "#007bff" : "#f1f1f1",
+                        color: msg.sender === "me" ? "#fff" : "#333",
+                        maxWidth: "80%",
+                      }}
+                    >
+                      {msg.message}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        color: "#999",
+                        marginTop: "4px",
+                        textAlign: msg.sender === "me" ? "right" : "left",
+                      }}
+                    >
+                      {new Date(msg.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
+                ))
+              )}
+            </div>
 
-          <div
-            className="chat-input"
-            style={{
-              padding: "10px",
-              borderTop: "1px solid #eee",
-              backgroundColor: "#f8f9fa",
-            }}
-          >
-            <form onSubmit={handleChatSend} style={{ display: "flex" }}>
-              <input
-                type="text"
-                value={chatMessage}
-                onChange={(e) => setChatMessage(e.target.value)}
-                placeholder="Type a message..."
-                style={{
-                  flex: 1,
-                  padding: "10px",
-                  border: "1px solid #ddd",
-                  borderRadius: "20px",
-                  outline: "none",
-                }}
-                required
-              />
-              <button
-                type="submit"
-                style={{
-                  marginLeft: "10px",
-                  padding: "10px 15px",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "20px",
-                  cursor: "pointer",
-                }}
-              >
-                <i className="fa fa-paper-plane" aria-hidden="true"></i>
-              </button>
-            </form>
+            <div
+              className="chat-input"
+              style={{
+                padding: "10px",
+                borderTop: "1px solid #eee",
+                backgroundColor: "#f8f9fa",
+              }}
+            >
+              <form onSubmit={handleChatSend} style={{ display: "flex" }}>
+                <input
+                  type="text"
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  style={{
+                    flex: 1,
+                    padding: "10px",
+                    border: "1px solid #ddd",
+                    borderRadius: "20px",
+                    outline: "none",
+                  }}
+                  required
+                />
+                <button
+                  type="submit"
+                  style={{
+                    marginLeft: "10px",
+                    padding: "10px 15px",
+                    backgroundColor: "#007bff",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "20px",
+                    cursor: "pointer",
+                  }}
+                >
+                  <i className="fa fa-paper-plane" aria-hidden="true"></i>
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Active Chats Indicator */}
-      {activeChats.length > 0 && !isChatOpen && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            right: "20px",
-            backgroundColor: "#007bff",
-            color: "#fff",
-            width: "50px",
-            height: "50px",
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            boxShadow: "0 0 10px rgba(0,0,0,0.2)",
-            zIndex: 999,
-          }}
-          onClick={() => setIsChatOpen(true)}
-        >
-          <i
-            className="fa fa-comments"
-            aria-hidden="true"
-            style={{ fontSize: "20px" }}
-          ></i>
-          <span
+      {
+        activeChats.length > 0 && !isChatOpen && (
+          <div
             style={{
-              position: "absolute",
-              top: "-5px",
-              right: "-5px",
-              backgroundColor: "red",
+              position: "fixed",
+              bottom: "20px",
+              right: "20px",
+              backgroundColor: "#007bff",
               color: "#fff",
+              width: "50px",
+              height: "50px",
               borderRadius: "50%",
-              width: "20px",
-              height: "20px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "12px",
+              cursor: "pointer",
+              boxShadow: "0 0 10px rgba(0,0,0,0.2)",
+              zIndex: 999,
             }}
+            onClick={() => setIsChatOpen(true)}
           >
-            {activeChats.length}
-          </span>
-        </div>
-      )}
+            <i
+              className="fa fa-comments"
+              aria-hidden="true"
+              style={{ fontSize: "20px" }}
+            ></i>
+            <span
+              style={{
+                position: "absolute",
+                top: "-5px",
+                right: "-5px",
+                backgroundColor: "red",
+                color: "#fff",
+                borderRadius: "50%",
+                width: "20px",
+                height: "20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "12px",
+              }}
+            >
+              {activeChats.length}
+            </span>
+          </div>
+        )
+      }
 
       <Footer />
       <CopyRights />
-    </div>
+    </div >
   );
 };
 

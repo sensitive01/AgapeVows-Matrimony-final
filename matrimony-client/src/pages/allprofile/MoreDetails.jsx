@@ -6,6 +6,7 @@ import {
   getAllChatDoneByTheUser,
   getTheProfieMoreDetails,
   sendChatMessage,
+  getInterestedProfile,
 } from "../../api/axiosService/userAuthService";
 import Footer from "../../components/Footer";
 import CopyRights from "../../components/CopyRights";
@@ -17,7 +18,7 @@ import maleDefault from "../../assets/images/profiles/men1.jpg";
 import femaleDefault from "../../assets/images/profiles/12.jpg";
 
 const ImageSlider = React.memo(
-  ({ allImages, currentImageIndex, setCurrentImageIndex, defaultImage }) => {
+  ({ allImages, currentImageIndex, setCurrentImageIndex, defaultImage, isAccepted }) => {
     const nextImage = useCallback(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
     }, [allImages.length, setCurrentImageIndex]);
@@ -28,130 +29,278 @@ const ImageSlider = React.memo(
       );
     }, [allImages.length, setCurrentImageIndex]);
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const toggleModal = () => {
+      setIsModalOpen(!isModalOpen);
+    };
+
     return (
-      <div className="s1" style={{ position: "relative" }}>
-        <img
-          src={allImages[currentImageIndex]}
-          loading="lazy"
-          className="pro"
-          alt="Profile"
+      <>
+        <div
+          className="s1"
           style={{
-            width: "100%",
-            height: "750px",
-            objectFit: "cover",
-            objectPosition: "center",
+            position: "relative",
+            cursor: "pointer",
           }}
-          onError={(e) => {
-            if (defaultImage) e.target.src = defaultImage;
-          }}
-        />
+          onClick={toggleModal}
+        >
+          <img
+            src={allImages[currentImageIndex]}
+            loading="lazy"
+            className="pro"
+            alt="Profile"
+            style={{
+              width: "100%",
+              display: "block",
+            }}
+            onError={(e) => {
+              if (defaultImage) e.target.src = defaultImage;
+            }}
+          />
 
-        {/* Navigation Arrows */}
-        {allImages.length > 1 && (
-          <>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                prevImage();
-              }}
+          {/* Zoom Indicator */}
+          <div style={{
+            position: "absolute",
+            top: "15px",
+            right: "15px",
+            background: "rgba(0, 0, 0, 0.6)",
+            color: "white",
+            padding: "6px 12px",
+            borderRadius: "20px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            backdropFilter: "blur(4px)",
+            zIndex: 5
+          }}>
+            <i className="fa fa-expand"></i> Click to Zoom
+          </div>
+
+          {/* Navigation Arrows */}
+          {allImages.length > 1 && isAccepted && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prevImage();
+                }}
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "10px",
+                  transform: "translateY(-50%)",
+                  background: "rgba(255, 255, 255, 0.8)",
+                  color: "#333",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  zIndex: 10,
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                  transition: "all 0.3s",
+                }}
+                className="slider-arrow"
+              >
+                <i className="fa fa-chevron-left"></i>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextImage();
+                }}
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  right: "10px",
+                  transform: "translateY(-50%)",
+                  background: "rgba(255, 255, 255, 0.8)",
+                  color: "#333",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  zIndex: 10,
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                  transition: "all 0.3s",
+                }}
+                className="slider-arrow"
+              >
+                <i className="fa fa-chevron-right"></i>
+              </button>
+            </>
+          )}
+
+          {/* Image Indicators */}
+          {allImages.length > 1 && isAccepted && (
+            <div
               style={{
                 position: "absolute",
-                top: "50%",
-                left: "10px",
-                transform: "translateY(-50%)",
-                background: "rgba(0, 0, 0, 0.5)",
-                color: "white",
-                border: "none",
-                borderRadius: "50%",
-                width: "40px",
-                height: "40px",
+                bottom: "15px",
+                left: "50%",
+                transform: "translateX(-50%)",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                zIndex: 10,
-                transition: "background 0.3s",
+                gap: "8px",
+                zIndex: 2,
+                background: "rgba(0,0,0,0.3)",
+                padding: "5px 10px",
+                borderRadius: "15px"
               }}
-              className="slider-arrow"
             >
-              <i className="fa fa-chevron-left"></i>
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                nextImage();
-              }}
-              style={{
-                position: "absolute",
-                top: "50%",
-                right: "10px",
-                transform: "translateY(-50%)",
-                background: "rgba(0, 0, 0, 0.5)",
-                color: "white",
-                border: "none",
-                borderRadius: "50%",
-                width: "40px",
-                height: "40px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                zIndex: 10,
-                transition: "background 0.3s",
-              }}
-              className="slider-arrow"
-            >
-              <i className="fa fa-chevron-right"></i>
-            </button>
-          </>
-        )}
+              {allImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex(index);
+                  }}
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    border: "none",
+                    background:
+                      index === currentImageIndex
+                        ? "white"
+                        : "rgba(255,255,255,0.5)",
+                    cursor: "pointer",
+                    padding: 0
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
 
-        {/* Image Indicators - Only show if multiple images */}
-        {allImages.length > 1 && (
+        {/* Image Gallery Modal */}
+        {isModalOpen && (
           <div
             style={{
-              position: "absolute",
-              bottom: "10px",
-              left: "50%",
-              transform: "translateX(-50%)",
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              backgroundColor: "rgba(0,0,0,0.9)",
+              zIndex: 99999,
               display: "flex",
-              gap: "6px",
-              zIndex: 2,
+              alignItems: "center",
+              justifyContent: "center",
             }}
+            onClick={toggleModal}
           >
-            {allImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentImageIndex(index)}
+            <div
+              style={{ position: "relative", maxWidth: "90%", maxHeight: "90%" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={allImages[currentImageIndex]}
                 style={{
-                  width: "8px",
-                  height: "8px",
-                  borderRadius: "50%",
-                  border: "none",
-                  background:
-                    index === currentImageIndex
-                      ? "white"
-                      : "rgba(255,255,255,0.5)",
-                  cursor: "pointer",
+                  maxWidth: "100%",
+                  maxHeight: "90vh",
+                  objectFit: "contain",
                 }}
               />
-            ))}
+              <button
+                onClick={toggleModal}
+                style={{
+                  position: "fixed",
+                  top: "20px",
+                  right: "30px",
+                  background: "rgba(0,0,0,0.5)",
+                  border: "none",
+                  color: "white",
+                  fontSize: "40px",
+                  cursor: "pointer",
+                  padding: "0 10px",
+                  borderRadius: "5px",
+                  zIndex: 100000,
+                }}
+              >
+                &times;
+              </button>
+
+              {allImages.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      prevImage();
+                    }}
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "-60px",
+                      transform: "translateY(-50%)",
+                      background: "rgba(255, 255, 255, 0.2)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50%",
+                      width: "50px",
+                      height: "50px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      fontSize: "24px",
+                    }}
+                  >
+                    <i className="fa fa-chevron-left"></i>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      nextImage();
+                    }}
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      right: "-60px",
+                      transform: "translateY(-50%)",
+                      background: "rgba(255, 255, 255, 0.2)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50%",
+                      width: "50px",
+                      height: "50px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      fontSize: "24px",
+                    }}
+                  >
+                    <i className="fa fa-chevron-right"></i>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         )}
-      </div>
+      </>
     );
   }
 );
 
 // Separate component for profile details to prevent unnecessary re-renders
 const ProfileDetails = React.memo(
-  ({ profileData, calculatedAge, formatDate, setCurrentImageIndex }) => {
+  ({ profileData, calculatedAge, formatDate, setCurrentImageIndex, isAccepted }) => {
     return (
       <DisPlayProfileDetails
         profileData={profileData}
         calculatedAge={calculatedAge}
         setCurrentImageIndex={setCurrentImageIndex}
         formatDate={formatDate}
+        isAccepted={isAccepted}
       />
     );
   }
@@ -227,13 +376,41 @@ const MoreDetails = () => {
     };
   }, [userId]);
 
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const response = await getTheProfieMoreDetails(profileId);
+
+
         if (response.status === 200) {
-          setProfileData(response.data.data);
+          let data = response.data.data;
+
+          // Fetch interest status if logged in
+          if (userId) {
+            try {
+              const pendingRes = await getInterestedProfile(userId, "pending");
+              const acceptedRes = await getInterestedProfile(userId, "accepted");
+
+              const pendingList = pendingRes.data?.data || [];
+              const acceptedList = acceptedRes.data?.data || [];
+
+              const isPending = pendingList.some(u => u._id === profileId);
+              const isAccepted = acceptedList.some(u => u._id === profileId);
+
+              if (isAccepted) {
+                data.interestStatus = 'accepted';
+              } else if (isPending) {
+                data.interestStatus = 'pending';
+              }
+            } catch (statusErr) {
+              console.error("Error fetching interest status:", statusErr);
+            }
+          }
+
+          setProfileData(data);
         } else {
           setError("Failed to fetch profile data");
         }
@@ -245,7 +422,7 @@ const MoreDetails = () => {
       }
     };
     fetchData();
-  }, [profileId]);
+  }, [profileId, userId]);
 
   // Get all images (profile + additional) - memoized to prevent recalculation
   const defaultImage = useMemo(() => {
@@ -444,6 +621,8 @@ const MoreDetails = () => {
     isOnline: onlineUsers.includes(profileId),
   };
 
+  const isAccepted = profileData?.interestStatus === 'accepted';
+
   return (
     <div className="min-h-screen">
       <div className="fixed top-0 left-0 right-0 z-50">
@@ -455,30 +634,89 @@ const MoreDetails = () => {
           <div className="profi-pg profi-ban">
             <div className="profile-image-sticky">
               <div className="profile">
-                <div className="pg-pro-big-im">
+                <div className="pg-pro-big-im" style={{
+                  boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
+                  borderRadius: "15px",
+                  overflow: "hidden",
+                  backgroundColor: "#fff",
+                  marginBottom: "20px",
+                  border: "1px solid #eee"
+                }}>
                   <ImageSlider
                     allImages={allImages}
                     currentImageIndex={currentImageIndex}
                     setCurrentImageIndex={setCurrentImageIndex}
                     defaultImage={defaultImage}
+                    isAccepted={isAccepted}
                   />
-                  <div className="s3">
-                    <button
-                      className="cta fol cta-chat"
-                      onClick={getChatDetails}
-                      disabled={chatLoading}
-                    >
-                      {chatLoading ? "Loading..." : "Chat now"}
-                    </button>
-                    <span
-                      className="cta cta-sendint"
-                      data-toggle="modal"
-                      data-target="#sendInter"
-                      onClick={handleSendInterest}
-                      style={{ cursor: "pointer" }}
-                    >
-                      Send interest
-                    </span>
+                  <div className="s3" style={{
+                    padding: "15px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "10px",
+                    backgroundColor: "#fff",
+                  }}>
+                    {isAccepted && (
+                      <button
+                        className="cta fol cta-chat"
+                        onClick={getChatDetails}
+                        disabled={chatLoading}
+                        style={{ width: "100%", margin: 0 }}
+                      >
+                        {chatLoading ? "Loading..." : "Chat now"}
+                      </button>
+                    )}
+                    {profileData?.interestStatus === "pending" ? (
+                      <span
+                        className="cta cta-sendint"
+                        style={{
+                          cursor: "default",
+                          opacity: 0.8,
+                          width: "100%",
+                          textAlign: "center",
+                          display: "block",
+                          padding: "10px",
+                          borderRadius: "5px"
+                        }}
+                      >
+                        Request Sent
+                      </span>
+                    ) : profileData?.interestStatus === "accepted" ? (
+                      <span
+                        className="cta cta-sendint"
+                        style={{
+                          cursor: "default",
+                          backgroundColor: "#4caf50",
+                          borderColor: "#4caf50",
+                          width: "100%",
+                          textAlign: "center",
+                          display: "block",
+                          padding: "10px",
+                          borderRadius: "5px"
+                        }}
+                      >
+                        Request Accepted
+                      </span>
+                    ) : (
+                      <span
+                        className="cta cta-sendint"
+                        data-bs-toggle="modal"
+                        data-bs-target="#sendInter"
+                        onClick={handleSendInterest}
+                        style={{
+                          cursor: "pointer",
+                          width: "100%",
+                          textAlign: "center",
+                          display: "block",
+                          padding: "10px",
+                          borderRadius: "5px",
+                          backgroundColor: "#ff9800", // Explicit color if class fails
+                          color: "white"
+                        }}
+                      >
+                        Send interest
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -489,12 +727,19 @@ const MoreDetails = () => {
               calculatedAge={calculatedAge}
               formatDate={formatDate}
               setCurrentImageIndex={setCurrentImageIndex}
+              isAccepted={isAccepted}
             />
           </div>
         </div>
       </div>
 
-      <ShowInterest />
+      <ShowInterest
+        selectedUser={profileData}
+        userId={userId}
+        onSuccess={() => {
+          setProfileData(prev => ({ ...prev, interestStatus: 'pending' }));
+        }}
+      />
 
       {isChatOpen && (
         <ChatUi
