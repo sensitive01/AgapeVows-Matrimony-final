@@ -16,9 +16,7 @@ const FindYourPerfectMatchNow = () => {
                   fringilla.Lorem Ipsum is simply dummy text of the printing and
                   typesetting industry.
                 </p>
-                <a href="/user/user-sign-up" className="cta-3" style={{ background: "#A020F0" }}>
-                  Register Now
-                </a>
+
                 <a href="/contact-page" className="cta-4">
                   Help &amp; Support
                 </a>

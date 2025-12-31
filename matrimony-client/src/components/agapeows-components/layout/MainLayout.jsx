@@ -48,11 +48,10 @@ const ExploreDropdown = ({ isVisible }) => {
 
   return (
     <div
-      className={`absolute top-full left-0 mt-2 w-72 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${
-        isVisible
+      className={`absolute top-full left-0 mt-2 w-72 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${isVisible
           ? "opacity-100 visible translate-y-0"
           : "opacity-0 invisible translate-y-2"
-      }`}
+        }`}
     >
       {categories.map((category, index) => (
         <button
@@ -82,11 +81,10 @@ const ProfileDropdown = ({ isVisible, onLogout }) => {
 
   return (
     <div
-      className={`absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${
-        isVisible
+      className={`absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${isVisible
           ? "opacity-100 visible translate-y-0"
           : "opacity-0 invisible translate-y-2"
-      }`}
+        }`}
     >
       {profileLinks.map((link, index) => (
         <button
