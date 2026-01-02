@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+/* Existing imports */
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ArrowLeft } from "lucide-react";
 import MainLayout from "./agapeows-components/layout/MainLayout";
-import UserSideBar from "./UserSideBar";
+
+import { getUserProfile } from "../api/axiosService/userAuthService";
 
 /**
  * Global Search Page
@@ -14,6 +16,8 @@ const GlobalSearchModal = () => {
   const [activeTab, setActiveTab] = useState("quick");
   const [bnrId, setBnrId] = useState("");
 
+  const userId = localStorage.getItem("userId");
+
   // Search Form State
   const [formData, setFormData] = useState({
     // Quick Search
@@ -22,6 +26,7 @@ const GlobalSearchModal = () => {
     caste: "",
     maritalStatus: "",
     denomination: "",
+    gender: "", // Initialize gender
     // Regular Search (adds)
     heightFrom: "",
     heightTo: "",
@@ -41,6 +46,30 @@ const GlobalSearchModal = () => {
     dontShowViewed: false,
     dontShowShortlisted: false,
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!userId) return;
+      try {
+        const response = await getUserProfile(userId);
+        if (response.status === 200) {
+          const user = response.data.data;
+          let searchGender = "";
+          if (user.gender === "Male" || user.gender === "Groom") {
+            searchGender = "Female";
+          } else if (user.gender === "Female" || user.gender === "Bride") {
+            searchGender = "Male";
+          }
+          if (searchGender) {
+            setFormData((prev) => ({ ...prev, gender: searchGender }));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+    fetchData();
+  }, [userId]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -83,14 +112,8 @@ const GlobalSearchModal = () => {
           >
             <div className="row" style={{ marginLeft: 0, marginRight: 0 }}>
               <div
-                className="col-md-3 col-lg-2"
-                style={{ paddingLeft: 0, marginLeft: "0px" }}
-              >
-                <UserSideBar />
-              </div>
-              <div
-                className="col-md-9 col-lg-10"
-                style={{ paddingLeft: "20px", paddingRight: "15px" }}
+                className="col-md-12 col-lg-12"
+                style={{ paddingLeft: "15px", paddingRight: "15px" }}
               >
                 {/* Header */}
                 <div className="bg-white shadow-sm border-b border-gray-200 mb-4 rounded-lg">

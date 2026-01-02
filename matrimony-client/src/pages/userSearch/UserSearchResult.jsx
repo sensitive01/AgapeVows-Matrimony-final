@@ -24,11 +24,21 @@ const UserCardImageSlider = ({ user, isAccepted }) => {
           ? femaleDefault
           : defaultProfileImg;
 
-    const images = [user.profileImage || defaultImg];
+    const images = [];
+
+    if (user.profileImage) {
+      images.push(user.profileImage);
+    }
+
     if (user.additionalImages && user.additionalImages.length > 0) {
       images.push(...user.additionalImages);
     }
-    return images;
+
+    // Remove duplicates
+    const uniqueImages = [...new Set(images)];
+
+    // Return unique images or default if empty
+    return uniqueImages.length > 0 ? uniqueImages : [defaultImg];
   }, [user]);
 
   const nextImage = (e) => {
@@ -260,6 +270,9 @@ const UserSearchResult = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeChats, setActiveChats] = useState([]);
 
+  /* Add viewType state */
+  const [viewType, setViewType] = useState("list");
+
   // Function to fetch filtered data from API
   const fetchFilteredData = useCallback(
     async (filterParams) => {
@@ -331,6 +344,12 @@ const UserSearchResult = () => {
     };
 
     if (state) {
+      if (state.formData && state.formData.gender) {
+        setFilters((prev) => ({
+          ...prev,
+          gender: state.formData.gender,
+        }));
+      }
       fetchData();
     }
   }, [state]);
@@ -503,12 +522,20 @@ const UserSearchResult = () => {
                         </div>
                       </li>
                       <li>
-                        <div className="sort-grid sort-grid-1">
+                        <div
+                          className={`sort-grid sort-grid-1 ${viewType === "grid" ? "act" : ""}`}
+                          onClick={() => setViewType("grid")}
+                          style={{ cursor: "pointer" }}
+                        >
                           <i className="fa fa-th-large" aria-hidden="true"></i>
                         </div>
                       </li>
                       <li>
-                        <div className="sort-grid sort-grid-2 act">
+                        <div
+                          className={`sort-grid sort-grid-2 ${viewType === "list" ? "act" : ""}`}
+                          onClick={() => setViewType("list")}
+                          style={{ cursor: "pointer" }}
+                        >
                           <i className="fa fa-bars" aria-hidden="true"></i>
                         </div>
                       </li>
@@ -526,9 +553,12 @@ const UserSearchResult = () => {
                 )}
 
                 <div className="all-list-sh">
-                  <ul>
+                  <ul style={viewType === "grid" ? { display: "flex", flexWrap: "wrap", margin: "0 -10px" } : {}}>
                     {users.map((user) => (
-                      <li key={user._id}>
+                      <li
+                        key={user._id}
+                        style={viewType === "grid" ? { width: "50%", padding: "0 10px", marginBottom: "20px" } : { width: "100%", marginBottom: "20px" }}
+                      >
                         <div
                           className={`all-pro-box ${Math.random() > 0.5 ? "user-avil-onli" : ""
                             }`}

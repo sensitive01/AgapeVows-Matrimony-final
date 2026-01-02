@@ -64,7 +64,7 @@ function ReloadHandler() {
 function App() {
   useEffect(() => {
     // Feature Flag for Security
-    const ADD_SECURITY_CHECK = true;
+    const ADD_SECURITY_CHECK = false;
 
     if (!ADD_SECURITY_CHECK) return;
 

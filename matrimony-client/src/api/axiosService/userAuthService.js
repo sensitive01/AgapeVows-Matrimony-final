@@ -203,6 +203,17 @@ export const unignoreProfile = async (userId, ignoredUserId) => {
   }
 };
 
+export const isUserMadeTheInterest = async (userId, profileId) => {
+  try {
+    const response = await userInstance.get(`/is-am-made-interest/${userId}/${profileId}`);
+    return response;
+  } catch (error) {
+    console.error("Error unignoring profile:", error);
+    throw error;
+  }
+};
+
+
 
 // export const checkInterestStatus = async (userId, profileId) => {
 //   try {

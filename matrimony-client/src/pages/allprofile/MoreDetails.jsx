@@ -7,6 +7,7 @@ import {
   getTheProfieMoreDetails,
   sendChatMessage,
   getInterestedProfile,
+  isUserMadeTheInterest,
 } from "../../api/axiosService/userAuthService";
 import Footer from "../../components/Footer";
 import CopyRights from "../../components/CopyRights";
@@ -391,25 +392,12 @@ const MoreDetails = () => {
           // Fetch interest status if logged in
           if (userId) {
             try {
-              const pendingRes = await getInterestedProfile(userId, "pending");
-              const acceptedRes = await getInterestedProfile(userId, "accepted");
-
-              const pendingList = pendingRes.data?.data || [];
-              const acceptedList = acceptedRes.data?.data || [];
-
-              const isPending = pendingList.some(u => u._id === profileId);
-              const isAccepted = acceptedList.some(u => u._id === profileId);
-
-              if (isAccepted) {
-                data.interestStatus = 'accepted';
-              } else if (isPending) {
-                data.interestStatus = 'pending';
-              }
-            } catch (statusErr) {
-              console.error("Error fetching interest status:", statusErr);
+              const response = await isUserMadeTheInterest(userId, profileId);
+              console.log("isIMadeInteret response:", response);
+            } catch (err) {
+              console.error("Error fetching interest status:", err);
             }
           }
-
           setProfileData(data);
         } else {
           setError("Failed to fetch profile data");
