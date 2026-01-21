@@ -1,7 +1,6 @@
 import React from "react";
-import accountIcon from "../../assets/images/profiles/1.jpg";
 
-const ProfileCompletion = () => {
+const ProfileCompletion = ({ userData }) => {
   return (
     <div className="col-md-12 col-lg-6 col-xl-4 db-sec-com">
       <h2 className="db-tit">Profiles status</h2>
@@ -48,13 +47,13 @@ const ProfileCompletion = () => {
           <li>
             <span>
               <i className="fa fa-eye view" aria-hidden="true"></i>
-              <b>12</b>Views
+              <b>{userData?.viewsCount || 0}</b>Views
             </span>
           </li>
           <li>
             <span>
               <i className="fa fa-handshake-o inte" aria-hidden="true"></i>
-              <b>12</b>Interests
+              <b>{userData?.interestsCount || 0}</b>Interests
             </span>
           </li>
           {/* <li>

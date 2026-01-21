@@ -392,37 +392,32 @@ const FormInput = ({
       )}
     </label>
     {type === "select" ? (
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "12px 20px" }}>
+      <select
+        name={name}
+        value={value || ""}
+        onChange={onChange}
+        required={required}
+        style={{
+          width: "100%",
+          padding: "10px 14px",
+          border: "2px solid #e5e7eb",
+          borderRadius: "6px",
+          fontSize: "14px",
+          color: "#374151",
+          background: "#fff",
+          cursor: "pointer",
+          transition: "border-color 0.2s ease",
+          maxHeight: "200px",
+          overflowY: "auto",
+        }}
+      >
+        <option value="">Select {label}</option>
         {options.map((option) => (
-          <label
-            key={option}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              cursor: "pointer",
-              fontSize: "14px",
-              color: "#374151",
-            }}
-          >
-            <input
-              type="radio"
-              name={name}
-              value={option}
-              checked={value === option}
-              onChange={onChange}
-              required={required}
-              style={{
-                width: "16px",
-                height: "16px",
-                marginRight: "8px",
-                accentColor: "#667eea",
-                cursor: "pointer",
-              }}
-            />
+          <option key={option} value={option}>
             {option}
-          </label>
+          </option>
         ))}
-      </div>
+      </select>
     ) : type === "textarea" ? (
       <textarea
         name={name}
@@ -911,11 +906,11 @@ const UserProfileEditPage = () => {
 
     if (imageToRemove.isExisting) {
       setExistingAdditionalImages((prev) =>
-        prev.filter((url) => url !== imageToRemove.url)
+        prev.filter((url) => url !== imageToRemove.url),
       );
     } else if (imageToRemove.file) {
       setAdditionalImageFiles((prev) =>
-        prev.filter((file) => file !== imageToRemove.file)
+        prev.filter((file) => file !== imageToRemove.file),
       );
     }
   };
@@ -965,7 +960,7 @@ const UserProfileEditPage = () => {
       console.log("Submitting form data...");
       console.log(
         "Form data to submit:",
-        Object.fromEntries(submitFormData.entries())
+        Object.fromEntries(submitFormData.entries()),
       );
 
       const response = await savePersonalInfo(submitFormData, userId);
@@ -1079,7 +1074,7 @@ const UserProfileEditPage = () => {
                     }}
                   >
                     <FormInput
-                      label="Profile Created For"
+                      label="Profile Created By"
                       name="profileCreatedFor"
                       type="select"
                       value={formData.profileCreatedFor}
@@ -1146,10 +1141,21 @@ const UserProfileEditPage = () => {
                       ]}
                     />
                     <FormInput
-                      label="Height (cm)"
+                      label="Height"
                       name="height"
+                      type="select"
                       value={formData.height}
                       onChange={handleInputChange}
+                      options={[
+                        "5'4\" (163 cm)",
+                        "5'5\" (165 cm)",
+                        "5'6\" (168 cm)",
+                        "5'7\" (170 cm)",
+                        "5'8\" (173 cm)",
+                        "5'9\" (175 cm)",
+                        "5'10\" (178 cm)",
+                        "5'11\" (180 cm)",
+                      ]}
                     />
                     <FormInput
                       label="Weight (kg)"
@@ -1190,24 +1196,24 @@ const UserProfileEditPage = () => {
 
                     {(formData.maritalStatus === "Divorced" ||
                       formData.maritalStatus === "Awaiting Divorce") && (
-                        <>
+                      <>
+                        <FormInput
+                          label="Divorced Month & Year"
+                          name="divorcedMonthYear"
+                          value={formData.divorcedMonthYear}
+                          onChange={handleInputChange}
+                        />
+                        <div style={{ gridColumn: "1 / -1" }}>
                           <FormInput
-                            label="Divorced Month & Year"
-                            name="divorcedMonthYear"
-                            value={formData.divorcedMonthYear}
+                            label="Reason for Divorce"
+                            name="reasonForDivorce"
+                            type="textarea"
+                            value={formData.reasonForDivorce}
                             onChange={handleInputChange}
                           />
-                          <div style={{ gridColumn: "1 / -1" }}>
-                            <FormInput
-                              label="Reason for Divorce"
-                              name="reasonForDivorce"
-                              type="textarea"
-                              value={formData.reasonForDivorce}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                        </>
-                      )}
+                        </div>
+                      </>
+                    )}
 
                     {formData.maritalStatus &&
                       formData.maritalStatus !== "Never Married" && (
@@ -1267,14 +1273,56 @@ const UserProfileEditPage = () => {
                     <FormInput
                       label="Mother Tongue"
                       name="motherTongue"
+                      type="select"
                       value={formData.motherTongue}
                       onChange={handleInputChange}
+                      options={[
+                        "Malayalam",
+                        "Tamil",
+                        "Telugu",
+                        "Kannada",
+                        "Hindi",
+                        "English",
+                        "Konkani",
+                        "Marathi",
+                        "Bengali",
+                        "Gujarati",
+                        "Punjabi",
+                        "Urdu",
+                        "Oriya",
+                        "Assamese",
+                        "Tulu",
+                        "Other",
+                      ]}
                     />
                     <FormInput
                       label="Caste"
                       name="caste"
+                      type="select"
                       value={formData.caste}
                       onChange={handleInputChange}
+                      options={[
+                        "Doesn't wish to specify",
+                        "Latin Catholic",
+                        "Roman Catholic",
+                        "Syro Malabar",
+                        "Syro Malankara",
+                        "Knanaya Catholic",
+                        "CSI (Church of South India)",
+                        "Pentecostal",
+                        "Jacobite",
+                        "Orthodox",
+                        "Marthoma",
+                        "Protestant",
+                        "Anglican",
+                        "Baptist",
+                        "Methodist",
+                        "Presbyterian",
+                        "Seventh Day Adventist",
+                        "Assembly of God",
+                        "Brethren",
+                        "Other",
+                      ]}
                     />
                   </div>
                 </FormSection>

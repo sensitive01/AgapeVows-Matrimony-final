@@ -38,6 +38,8 @@ import IgnoredProfile from "./pages/ignoredprofile/IgnoredProfile";
 import Events from "./pages/public/Events"; // Import Events page
 import GlobalSearchModal from "./components/GlobalSearchModal";
 import HelpAndSupport from "./pages/helpAndSupport";
+import BridalMakeup from "./pages/public/BridalMakeup";
+import InsuranceServices from "./pages/public/InsuranceServices";
 
 // Component to handle page reloads
 function ReloadHandler() {
@@ -93,7 +95,9 @@ function App() {
       // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, and Screenshot interactions
       if (
         e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j")) ||
+        (e.ctrlKey &&
+          e.shiftKey &&
+          (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j")) ||
         (e.ctrlKey && (e.key === "U" || e.key === "u")) ||
         (e.ctrlKey && (e.key === "S" || e.key === "s")) ||
         (e.ctrlKey && (e.key === "P" || e.key === "p")) ||
@@ -219,10 +223,7 @@ function App() {
           path="/user/blocked-profiles-page"
           element={<BlockedProfile />}
         />
-        <Route
-          path="/help-support"
-          element={<HelpAndSupport />}
-        />
+        <Route path="/help-support" element={<HelpAndSupport />} />
         <Route
           path="/user/ignored-profiles-page"
           element={<IgnoredProfile />}
@@ -241,6 +242,8 @@ function App() {
         <Route path="/contact-page" element={<ContactPage />} />
         <Route path="/faq-page" element={<FaqPage />} />
         <Route path="/about-us" element={<AboutPage />} />
+        <Route path="/bridal-makeup" element={<BridalMakeup />} />
+        <Route path="/insurance-services" element={<InsuranceServices />} />
         <Route path="/user/events-page" element={<Events />} />
       </Routes>
     </Router>

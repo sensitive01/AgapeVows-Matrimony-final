@@ -214,6 +214,7 @@ const userSchema = new mongoose.Schema(
       ========================== */
       profileImage: { type: String },
       additionalImages: [{ type: String }],
+      profileViews: [{ type: String }],
    },
    { timestamps: true }
 );

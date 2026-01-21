@@ -61,15 +61,10 @@ const ProfileSection = ({ title, icon, children }) => (
           gap: "10px",
         }}
       >
-        <i
-          className={`fa ${icon}`}
-          style={{ color: "#7c3aed" }}
-        ></i>
+        <i className={`fa ${icon}`} style={{ color: "#7c3aed" }}></i>
         {title}
       </h4>
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        {children}
-      </div>
+      <div style={{ display: "flex", flexDirection: "column" }}>{children}</div>
     </div>
   </div>
 );
@@ -91,7 +86,10 @@ const SocialLink = ({ icon, color, label, value }) => (
       fontSize: "0.9rem",
     }}
   >
-    <i className={`fa ${icon}`} style={{ fontSize: "1.1rem", color: color }}></i>
+    <i
+      className={`fa ${icon}`}
+      style={{ fontSize: "1.1rem", color: color }}
+    ></i>
     <span style={{ color: "#333", fontWeight: "500" }}>{label}</span>
   </a>
 );
@@ -156,7 +154,7 @@ const UserProfilePage = () => {
                   paddingRight: "15px",
                   height: "calc(100vh - 80px)",
                   overflowY: "auto",
-                  overflowX: "hidden"
+                  overflowX: "hidden",
                 }}
               >
                 <div className="row">
@@ -335,12 +333,13 @@ const UserProfilePage = () => {
                               }}
                             >
                               <span
-                                className={`badge ${userInfo?.profileStatus === "Approved"
-                                  ? "bg-success"
-                                  : userInfo?.profileStatus === "Pending"
-                                    ? "bg-warning text-dark"
-                                    : "bg-secondary"
-                                  }`}
+                                className={`badge ${
+                                  userInfo?.profileStatus === "Approved"
+                                    ? "bg-success"
+                                    : userInfo?.profileStatus === "Pending"
+                                      ? "bg-warning text-dark"
+                                      : "bg-secondary"
+                                }`}
                                 style={{
                                   padding: "8px 16px",
                                   fontSize: "0.9rem",
@@ -415,24 +414,109 @@ const UserProfilePage = () => {
 
                   {/* Basic Details Section */}
                   <ProfileSection title="Basic Details" icon="fa-info-circle">
-                    <InfoRow
-                      label="Profile Created for"
-                      value={userInfo?.profileCreatedFor}
-                    />
+                    {/* Profile Created By - Dropdown */}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        padding: "8px 0",
+                        fontSize: "0.95rem",
+                        borderBottom: "1px solid #f0f0f0",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span
+                        style={{
+                          color: "#666",
+                          fontWeight: "500",
+                          minWidth: "200px",
+                        }}
+                      >
+                        Profile Created By:
+                      </span>
+                      <select
+                        value={userInfo?.profileCreatedFor || ""}
+                        onChange={async (e) => {
+                          const newValue = e.target.value;
+                          // Update local state immediately for instant UI feedback
+                          setUserInfo((prev) => ({
+                            ...prev,
+                            profileCreatedFor: newValue,
+                          }));
+
+                          // Call API to save the change
+                          try {
+                            const formData = new FormData();
+                            formData.append("profileCreatedFor", newValue);
+
+                            const { savePersonalInfo } =
+                              await import("../api/axiosService/userAuthService");
+                            const response = await savePersonalInfo(
+                              formData,
+                              userId,
+                            );
+
+                            if (response.status === 200) {
+                              console.log(
+                                "Profile Created By updated successfully",
+                              );
+                            }
+                          } catch (error) {
+                            console.error(
+                              "Error updating Profile Created By:",
+                              error,
+                            );
+                            // Revert on error
+                            const response = await getUserProfile(userId);
+                            if (response.status === 200) {
+                              setUserInfo(response.data.data);
+                            }
+                          }
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: "8px 12px",
+                          borderRadius: "6px",
+                          border: "2px solid #e0e0e0",
+                          fontSize: "0.95rem",
+                          fontWeight: "600",
+                          color: "#333",
+                          background: "#fff",
+                          cursor: "pointer",
+                          outline: "none",
+                          transition: "all 0.3s ease",
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = "#667eea";
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = "#e0e0e0";
+                        }}
+                      >
+                        <option value="">Select</option>
+                        <option value="Self">Self</option>
+                        <option value="Son">Son</option>
+                        <option value="Daughter">Daughter</option>
+                        <option value="Brother">Brother</option>
+                        <option value="Sister">Sister</option>
+                        <option value="Friend">Friend</option>
+                        <option value="Relative">Relative</option>
+                      </select>
+                    </div>
                     <InfoRow label="Name" value={userInfo?.userName} />
                     <InfoRow
                       label="Age"
                       value={
                         userInfo?.dateOfBirth
                           ? `${calculateAge(
-                            userInfo.dateOfBirth
-                          )} years / ${new Date(
-                            userInfo.dateOfBirth
-                          ).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}`
+                              userInfo.dateOfBirth,
+                            )} years / ${new Date(
+                              userInfo.dateOfBirth,
+                            ).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}`
                           : null
                       }
                     />
@@ -444,15 +528,11 @@ const UserProfilePage = () => {
                     <InfoRow label="Complexion" value={userInfo?.complexion} />
                     <InfoRow
                       label="Height"
-                      value={
-                        userInfo?.height ? `${userInfo.height} cm` : null
-                      }
+                      value={userInfo?.height ? `${userInfo.height} cm` : null}
                     />
                     <InfoRow
                       label="Weight"
-                      value={
-                        userInfo?.weight ? `${userInfo.weight} kg` : null
-                      }
+                      value={userInfo?.weight ? `${userInfo.weight} kg` : null}
                     />
                     <InfoRow
                       label="Marital Status"
@@ -483,17 +563,17 @@ const UserProfilePage = () => {
 
                     {(userInfo?.maritalStatus === "Divorced" ||
                       userInfo?.maritalStatus === "Awaiting Divorce") && (
-                        <>
-                          <InfoRow
-                            label="Divorced Month & Year"
-                            value={userInfo?.divorcedMonthYear}
-                          />
-                          <InfoRow
-                            label="Reason for Divorce"
-                            value={userInfo?.reasonForDivorce}
-                          />
-                        </>
-                      )}
+                      <>
+                        <InfoRow
+                          label="Divorced Month & Year"
+                          value={userInfo?.divorcedMonthYear}
+                        />
+                        <InfoRow
+                          label="Reason for Divorce"
+                          value={userInfo?.reasonForDivorce}
+                        />
+                      </>
+                    )}
 
                     <InfoRow
                       label="Eating Habits"
@@ -854,10 +934,7 @@ const UserProfilePage = () => {
                       label="Annual Income"
                       value={userInfo?.partnerAnnualIncome}
                     />
-                    <InfoRow
-                      label="Country"
-                      value={userInfo?.partnerCountry}
-                    />
+                    <InfoRow label="Country" value={userInfo?.partnerCountry} />
                     <InfoRow label="State" value={userInfo?.partnerState} />
                     <InfoRow
                       label="District"

@@ -19,14 +19,20 @@ import maleDefault from "../../assets/images/profiles/men1.jpg";
 import femaleDefault from "../../assets/images/profiles/12.jpg";
 
 const ImageSlider = React.memo(
-  ({ allImages, currentImageIndex, setCurrentImageIndex, defaultImage, isAccepted }) => {
+  ({
+    allImages,
+    currentImageIndex,
+    setCurrentImageIndex,
+    defaultImage,
+    isAccepted,
+  }) => {
     const nextImage = useCallback(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
     }, [allImages.length, setCurrentImageIndex]);
 
     const prevImage = useCallback(() => {
       setCurrentImageIndex((prevIndex) =>
-        prevIndex === 0 ? allImages.length - 1 : prevIndex - 1
+        prevIndex === 0 ? allImages.length - 1 : prevIndex - 1,
       );
     }, [allImages.length, setCurrentImageIndex]);
 
@@ -61,21 +67,23 @@ const ImageSlider = React.memo(
           />
 
           {/* Zoom Indicator */}
-          <div style={{
-            position: "absolute",
-            top: "15px",
-            right: "15px",
-            background: "rgba(0, 0, 0, 0.6)",
-            color: "white",
-            padding: "6px 12px",
-            borderRadius: "20px",
-            fontSize: "14px",
-            display: "flex",
-            alignItems: "center",
-            gap: "5px",
-            backdropFilter: "blur(4px)",
-            zIndex: 5
-          }}>
+          <div
+            style={{
+              position: "absolute",
+              top: "15px",
+              right: "15px",
+              background: "rgba(0, 0, 0, 0.6)",
+              color: "white",
+              padding: "6px 12px",
+              borderRadius: "20px",
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              backdropFilter: "blur(4px)",
+              zIndex: 5,
+            }}
+          >
             <i className="fa fa-expand"></i> Click to Zoom
           </div>
 
@@ -154,7 +162,7 @@ const ImageSlider = React.memo(
                 zIndex: 2,
                 background: "rgba(0,0,0,0.3)",
                 padding: "5px 10px",
-                borderRadius: "15px"
+                borderRadius: "15px",
               }}
             >
               {allImages.map((_, index) => (
@@ -174,7 +182,7 @@ const ImageSlider = React.memo(
                         ? "white"
                         : "rgba(255,255,255,0.5)",
                     cursor: "pointer",
-                    padding: 0
+                    padding: 0,
                   }}
                 />
               ))}
@@ -200,7 +208,11 @@ const ImageSlider = React.memo(
             onClick={toggleModal}
           >
             <div
-              style={{ position: "relative", maxWidth: "90%", maxHeight: "90%" }}
+              style={{
+                position: "relative",
+                maxWidth: "90%",
+                maxHeight: "90%",
+              }}
               onClick={(e) => e.stopPropagation()}
             >
               <img
@@ -289,12 +301,18 @@ const ImageSlider = React.memo(
         )}
       </>
     );
-  }
+  },
 );
 
 // Separate component for profile details to prevent unnecessary re-renders
 const ProfileDetails = React.memo(
-  ({ profileData, calculatedAge, formatDate, setCurrentImageIndex, isAccepted }) => {
+  ({
+    profileData,
+    calculatedAge,
+    formatDate,
+    setCurrentImageIndex,
+    isAccepted,
+  }) => {
     return (
       <DisPlayProfileDetails
         profileData={profileData}
@@ -304,7 +322,7 @@ const ProfileDetails = React.memo(
         isAccepted={isAccepted}
       />
     );
-  }
+  },
 );
 
 const MoreDetails = () => {
@@ -377,14 +395,11 @@ const MoreDetails = () => {
     };
   }, [userId]);
 
-
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await getTheProfieMoreDetails(profileId);
-
+        const response = await getTheProfieMoreDetails(profileId, userId);
 
         if (response.status === 200) {
           let data = response.data.data;
@@ -520,7 +535,7 @@ const MoreDetails = () => {
       await sendChatMessage(userId, message, profileId);
       setNewMessage("");
     },
-    [newMessage, userId, profileId, socket]
+    [newMessage, userId, profileId, socket],
   );
 
   const getChatDetails = async () => {
@@ -550,7 +565,7 @@ const MoreDetails = () => {
                 minute: "2-digit",
               }),
               senderId: msg.senderId,
-            })
+            }),
           );
 
           setChatMessages(formattedMessages);
@@ -609,7 +624,7 @@ const MoreDetails = () => {
     isOnline: onlineUsers.includes(profileId),
   };
 
-  const isAccepted = profileData?.interestStatus === 'accepted';
+  const isAccepted = profileData?.interestStatus === "accepted";
 
   return (
     <div className="min-h-screen">
@@ -622,14 +637,17 @@ const MoreDetails = () => {
           <div className="profi-pg profi-ban">
             <div className="profile-image-sticky">
               <div className="profile">
-                <div className="pg-pro-big-im" style={{
-                  boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
-                  borderRadius: "15px",
-                  overflow: "hidden",
-                  backgroundColor: "#fff",
-                  marginBottom: "20px",
-                  border: "1px solid #eee"
-                }}>
+                <div
+                  className="pg-pro-big-im"
+                  style={{
+                    boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
+                    borderRadius: "15px",
+                    overflow: "hidden",
+                    backgroundColor: "#fff",
+                    marginBottom: "20px",
+                    border: "1px solid #eee",
+                  }}
+                >
                   <ImageSlider
                     allImages={allImages}
                     currentImageIndex={currentImageIndex}
@@ -637,13 +655,16 @@ const MoreDetails = () => {
                     defaultImage={defaultImage}
                     isAccepted={isAccepted}
                   />
-                  <div className="s3" style={{
-                    padding: "15px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "10px",
-                    backgroundColor: "#fff",
-                  }}>
+                  <div
+                    className="s3"
+                    style={{
+                      padding: "15px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "10px",
+                      backgroundColor: "#fff",
+                    }}
+                  >
                     {isAccepted && (
                       <button
                         className="cta fol cta-chat"
@@ -664,7 +685,7 @@ const MoreDetails = () => {
                           textAlign: "center",
                           display: "block",
                           padding: "10px",
-                          borderRadius: "5px"
+                          borderRadius: "5px",
                         }}
                       >
                         Request Sent
@@ -680,7 +701,7 @@ const MoreDetails = () => {
                           textAlign: "center",
                           display: "block",
                           padding: "10px",
-                          borderRadius: "5px"
+                          borderRadius: "5px",
                         }}
                       >
                         Request Accepted
@@ -699,7 +720,7 @@ const MoreDetails = () => {
                           padding: "10px",
                           borderRadius: "5px",
                           backgroundColor: "#ff9800", // Explicit color if class fails
-                          color: "white"
+                          color: "white",
                         }}
                       >
                         Send interest
@@ -725,7 +746,7 @@ const MoreDetails = () => {
         selectedUser={profileData}
         userId={userId}
         onSuccess={() => {
-          setProfileData(prev => ({ ...prev, interestStatus: 'pending' }));
+          setProfileData((prev) => ({ ...prev, interestStatus: "pending" }));
         }}
       />
 

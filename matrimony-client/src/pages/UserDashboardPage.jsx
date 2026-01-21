@@ -4,7 +4,10 @@ import Footer from "../components/Footer";
 import CopyRights from "../components/CopyRights";
 import UserSideBar from "../components/UserSideBar";
 import LayoutComponent from "../components/layouts/LayoutComponent";
-import { newProfileMatch } from "../api/axiosService/userAuthService";
+import {
+  newProfileMatch,
+  getUserInfo,
+} from "../api/axiosService/userAuthService";
 import PlanDetails from "./userdashboard/PlanDetails";
 import ProfileCompletion from "./userdashboard/ProfileCompletion";
 import RecentChats from "./userdashboard/RecentChats";
@@ -21,6 +24,23 @@ const UserDashboardPage = () => {
   const sliderRef = useRef(null);
   const chartRef = useRef(null);
   const hasInitialized = useRef(false);
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (userId) {
+        try {
+          const response = await getUserInfo(userId);
+          if (response.data && response.data.success) {
+            setUserInfo(response.data.data);
+          }
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        }
+      }
+    };
+    fetchUserInfo();
+  }, [userId]);
 
   // Function to safely destroy slider
   const destroySlider = () => {
@@ -150,7 +170,7 @@ const UserDashboardPage = () => {
             profile.community &&
             profile.community
               .toLowerCase()
-              .includes(searchData.community.toLowerCase())
+              .includes(searchData.community.toLowerCase()),
         );
       }
 
@@ -160,7 +180,7 @@ const UserDashboardPage = () => {
             profile.city &&
             profile.city
               .toLowerCase()
-              .includes(searchData.location.toLowerCase())
+              .includes(searchData.location.toLowerCase()),
         );
       }
 
@@ -204,7 +224,7 @@ const UserDashboardPage = () => {
                 step: function (now) {
                   window.$(this).text(Math.ceil(now));
                 },
-              }
+              },
             );
         });
 
@@ -408,7 +428,7 @@ const UserDashboardPage = () => {
 
                 {/* Additional Dashboard Components */}
                 <div className="row">
-                  <ProfileCompletion />
+                  <ProfileCompletion userData={userInfo} />
                   <PlanDetails />
                   <RecentChats />
                 </div>

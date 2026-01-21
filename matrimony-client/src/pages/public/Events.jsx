@@ -16,6 +16,8 @@ const Events = () => {
   const [error, setError] = useState(null);
   const [searchState, setSearchState] = useState("");
   const [userLocation, setUserLocation] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [activeTab, setActiveTab] = useState("Active");
 
   useEffect(() => {
     // Attempt to auto-detect user location
@@ -29,7 +31,7 @@ const Events = () => {
         },
         (error) => {
           console.log("Location access denied or error:", error);
-        }
+        },
       );
     }
 
@@ -58,20 +60,38 @@ const Events = () => {
   // Filter and Sort Events
   const getFilteredAndSortedEvents = () => {
     let filtered = [...events];
+    const now = new Date();
 
+    // Filter by Search
     if (searchState.trim()) {
       const query = searchState.toLowerCase();
       filtered = filtered.filter(
         (event) =>
           (event.state && event.state.toLowerCase().includes(query)) ||
-          (event.location && event.location.toLowerCase().includes(query))
+          (event.location && event.location.toLowerCase().includes(query)),
       );
+    }
+
+    // Filter by Active/Inactive Tab
+    if (activeTab === "Active") {
+      filtered = filtered.filter((event) => {
+        const eventDate = new Date(event.date);
+        // Active Tab: Status is Active AND Date is in the future (or today)
+        return event.status === "Active" && eventDate >= now;
+      });
+    } else {
+      filtered = filtered.filter((event) => {
+        const eventDate = new Date(event.date);
+        // Inactive Tab: Status is Inactive OR Date is in the past
+        return event.status === "Inactive" || eventDate < now;
+      });
     }
 
     filtered.sort((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
-      return dateA - dateB;
+      // For Active, sort ascending (soonest first). For Inactive, sort descending (most recent past first).
+      return activeTab === "Active" ? dateA - dateB : dateB - dateA;
     });
 
     return filtered;
@@ -83,21 +103,30 @@ const Events = () => {
     setSearchState(e.target.value);
   };
 
-  const formatEventDate = (dateString) => {
+  const formatEventDate = (dateString, includeTime = true) => {
     if (!dateString) return { date: "TBD", time: "TBD", fullDate: null };
     const dateObj = new Date(dateString);
-    return {
-      date: dateObj.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-      time: dateObj.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      fullDate: dateObj,
-    };
+    const date = dateObj.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    const time = includeTime
+      ? dateObj.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "";
+
+    return { date, time, fullDate: dateObj };
+  };
+
+  const handleViewDetails = (event) => {
+    setSelectedEvent(event);
+  };
+
+  const closeDetailsModal = () => {
+    setSelectedEvent(null);
   };
 
   if (loading) {
@@ -120,14 +149,14 @@ const Events = () => {
         {/* Page Title & Search Section */}
         <div className="mb-10 text-center">
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-            Current & Upcoming Events
+            Events & Gatherings
           </h1>
           <p className="text-gray-500 max-w-2xl mx-auto mb-8 text-sm md:text-base">
             Discover and join celebrations, gatherings, and special occasions
             near you.
           </p>
 
-          <div className="max-w-xl mx-auto relative group">
+          <div className="max-w-xl mx-auto relative group mb-8">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <FaSearch className="text-gray-400 group-focus-within:text-purple-600 transition-colors" />
             </div>
@@ -139,8 +168,35 @@ const Events = () => {
               className="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-full leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 shadow-sm transition-all duration-200 ease-in-out"
             />
           </div>
+
+          {/* TABS */}
+          <div className="flex justify-center mb-8">
+            <div className="bg-gray-100 p-1 rounded-lg inline-flex shadow-inner">
+              <button
+                onClick={() => setActiveTab("Active")}
+                className={`px-6 py-2 rounded-md text-sm font-semibold transition-all duration-200 focus:outline-none ${
+                  activeTab === "Active"
+                    ? "bg-white text-purple-700 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+                }`}
+              >
+                Upcoming Events
+              </button>
+              <button
+                onClick={() => setActiveTab("Inactive")}
+                className={`px-6 py-2 rounded-md text-sm font-semibold transition-all duration-200 focus:outline-none ${
+                  activeTab === "Inactive"
+                    ? "bg-white text-purple-700 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+                }`}
+              >
+                Past / Inactive Events
+              </button>
+            </div>
+          </div>
+
           {userLocation && !searchState && (
-            <div className="mt-3 flex items-center justify-center text-xs text-green-600 font-medium">
+            <div className="mt-[-20px] mb-6 flex items-center justify-center text-xs text-green-600 font-medium">
               <FaMapMarkerAlt className="mr-1" />
               Location detected. Listing all events sorted by date.
             </div>
@@ -152,6 +208,7 @@ const Events = () => {
           {displayedEvents.length > 0 ? (
             displayedEvents.map((event) => {
               const { date, time } = formatEventDate(event.date);
+              const isActiveTab = activeTab === "Active";
 
               return (
                 <div
@@ -166,14 +223,18 @@ const Events = () => {
                         "https://via.placeholder.com/600x400?text=Event+Image"
                       }
                       alt={event.name}
-                      className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
+                      className={`absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out ${!isActiveTab ? "grayscale opacity-90" : ""}`}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:bg-none"></div>
 
                     {/* Status Badge */}
-                    {event.status === "Active" && (
+                    {isActiveTab ? (
                       <span className="absolute top-4 left-4 bg-green-500/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                         ACTIVE
+                      </span>
+                    ) : (
+                      <span className="absolute top-4 left-4 bg-gray-500/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                        PAST / INACTIVE
                       </span>
                     )}
 
@@ -192,7 +253,9 @@ const Events = () => {
                   <div className="flex-1 p-6 md:p-8 flex flex-col">
                     {/* Desktop Date/Time Row */}
                     <div className="hidden md:flex flex-wrap gap-4 mb-4 text-sm font-medium text-gray-500">
-                      <div className="flex items-center text-purple-600 bg-purple-50 px-3 py-1 rounded-md">
+                      <div
+                        className={`flex items-center px-3 py-1 rounded-md ${isActiveTab ? "text-purple-600 bg-purple-50" : "text-gray-600 bg-gray-100"}`}
+                      >
                         <FaCalendarAlt className="mr-2" />
                         {date}
                       </div>
@@ -204,7 +267,9 @@ const Events = () => {
 
                     {/* Title & Description */}
                     <div className="mb-4">
-                      <h2 className="hidden md:block text-2xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors duration-200">
+                      <h2
+                        className={`hidden md:block text-2xl font-bold mb-2 transition-colors duration-200 ${isActiveTab ? "text-gray-900 group-hover:text-purple-600" : "text-gray-600"}`}
+                      >
                         {event.name}
                       </h2>
                       <div className="flex items-start text-gray-600 mb-3">
@@ -225,11 +290,19 @@ const Events = () => {
 
                     {/* Actions & Contact */}
                     <div className="mt-auto pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div className="flex items-center text-sm text-gray-700 bg-gray-50 px-3 py-2 rounded-lg w-full sm:w-auto">
-                        <span className="font-semibold mr-2 text-gray-900">
-                          Contact:
-                        </span>
-                        {event.contact}
+                      {/* Contact Info (Displayed on card as requested) */}
+                      <div className="flex flex-col sm:items-start w-full sm:w-auto text-sm">
+                        <div className="flex items-center text-gray-700 bg-gray-50 px-3 py-2 rounded-lg mb-2 sm:mb-0 w-full sm:w-auto">
+                          <span className="font-semibold mr-2 text-gray-900">
+                            Contact:
+                          </span>
+                          {event.contact}
+                        </div>
+                        {event.email && (
+                          <div className="flex items-center text-gray-600 px-3 py-1 text-xs">
+                            <span className="mr-2">Email:</span> {event.email}
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -243,7 +316,10 @@ const Events = () => {
                             <FaDirections /> Directions
                           </a>
                         )}
-                        <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform active:scale-95 transition-all text-sm">
+                        <button
+                          onClick={() => handleViewDetails(event)}
+                          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2 font-medium rounded-lg shadow-md hover:shadow-lg transform active:scale-95 transition-all text-sm ${isActiveTab ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+                        >
                           View Details{" "}
                           <FaExternalLinkAlt className="text-xs opacity-70" />
                         </button>
@@ -259,11 +335,14 @@ const Events = () => {
                 <FaSearch className="text-4xl text-gray-300" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                No Events Found
+                {activeTab === "Active"
+                  ? "No Upcoming Events Found"
+                  : "No Past Events Found"}
               </h3>
               <p className="text-gray-500 max-w-sm mx-auto mb-6">
-                We couldn't find any events matching "{searchState}". Try
-                checking the spelling or searching for a broader location.
+                We couldn't find any{" "}
+                {activeTab === "Active" ? "upcoming" : "past"} events matching
+                {searchState}.
               </p>
               <button
                 onClick={() => setSearchState("")}
@@ -275,6 +354,144 @@ const Events = () => {
           )}
         </div>
       </div>
+
+      {/* Event Details Modal */}
+      {selectedEvent && (
+        <div
+          className="fixed inset-0 z-[150] overflow-y-auto"
+          aria-labelledby="modal-title"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            {/* Background Overlay */}
+            <div
+              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+              aria-hidden="true"
+              onClick={closeDetailsModal}
+            ></div>
+
+            {/* Modal Panel */}
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start flex-col">
+                  {selectedEvent.image && (
+                    <div className="w-full mb-4 overflow-hidden rounded-lg">
+                      <img
+                        src={selectedEvent.image}
+                        alt={selectedEvent.name}
+                        className="w-full h-auto object-cover max-h-[400px]"
+                      />
+                    </div>
+                  )}
+
+                  <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                    <h3
+                      className="text-2xl leading-6 font-bold text-gray-900 mb-2"
+                      id="modal-title"
+                    >
+                      {selectedEvent.name}
+                    </h3>
+
+                    <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-500">
+                      <span className="flex items-center">
+                        <FaCalendarAlt className="mr-1 text-purple-600" />{" "}
+                        {formatEventDate(selectedEvent.date).date}{" "}
+                        {formatEventDate(selectedEvent.date).time}
+                      </span>
+                      <span className="flex items-center">
+                        <FaMapMarkerAlt className="mr-1 text-purple-600" />{" "}
+                        {selectedEvent.location}, {selectedEvent.state}
+                      </span>
+
+                      {/* Show Active/Inactive status in modal too */}
+                      {selectedEvent.status === "Active" &&
+                      new Date(selectedEvent.date) >= new Date() ? (
+                        <span className="flex items-center text-green-600 font-bold text-xs px-2 py-0.5 bg-green-50 rounded-full border border-green-200">
+                          ACTIVE
+                        </span>
+                      ) : (
+                        <span className="flex items-center text-gray-500 font-bold text-xs px-2 py-0.5 bg-gray-100 rounded-full border border-gray-200">
+                          INACTIVE
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-100 mb-4 text-sm text-gray-700">
+                      <strong>Church / Venue:</strong>{" "}
+                      {selectedEvent.churchName}
+                    </div>
+
+                    <div className="mt-2 text-sm text-gray-600 text-justify">
+                      <p className="whitespace-pre-wrap">
+                        {selectedEvent.description}
+                      </p>
+                    </div>
+
+                    {selectedEvent.details && (
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <h4 className="font-semibold text-gray-800 mb-2">
+                          Additional Details
+                        </h4>
+                        <p className="text-sm text-gray-600 whitespace-pre-wrap">
+                          {selectedEvent.details}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+                      <h4 className="font-bold text-gray-900 mb-2 text-sm uppercase tracking-wide">
+                        Contact Information
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="font-semibold text-gray-700">
+                            Phone:
+                          </span>{" "}
+                          {selectedEvent.contact}
+                        </div>
+                        {selectedEvent.email && (
+                          <div>
+                            <span className="font-semibold text-gray-700">
+                              Email:
+                            </span>{" "}
+                            {selectedEvent.email}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:justify-end sm:gap-3">
+                {selectedEvent.mapLink && (
+                  <a
+                    href={selectedEvent.mapLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full inline-flex justify-center items-center rounded-md border border-purple-200 shadow-sm px-4 py-2 bg-white text-base font-medium text-purple-700 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:w-auto sm:text-sm mb-3 sm:mb-0"
+                  >
+                    <FaDirections className="mr-2" /> Get Directions
+                  </a>
+                )}
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:w-auto sm:text-sm"
+                  onClick={closeDetailsModal}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

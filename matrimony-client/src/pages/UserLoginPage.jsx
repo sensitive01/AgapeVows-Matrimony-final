@@ -65,19 +65,23 @@ const UserLoginPage = () => {
 
     try {
       const response = await verifyUser(formData);
-      console.log(response);
       if (response.status === 200) {
         localStorage.setItem("userId", response.data.userId);
-        navigate("/user/user-dashboard-page");
-      } else if (response.status === 401) {
-        setLoginError(response.response.data.message);
+        localStorage.setItem("userName", response.data.userName);
+        if (response.data.profileImage) {
+          localStorage.setItem("userImage", response.data.profileImage);
+        }
+        navigate("/user/user-dashboard-page", { replace: true });
       }
     } catch (error) {
-      console.error("Login error:", error.response.data.message);
-      setLoginError(
-        error.response.data.message ||
-        "Network error. Please check your connection and try again."
-      );
+      console.error("Login error:", error);
+      if (error.response && error.response.data) {
+        setLoginError(error.response.data.message || "Invalid credentials");
+      } else {
+        setLoginError(
+          "Network error. Please check your connection and try again.",
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +94,7 @@ const UserLoginPage = () => {
       </div>
 
       <div className="pt-16">
-        <div className="login">
+        <div className="login" style={{ paddingTop: "40px" }}>
           <div className="container">
             <div className="row">
               <div className="inn">
@@ -127,13 +131,13 @@ const UserLoginPage = () => {
                           </div>
                         )}
 
-
                         <div className="form-group">
                           <label className="lb">Email:</label>
                           <input
                             type="email"
-                            className={`form-control ${errors.email ? "is-invalid" : ""
-                              }`}
+                            className={`form-control ${
+                              errors.email ? "is-invalid" : ""
+                            }`}
                             id="email"
                             placeholder="Enter email"
                             name="email"
@@ -152,8 +156,9 @@ const UserLoginPage = () => {
                           <label className="lb">Password:</label>
                           <input
                             type="password"
-                            className={`form-control ${errors.password ? "is-invalid" : ""
-                              }`}
+                            className={`form-control ${
+                              errors.password ? "is-invalid" : ""
+                            }`}
                             id="pwd"
                             placeholder="Enter password"
                             name="password"

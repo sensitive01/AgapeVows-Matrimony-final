@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+/* import { useLocation } from "react-router-dom"; */
 import {
   Search,
   Phone,
@@ -10,10 +10,11 @@ import {
   ChevronDown,
   Menu,
   X,
+  User,
 } from "lucide-react";
 import logo from "../../../assets/images/agapevows - logo.webp";
 import { getUserProfile } from "../../../api/axiosService/userAuthService";
-import profileImg from "../../../assets/images/profiles/1.jpg";
+/* import profileImg from "../../../assets/images/profiles/1.jpg"; */ // Removed as we use generic icon now
 import PreLoader from "../../PreLoader";
 import GlobalSearchModal from "../../GlobalSearchModal";
 
@@ -40,6 +41,14 @@ const ExploreDropdown = ({ isVisible }) => {
       title: "Pre-Marital and Marital Counseling",
       path: "#",
     },
+    {
+      title: "Bridal Make-up",
+      path: "/bridal-makeup",
+    },
+    {
+      title: "Insurance Services",
+      path: "/insurance-services",
+    },
   ];
 
   const handleNavigate = (path) => {
@@ -48,10 +57,11 @@ const ExploreDropdown = ({ isVisible }) => {
 
   return (
     <div
-      className={`absolute top-full left-0 mt-2 w-72 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${isVisible
+      className={`absolute top-full left-0 mt-2 w-72 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${
+        isVisible
           ? "opacity-100 visible translate-y-0"
           : "opacity-0 invisible translate-y-2"
-        }`}
+      }`}
     >
       {categories.map((category, index) => (
         <button
@@ -81,10 +91,11 @@ const ProfileDropdown = ({ isVisible, onLogout }) => {
 
   return (
     <div
-      className={`absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${isVisible
+      className={`absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 border border-gray-100 transition-all duration-300 ${
+        isVisible
           ? "opacity-100 visible translate-y-0"
           : "opacity-0 invisible translate-y-2"
-        }`}
+      }`}
     >
       {profileLinks.map((link, index) => (
         <button
@@ -108,39 +119,52 @@ const ProfileDropdown = ({ isVisible, onLogout }) => {
 
 const MainLayout = () => {
   const userId = localStorage.getItem("userId");
-  const location = useLocation();
+  /* const location = useLocation(); */ // Removed unused var
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isExploreDropdownVisible, setIsExploreDropdownVisible] =
     useState(false);
   const [isProfileDropdownVisible, setIsProfileDropdownVisible] =
     useState(false);
-  const [isUserActive, setIsUserActive] = useState(false);
-  const [userName, setUserName] = useState();
-  const [userImage, setUserImage] = useState(profileImg);
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [userName, setUserName] = useState(localStorage.getItem("userName"));
+  /* import { User as UserIcon } from "lucide-react"; */
+  // Need to add User to imports first.
+
+  const [userImage, setUserImage] = useState(
+    localStorage.getItem("userImage") || null,
+  ); // Initialize from storage
+  /* const [isSearchModalOpen, setIsSearchModalOpen] = useState(false); */ // Removed unused var
+  const [isUserActive, setIsUserActive] = useState(Boolean(userId));
 
   useEffect(() => {
-    setIsUserActive(Boolean(userId));
-
-    const storedUserName = localStorage.getItem("userName");
+    // setIsUserActive(Boolean(userId)); // Removed to prevent double check/re-render logic if handled in init.
+    // Actually, keep it if userId changes dynamically? no, userId is const outside.
+    // Ideally useEffect should react to something. But userId is from localstorage at render time.
+    /* const storedUserName = localStorage.getItem("userName");
     if (storedUserName) {
       setUserName(storedUserName);
-    }
+    } */
   }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await getUserProfile(userId);
       if (response.status === 200) {
+        // Update with fresh data from server
         setUserName(response.data.data.userName || "User");
-        setUserImage(response.data.data.profileImage);
+        setUserImage(response.data.data.profileImage || null);
+
+        // Update storage to keep in sync
+        if (response.data.data.userName)
+          localStorage.setItem("userName", response.data.data.userName);
+        if (response.data.data.profileImage)
+          localStorage.setItem("userImage", response.data.data.profileImage);
       }
     };
     if (userId) {
       fetchData();
     }
-  }, []);
+  }, [userId]);
 
   const handleLogOut = () => {
     localStorage.clear();
@@ -286,7 +310,7 @@ const MainLayout = () => {
                 onMouseLeave={() => setIsExploreDropdownVisible(false)}
               >
                 <button className="text-gray-800 hover:text-purple-600 font-medium flex items-center py-2">
-                  SERVICE <ChevronDown className="w-4 h-4 ml-1" />
+                  SERVICES <ChevronDown className="w-4 h-4 ml-1" />
                 </button>
                 <ExploreDropdown
                   isVisible={isExploreDropdownVisible}
@@ -334,11 +358,17 @@ const MainLayout = () => {
                   onMouseLeave={() => setIsProfileDropdownVisible(false)}
                 >
                   <div className="flex items-center space-x-3 cursor-pointer">
-                    <img
-                      src={userImage}
-                      alt="Profile"
-                      className="w-10 h-10 rounded-full"
-                    />
+                    {userImage ? (
+                      <img
+                        src={userImage}
+                        alt="Profile"
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                        <User className="w-6 h-6" />
+                      </div>
+                    )}
                     <div>
                       <div className="text-gray-800 font-medium">
                         {userName}
@@ -455,11 +485,17 @@ const MainLayout = () => {
                 {isUserActive ? (
                   <div className="space-y-2">
                     <div className="flex items-center space-x-3 mb-3">
-                      <img
-                        src={userImage}
-                        alt="Profile"
-                        className="w-8 h-8 rounded-full"
-                      />
+                      {userImage ? (
+                        <img
+                          src={userImage}
+                          alt="Profile"
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                          <User className="w-5 h-5" />
+                        </div>
+                      )}
                       <div>
                         <div className="text-gray-800 font-medium text-sm">
                           {userName}
@@ -540,33 +576,6 @@ const MainLayout = () => {
           )}
         </div>
       </header>
-
-      {/* Global Search Bar - Added as per request for global visibility */}
-      {location.pathname !== "/" && (
-        <div
-          className="bg-purple-50 border-b border-purple-100 py-3 cursor-pointer hover:bg-purple-100 transition-colors"
-          onClick={() => handleNavigate("/user/find-matches")}
-        >
-          {/* <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-            <div className="flex items-center text-gray-700 flex-1 min-w-0 mr-2">
-              <div className="bg-white p-2 rounded-full shadow-sm mr-3 text-purple-600 shrink-0">
-                <Search className="w-5 h-5" />
-              </div>
-              <span className="font-medium truncate text-sm md:text-base">
-                <span className="hidden md:inline">
-                  Click here to Search Profiles / Search by Reference ID
-                </span>
-                <span className="md:hidden">Search Profiles / ID</span>
-              </span>
-            </div>
-            <div className="text-purple-600 text-xs md:text-sm font-semibold flex items-center shrink-0">
-              <span className="hidden xs:inline">ADVANCED SEARCH</span>
-              <span className="xs:hidden">ADVANCED</span>
-              <ChevronDown className="w-4 h-4 ml-1" />
-            </div>
-          </div> */}
-        </div>
-      )}
     </>
   );
 };

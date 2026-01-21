@@ -32,10 +32,12 @@ export const fetchAllUserProfilesHome = async () => {
   return response;
 };
 
-export const getTheProfieMoreDetails = async (userId) => {
-  const response = await userInstance.get(
-    `/get-profile-more-information/${userId}`
-  );
+export const getTheProfieMoreDetails = async (userId, viewerId) => {
+  let url = `/get-profile-more-information/${userId}`;
+  if (viewerId) {
+    url += `?viewerId=${viewerId}`;
+  }
+  const response = await userInstance.get(url);
   return response;
 };
 

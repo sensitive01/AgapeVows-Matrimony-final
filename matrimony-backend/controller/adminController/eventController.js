@@ -18,11 +18,13 @@ exports.addNewEvent = async (req, res) => {
             name,
             date,
             location,
-            churchName, // Add this
+            churchName,
             state,
             contact,
+            email,
             mapLink,
             description,
+            details,
             status,
             isPinned
         } = req.body;
@@ -43,8 +45,10 @@ exports.addNewEvent = async (req, res) => {
             location,
             state,
             contact,
+            email,
             mapLink,
             description,
+            details,
             status,
             churchName,
             // Convert string "true"/"false" to boolean
@@ -68,8 +72,10 @@ exports.editEvent = async (req, res) => {
             location,
             state,
             contact,
+            email,
             mapLink,
             description,
+            details,
             status,
             isPinned
         } = req.body;
@@ -80,8 +86,10 @@ exports.editEvent = async (req, res) => {
             location,
             state,
             contact,
+            email,
             mapLink,
             description,
+            details,
             status,
             isPinned: isPinned === 'true'
         };

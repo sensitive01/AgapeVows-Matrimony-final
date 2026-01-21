@@ -110,6 +110,8 @@ const verifyLogin = async (req, res) => {
       message: "Login successful",
       userId: user._id,
       rememberMe,
+      userName: user.userName,
+      profileImage: user.profileImage,
     });
   } catch (err) {
     console.error("Error in verifying login", err);
@@ -205,6 +207,12 @@ const saveNewPassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.userPassword = hashedPassword;
+
+    // Fix for validation error if profileCreatedFor is empty string
+    if (user.profileCreatedFor === "") {
+      user.profileCreatedFor = undefined;
+    }
+
     await user.save();
 
     return res.status(200).json({ success: true, message: "Password updated successfully", userId });

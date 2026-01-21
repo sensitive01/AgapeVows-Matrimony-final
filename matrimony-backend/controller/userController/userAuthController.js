@@ -53,10 +53,25 @@ const getUserInformation = async (req, res) => {
       });
     }
 
+    // Get Interest Count
+    const interestsCount = await interestModel.countDocuments({
+      targetUserId: userId,
+    });
+
+    // Get Views Count
+    const viewsCount = userData.profileViews ? userData.profileViews.length : 0;
+
+    // Convert to object and add counts
+    const responseData = {
+      ...userData.toObject(),
+      viewsCount,
+      interestsCount,
+    };
+
     res.status(200).json({
       success: true,
       message: "User information retrieved successfully",
-      data: userData,
+      data: responseData,
     });
   } catch (err) {
     console.error("Error in getting the user information", err);
@@ -365,6 +380,7 @@ const getAllUserProfileDataHome = async (req, res) => {
 const getProfileMoreInformation = async (req, res) => {
   try {
     const { profileId } = req.params;
+    const { viewerId } = req.query; // Check for viewerId in query params
 
     const profileData = await userModel.findById(
       { _id: profileId },
@@ -376,6 +392,20 @@ const getProfileMoreInformation = async (req, res) => {
         success: false,
         message: "Profile not found",
       });
+    }
+
+    // Logic to update view count (Unique Views)
+    if (viewerId && viewerId !== profileId) {
+      // Ensure profileViews array exists (schema update handled)
+      if (!profileData.profileViews) {
+        profileData.profileViews = [];
+      }
+
+      // Add viewerId if not already present
+      if (!profileData.profileViews.includes(viewerId)) {
+        profileData.profileViews.push(viewerId);
+        await profileData.save();
+      }
     }
 
     return res.status(200).json({
@@ -590,7 +620,21 @@ const getNewProfileMatches = async (req, res) => {
       partnerCaste ? { caste: partnerCaste } : null,
       partnerDistrict ? { city: partnerDistrict } : null,
       (heightFrom && !isNaN(heightFrom))
-        ? { $expr: { $gte: [{ $toDouble: "$height" }, heightFrom] } }
+        ? {
+          $expr: {
+            $gte: [
+              {
+                $convert: {
+                  input: "$height",
+                  to: "double",
+                  onError: 0,
+                  onNull: 0
+                }
+              },
+              heightFrom
+            ]
+          }
+        }
         : null,
     ].filter(Boolean);
 
@@ -949,12 +993,12 @@ const getShortListedProfileData = async (req, res) => {
 
 
 const getAllEvents = async (req, res) => {
-    try {
-        const events = await Event.find().sort({ createdAt: -1 });
-        res.status(200).json({ success: true, data: events });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+  try {
+    const events = await Event.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: events });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 

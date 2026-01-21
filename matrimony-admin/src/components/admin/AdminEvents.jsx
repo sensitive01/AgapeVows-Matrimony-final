@@ -9,7 +9,8 @@ import {
 } from "../../api/service/adminServices";
 
 const AdminEvents = () => {
-  const [modalMode, setModalMode] = useState("add"); // 'add' or 'edit'
+  const [modalMode, setModalMode] = useState("add"); // 'add', 'edit', 'view'
+  const [activeTab, setActiveTab] = useState("Active");
   const [currentEvent, setCurrentEvent] = useState({
     id: null,
     name: "",
@@ -18,8 +19,10 @@ const AdminEvents = () => {
     churchName: "",
     state: "",
     contact: "",
+    email: "", // New field
     mapLink: "",
     description: "",
+    details: "", // New field
     image: null,
     imageFile: null,
     status: "Active",
@@ -33,7 +36,7 @@ const AdminEvents = () => {
     try {
       const response = await getAllEvents();
       if (response.status === 200) {
-        setEvents(response.data.data); // Assuming response.data.data contains the list
+        setEvents(response.data.data);
       }
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -44,7 +47,6 @@ const AdminEvents = () => {
     fetchEvents();
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = () => {
       setOpenDropdown(null);
@@ -63,8 +65,10 @@ const AdminEvents = () => {
       churchName: "",
       state: "",
       contact: "",
+      email: "",
       mapLink: "",
       description: "",
+      details: "",
       image: null,
       imageFile: null,
       status: "Active",
@@ -77,18 +81,29 @@ const AdminEvents = () => {
     setCurrentEvent({
       id: event._id,
       name: event.name,
-      // Format date for datetime-local input (YYYY-MM-DDTHH:mm)
       date: event.date ? new Date(event.date).toISOString().slice(0, 16) : "",
       location: event.location,
       churchName: event.churchName || "",
       state: event.state || "",
       contact: event.contact || "",
+      email: event.email || "",
       mapLink: event.mapLink || "",
-      description: event.description,
+      description: event.description || "",
+      details: event.details || "",
       image: event.image || null,
-      imageFile: null, // Reset file input when editing, unless changed
+      imageFile: null,
       status: event.status,
       isPinned: event.isPinned || false,
+    });
+  };
+
+  const handleViewEvent = (event) => {
+    setModalMode("view");
+    setCurrentEvent({
+      ...event,
+      id: event._id,
+      date: event.date ? new Date(event.date).toISOString().slice(0, 16) : "",
+      image: event.image || null,
     });
   };
 
@@ -111,7 +126,7 @@ const AdminEvents = () => {
     e.preventDefault();
 
     if (!currentEvent.name || !currentEvent.date || !currentEvent.location) {
-      alert("Please fill in all required fields (Name, Date, Location)");
+      alert("Please fill in all required fields");
       return;
     }
 
@@ -125,8 +140,10 @@ const AdminEvents = () => {
       formData.append("churchName", currentEvent.churchName);
       formData.append("state", currentEvent.state);
       formData.append("contact", currentEvent.contact);
+      formData.append("email", currentEvent.email);
       formData.append("mapLink", currentEvent.mapLink);
       formData.append("description", currentEvent.description);
+      formData.append("details", currentEvent.details);
       formData.append("status", currentEvent.status);
       formData.append("isPinned", currentEvent.isPinned);
       if (currentEvent.imageFile) {
@@ -137,13 +154,13 @@ const AdminEvents = () => {
         const response = await addNewEvent(formData);
         if (response.status === 201) {
           alert("Event added successfully!");
-          fetchEvents(); // Refresh list
+          fetchEvents();
         }
       } else {
         const response = await editEvent(currentEvent.id, formData);
         if (response.status === 200) {
           alert("Event updated successfully!");
-          fetchEvents(); // Refresh list
+          fetchEvents();
         }
       }
 
@@ -153,8 +170,8 @@ const AdminEvents = () => {
       if (bootstrapModal) {
         bootstrapModal.hide();
       } else {
-        modal?.setAttribute("data-bs-dismiss", "modal");
-        modal?.click();
+        const closeBtn = document.querySelector("#eventsModal .btn-close");
+        if (closeBtn) closeBtn.click();
       }
     } catch (error) {
       console.error("Error saving event:", error);
@@ -192,6 +209,16 @@ const AdminEvents = () => {
     });
   };
 
+  // Filter events based on active tab and date/status logic
+  const filteredEvents = events.filter((event) => {
+    const isExpired = new Date(event.date) < new Date();
+    if (activeTab === "Active") {
+      return event.status === "Active" && !isExpired;
+    } else {
+      return event.status === "Inactive" || isExpired;
+    }
+  });
+
   return (
     <>
       <style jsx>{`
@@ -206,6 +233,17 @@ const AdminEvents = () => {
         }
         .modal-body::-webkit-scrollbar {
           display: none;
+        }
+        .nav-tabs .nav-link {
+          color: #495057;
+          border: none;
+          border-bottom: 2px solid transparent;
+          font-weight: 500;
+          padding: 10px 20px;
+        }
+        .nav-tabs .nav-link.active {
+          color: #6366f1;
+          border-bottom: 2px solid #6366f1;
         }
         .cursor-pointer {
           cursor: pointer;
@@ -226,14 +264,6 @@ const AdminEvents = () => {
         }
         .table {
           border: none;
-        }
-        .dropdown-menu {
-          box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-          border: 1px solid rgba(0, 0, 0, 0.15);
-          border-radius: 0.375rem;
-        }
-        .dropdown-item:hover {
-          background-color: #f8f9fa;
         }
       `}</style>
       <NewLayout>
@@ -264,6 +294,7 @@ const AdminEvents = () => {
               </nav>
             </div>
           </div>
+
           <div className="row">
             <div className="col-md-12">
               <div className="box-com box-qui box-lig box-tab">
@@ -273,12 +304,31 @@ const AdminEvents = () => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    paddingBottom: "10px",
                   }}
                 >
-                  <h3>All Events</h3>
+                  <ul className="nav nav-tabs" style={{ border: "none" }}>
+                    <li className="nav-item">
+                      <button
+                        className={`nav-link ${activeTab === "Active" ? "active" : ""}`}
+                        onClick={() => setActiveTab("Active")}
+                      >
+                        Active Events
+                      </button>
+                    </li>
+                    <li className="nav-item">
+                      <button
+                        className={`nav-link ${activeTab === "Inactive" ? "active" : ""}`}
+                        onClick={() => setActiveTab("Inactive")}
+                      >
+                        Inactive Events
+                      </button>
+                    </li>
+                  </ul>
+
                   <button
                     type="button"
-                    className="btn btn-secondary"
+                    className="btn btn-primary"
                     data-bs-toggle="modal"
                     data-bs-target="#eventsModal"
                     onClick={handleAddNewEvent}
@@ -287,6 +337,7 @@ const AdminEvents = () => {
                     Event
                   </button>
                 </div>
+
                 <div
                   className="table-responsive"
                   style={{ height: "60vh", overflowY: "auto" }}
@@ -304,7 +355,7 @@ const AdminEvents = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {events.map((event, index) => (
+                      {filteredEvents.map((event, index) => (
                         <tr key={event._id}>
                           <td className="border-0">{index + 1}</td>
                           <td className="border-0">
@@ -354,7 +405,7 @@ const AdminEvents = () => {
                           <td className="border-0">
                             <div>{event.churchName}</div>
                             <small className="text-muted">
-                              {event.location}
+                              {event.location} - {event.state}
                             </small>
                           </td>
                           <td className="border-0">
@@ -378,7 +429,7 @@ const AdminEvents = () => {
                                   setOpenDropdown(
                                     openDropdown === event._id
                                       ? null
-                                      : event._id
+                                      : event._id,
                                   );
                                 }}
                               >
@@ -393,12 +444,27 @@ const AdminEvents = () => {
                                   style={{
                                     display: "block",
                                     top: "100%",
-                                    left: "auto",
                                     right: "0",
                                     zIndex: 1000,
                                     minWidth: "150px",
                                   }}
                                 >
+                                  <li>
+                                    <a
+                                      className="dropdown-item"
+                                      href="#"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#eventsModal"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        setOpenDropdown(null);
+                                        handleViewEvent(event);
+                                      }}
+                                    >
+                                      <i className="fa fa-eye me-2"></i>View
+                                      Details
+                                    </a>
+                                  </li>
                                   <li>
                                     <a
                                       className="dropdown-item"
@@ -434,15 +500,14 @@ const AdminEvents = () => {
                           </td>
                         </tr>
                       ))}
-                      {events.length === 0 && (
+                      {filteredEvents.length === 0 && (
                         <tr>
-                          <td colSpan="6" className="text-center py-5 border-0">
+                          <td colSpan="7" className="text-center py-5 border-0">
                             <div>
                               <i className="fa fa-calendar fa-3x text-muted mb-3"></i>
-                              <h5 className="text-muted">No events found</h5>
-                              <p className="text-muted">
-                                Click "Add New Event" to create your first event
-                              </p>
+                              <h5 className="text-muted">
+                                No events found in {activeTab}
+                              </h5>
                             </div>
                           </td>
                         </tr>
@@ -454,13 +519,17 @@ const AdminEvents = () => {
             </div>
           </div>
 
-          {/* Modal for Add/Edit Event */}
-          <div className="modal fade" id="eventsModal">
+          {/* Modal for Add/Edit/View Event */}
+          <div className="modal fade" id="eventsModal" tabIndex="-1">
             <div className="modal-dialog modal-lg">
               <div className="modal-content">
                 <div className="modal-header">
                   <h4 className="modal-title">
-                    {modalMode === "add" ? "Add New Event" : "Edit Event"}
+                    {modalMode === "add"
+                      ? "Add New Event"
+                      : modalMode === "edit"
+                        ? "Edit Event"
+                        : "Event Details"}
                   </h4>
                   <button
                     type="button"
@@ -469,220 +538,359 @@ const AdminEvents = () => {
                   />
                 </div>
                 <div className="modal-body">
-                  <div className="form-inp">
-                    <form onSubmit={handleSubmitEvent}>
-                      <div className="form-group mb-3">
-                        <label className="lb">Event Name: *</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Enter event name"
-                          value={currentEvent.name}
-                          onChange={(e) =>
-                            setCurrentEvent({
-                              ...currentEvent,
-                              name: e.target.value,
-                            })
-                          }
-                          required
-                        />
-                      </div>
-
-                      <div className="form-group mb-3">
-                        <label className="lb">
-                          Church / Meeting Place Name: *
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="e.g. Grace Church"
-                          value={currentEvent.churchName}
-                          onChange={(e) =>
-                            setCurrentEvent({
-                              ...currentEvent,
-                              churchName: e.target.value,
-                            })
-                          }
-                          required
-                        />
-                      </div>
-
-                      <div className="form-group mb-3">
-                        <label className="lb">Event Image:</label>
-                        <input
-                          type="file"
-                          className="form-control"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                        />
-                        {currentEvent.image && (
-                          <div className="mt-2">
-                            <img
-                              src={currentEvent.image}
-                              alt="Preview"
-                              style={{
-                                width: "100px",
-                                height: "100px",
-                                objectFit: "cover",
-                                borderRadius: "5px",
-                                border: "1px solid #ddd",
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-6">
-                          <div className="form-group mb-3">
-                            <label className="lb">Date & Time: *</label>
-                            <input
-                              type="datetime-local"
-                              className="form-control"
-                              value={currentEvent.date}
-                              onChange={(e) =>
-                                setCurrentEvent({
-                                  ...currentEvent,
-                                  date: e.target.value,
-                                })
-                              }
-                              required
-                            />
-                          </div>
+                  {modalMode === "view" ? (
+                    // VIEW MODE UI
+                    <div className="view-event-details">
+                      {currentEvent.image && (
+                        <div className="mb-4 text-center">
+                          <img
+                            src={currentEvent.image}
+                            alt="Event"
+                            className="img-fluid rounded shadow-sm"
+                            style={{
+                              maxHeight: "400px",
+                              width: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
                         </div>
-                        <div className="col-md-6">
-                          <div className="form-group mb-3">
-                            <label className="lb">Location: *</label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              placeholder="Enter location"
-                              value={currentEvent.location}
-                              onChange={(e) =>
-                                setCurrentEvent({
-                                  ...currentEvent,
-                                  location: e.target.value,
-                                })
-                              }
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
+                      )}
 
-                      <div className="row">
-                        <div className="col-md-6">
-                          <div className="form-group mb-3">
-                            <label className="lb">State: *</label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              placeholder="e.g. Kerala, Karnataka"
-                              value={currentEvent.state}
-                              onChange={(e) =>
-                                setCurrentEvent({
-                                  ...currentEvent,
-                                  state: e.target.value,
-                                })
-                              }
-                              required
-                            />
+                      <div className="row mb-3">
+                        <div className="col-md-8">
+                          <h2 className="mb-3">{currentEvent.name}</h2>
+                          <div className="d-flex align-items-center mb-2 text-muted">
+                            <i className="fa fa-calendar me-2"></i>{" "}
+                            {formatDate(currentEvent.date)}
                           </div>
+                          <div className="d-flex align-items-center mb-2 text-muted">
+                            <i className="fa fa-map-marker me-2"></i>{" "}
+                            {currentEvent.location}, {currentEvent.state}
+                          </div>
+                          <div className="d-flex align-items-center mb-3 text-muted">
+                            <i className="fa fa-church me-2"></i>{" "}
+                            {currentEvent.churchName}
+                          </div>
+
+                          <h5 className="mt-4 border-bottom pb-2">
+                            Description
+                          </h5>
+                          <p
+                            className="text-secondary"
+                            style={{ whiteSpace: "pre-wrap" }}
+                          >
+                            {currentEvent.description ||
+                              "No description provided."}
+                          </p>
+
+                          <h5 className="mt-4 border-bottom pb-2">
+                            Additional Details
+                          </h5>
+                          <p
+                            className="text-secondary"
+                            style={{ whiteSpace: "pre-wrap" }}
+                          >
+                            {currentEvent.details ||
+                              "No additional details available."}
+                          </p>
                         </div>
-                        <div className="col-md-6">
-                          <div className="form-group mb-3">
-                            <label className="lb">Contact Details: *</label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              placeholder="Phone or Email"
-                              value={currentEvent.contact}
-                              onChange={(e) =>
-                                setCurrentEvent({
-                                  ...currentEvent,
-                                  contact: e.target.value,
-                                })
-                              }
-                              required
-                            />
+
+                        <div className="col-md-4">
+                          <div className="card bg-light border-0">
+                            <div className="card-body">
+                              <h6 className="card-title fw-bold">
+                                Contact Info
+                              </h6>
+                              <p className="mb-1">
+                                <i className="fa fa-phone me-2"></i>{" "}
+                                {currentEvent.contact}
+                              </p>
+                              {currentEvent.email && (
+                                <p className="mb-3">
+                                  <i className="fa fa-envelope me-2"></i>{" "}
+                                  {currentEvent.email}
+                                </p>
+                              )}
+
+                              {currentEvent.mapLink && (
+                                <a
+                                  href={currentEvent.mapLink}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="btn btn-outline-primary btn-sm w-100"
+                                >
+                                  <i className="fa fa-map me-1"></i> View on Map
+                                </a>
+                              )}
+
+                              <div className="mt-3 pt-3 border-top">
+                                <span
+                                  className={`badge ${currentEvent.status === "Active" ? "bg-success" : "bg-secondary"}`}
+                                >
+                                  {currentEvent.status}
+                                </span>
+                                {currentEvent.isPinned && (
+                                  <span className="badge bg-warning text-dark ms-2">
+                                    Pinned
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-
-                      <div className="form-group mb-3">
-                        <label className="lb">Google Map Link:</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="https://maps.google.com/..."
-                          value={currentEvent.mapLink}
-                          onChange={(e) =>
-                            setCurrentEvent({
-                              ...currentEvent,
-                              mapLink: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="form-group mb-3">
-                        <div className="form-check">
+                    </div>
+                  ) : (
+                    // EDIT/ADD MODE UI
+                    <div className="form-inp">
+                      <form onSubmit={handleSubmitEvent}>
+                        <div className="form-group mb-3">
+                          <label className="lb">Event Name: *</label>
                           <input
-                            className="form-check-input"
-                            type="checkbox"
-                            id="pinEvent"
-                            checked={currentEvent.isPinned}
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter event name"
+                            value={currentEvent.name}
                             onChange={(e) =>
                               setCurrentEvent({
                                 ...currentEvent,
-                                isPinned: e.target.checked,
+                                name: e.target.value,
+                              })
+                            }
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group mb-3">
+                          <label className="lb">
+                            Church / Meeting Place Name: *
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="e.g. Grace Church"
+                            value={currentEvent.churchName}
+                            onChange={(e) =>
+                              setCurrentEvent({
+                                ...currentEvent,
+                                churchName: e.target.value,
+                              })
+                            }
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group mb-3">
+                          <label className="lb">Event Image:</label>
+                          <input
+                            type="file"
+                            className="form-control"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                          />
+                          {currentEvent.image && (
+                            <div className="mt-2 text-center">
+                              <img
+                                src={currentEvent.image}
+                                alt="Preview"
+                                style={{
+                                  maxHeight: "200px",
+                                  maxWidth: "100%",
+                                  objectFit: "contain",
+                                  borderRadius: "5px",
+                                  border: "1px solid #ddd",
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="row">
+                          <div className="col-md-6">
+                            <div className="form-group mb-3">
+                              <label className="lb">Date & Time: *</label>
+                              <input
+                                type="datetime-local"
+                                className="form-control"
+                                value={currentEvent.date}
+                                onChange={(e) =>
+                                  setCurrentEvent({
+                                    ...currentEvent,
+                                    date: e.target.value,
+                                  })
+                                }
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div className="col-md-6">
+                            <div className="form-group mb-3">
+                              <label className="lb">Location: *</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Enter location"
+                                value={currentEvent.location}
+                                onChange={(e) =>
+                                  setCurrentEvent({
+                                    ...currentEvent,
+                                    location: e.target.value,
+                                  })
+                                }
+                                required
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="row">
+                          <div className="col-md-6">
+                            <div className="form-group mb-3">
+                              <label className="lb">State: *</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="e.g. Kerala, Karnataka"
+                                value={currentEvent.state}
+                                onChange={(e) =>
+                                  setCurrentEvent({
+                                    ...currentEvent,
+                                    state: e.target.value,
+                                  })
+                                }
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div className="col-md-6">
+                            <div className="form-group mb-3">
+                              <label className="lb">Contact Details: *</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Phone"
+                                value={currentEvent.contact}
+                                onChange={(e) =>
+                                  setCurrentEvent({
+                                    ...currentEvent,
+                                    contact: e.target.value,
+                                  })
+                                }
+                                required
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="form-group mb-3">
+                          <label className="lb">Email:</label>
+                          <input
+                            type="email"
+                            className="form-control"
+                            placeholder="contact@example.com"
+                            value={currentEvent.email}
+                            onChange={(e) =>
+                              setCurrentEvent({
+                                ...currentEvent,
+                                email: e.target.value,
                               })
                             }
                           />
-                          <label
-                            className="form-check-label"
-                            htmlFor="pinEvent"
-                          >
-                            <strong>Pin this event</strong> (Shows to all users
-                            regardless of location)
-                          </label>
                         </div>
-                      </div>
 
-                      <div className="form-group mb-3">
-                        <label className="lb">Description:</label>
-                        <textarea
-                          className="form-control"
-                          placeholder="Event details..."
-                          value={currentEvent.description}
-                          onChange={(e) =>
-                            setCurrentEvent({
-                              ...currentEvent,
-                              description: e.target.value,
-                            })
-                          }
-                          rows="4"
-                        ></textarea>
-                      </div>
+                        <div className="form-group mb-3">
+                          <label className="lb">Google Map Link:</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="https://maps.google.com/..."
+                            value={currentEvent.mapLink}
+                            onChange={(e) =>
+                              setCurrentEvent({
+                                ...currentEvent,
+                                mapLink: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
 
-                      <div className="form-group mb-3">
-                        <label className="lb">Status:</label>
-                        <select
-                          className="form-control"
-                          value={currentEvent.status}
-                          onChange={(e) =>
-                            setCurrentEvent({
-                              ...currentEvent,
-                              status: e.target.value,
-                            })
-                          }
-                        >
-                          <option value="Active">Active</option>
-                          <option value="Inactive">Inactive</option>
-                        </select>
-                      </div>
-                    </form>
-                  </div>
+                        <div className="form-group mb-3">
+                          <div className="form-check">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              id="pinEvent"
+                              checked={currentEvent.isPinned}
+                              onChange={(e) =>
+                                setCurrentEvent({
+                                  ...currentEvent,
+                                  isPinned: e.target.checked,
+                                })
+                              }
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor="pinEvent"
+                            >
+                              <strong>Pin this event</strong> (Shows to all
+                              users regardless of location)
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="form-group mb-3">
+                          <label className="lb">Description:</label>
+                          <textarea
+                            className="form-control"
+                            placeholder="Event details..."
+                            value={currentEvent.description}
+                            onChange={(e) =>
+                              setCurrentEvent({
+                                ...currentEvent,
+                                description: e.target.value,
+                              })
+                            }
+                            rows="4"
+                          ></textarea>
+                        </div>
+
+                        <div className="form-group mb-3">
+                          <label className="lb">
+                            Additional Details (for View Popup):
+                          </label>
+                          <textarea
+                            className="form-control"
+                            placeholder="Add extra details here..."
+                            value={currentEvent.details}
+                            onChange={(e) =>
+                              setCurrentEvent({
+                                ...currentEvent,
+                                details: e.target.value,
+                              })
+                            }
+                            rows="3"
+                          ></textarea>
+                        </div>
+
+                        <div className="form-group mb-3">
+                          <label className="lb">Status:</label>
+                          <select
+                            className="form-control"
+                            value={currentEvent.status}
+                            onChange={(e) =>
+                              setCurrentEvent({
+                                ...currentEvent,
+                                status: e.target.value,
+                              })
+                            }
+                          >
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                          </select>
+                        </div>
+                      </form>
+                    </div>
+                  )}
                 </div>
                 <div className="modal-footer">
                   <button
@@ -692,18 +900,20 @@ const AdminEvents = () => {
                   >
                     Close
                   </button>
-                  <button
-                    type="submit"
-                    className="cta-full cta-colr"
-                    disabled={loading}
-                    onClick={handleSubmitEvent}
-                  >
-                    {loading
-                      ? "Saving..."
-                      : modalMode === "add"
-                      ? "Add Event"
-                      : "Update Event"}
-                  </button>
+                  {modalMode !== "view" && (
+                    <button
+                      type="submit"
+                      className="cta-full cta-colr"
+                      disabled={loading}
+                      onClick={handleSubmitEvent}
+                    >
+                      {loading
+                        ? "Saving..."
+                        : modalMode === "add"
+                          ? "Add Event"
+                          : "Update Event"}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
