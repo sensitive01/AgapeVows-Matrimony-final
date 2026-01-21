@@ -37,7 +37,7 @@ import BlockedProfile from "./pages/blockedprofile/BlockedProfile";
 import IgnoredProfile from "./pages/ignoredprofile/IgnoredProfile";
 import Events from "./pages/public/Events"; // Import Events page
 import GlobalSearchModal from "./components/GlobalSearchModal";
-import HelpAndSupport from "./pages/helpAndSupport";
+import HelpAndSupport from "./pages/HelpAndSupport";
 import BridalMakeup from "./pages/public/BridalMakeup";
 import InsuranceServices from "./pages/public/InsuranceServices";
 
