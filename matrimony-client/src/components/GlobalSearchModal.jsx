@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ArrowLeft, ChevronDown } from "lucide-react";
@@ -602,7 +601,7 @@ const GlobalSearchModal = () => {
         <MainLayout />
       </div>
 
-      <div className="pt-8">
+      <div style={{ paddingTop: "150px" }}>
         <div className="db">
           <div
             className="container-fluid"

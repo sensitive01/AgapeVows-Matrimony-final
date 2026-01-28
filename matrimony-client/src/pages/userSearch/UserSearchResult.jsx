@@ -3,7 +3,7 @@ import LayoutComponent from "../../components/layouts/LayoutComponent";
 import ShowInterest from "./ShowInterest";
 import Footer from "../../components/Footer";
 import CopyRights from "../../components/CopyRights";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   fetchSearchedProfileData,
   saveTheProfileAsShortlisted,
@@ -12,7 +12,7 @@ import defaultProfileImg from "../../assets/images/blue-circle-with-white-user_7
 import maleDefault from "../../assets/images/profiles/men1.jpg";
 import femaleDefault from "../../assets/images/profiles/12.jpg";
 
-const UserCardImageSlider = ({ user, isAccepted }) => {
+const UserCardImageSlider = ({ user, isAccepted, height = "220px" }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
 
@@ -69,7 +69,7 @@ const UserCardImageSlider = ({ user, isAccepted }) => {
 
   return (
     <>
-      <div style={{ position: "relative", width: "100%", height: "220px" }}>
+      <div style={{ position: "relative", width: "100%", height: height }}>
         <div
           onClick={openZoom}
           style={{
@@ -254,7 +254,9 @@ const UserCardImageSlider = ({ user, isAccepted }) => {
 };
 
 const UserSearchResult = () => {
-  const { state } = useLocation();
+  const location = useLocation();
+  const state = location.state;
+  const navigate = useNavigate();
 
   console.log(state);
   const userId = localStorage.getItem("userId");
@@ -582,125 +584,181 @@ const UserSearchResult = () => {
                         }
                       >
                         <div
-                          className={`all-pro-box ${
-                            Math.random() > 0.5 ? "user-avil-onli" : ""
-                          }`}
-                          data-useravil={
-                            Math.random() > 0.5 ? "avilyes" : "avilno"
-                          }
-                          data-aviltxt={
-                            Math.random() > 0.5 ? "Available online" : "Offline"
-                          }
+                          className="search-result-card"
+                          style={{
+                            border: "1px solid #ddd",
+                            padding: "15px",
+                            backgroundColor: "#fff",
+                            borderRadius: "4px",
+                            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                          }}
                         >
-                          <div className="pro-img">
-                            <UserCardImageSlider
-                              user={user}
-                              isAccepted={user.interestStatus === "accepted"}
-                            />
-                            <div
-                              className="pro-ave"
-                              title="User currently available"
-                            >
-                              <span
-                                className={`pro-ave-${
-                                  Math.random() > 0.5 ? "yes" : "no"
-                                }`}
-                              ></span>
-                            </div>
-                            <div className="pro-avl-status">
-                              {Math.random() > 0.5 ? (
-                                <h5>Available Online</h5>
-                              ) : (
-                                <>
-                                  <h5>Last login 10 mins ago</h5>
-                                  <span className="marqu">
-                                    Last login 10 mins ago | I'll be available
-                                    on 10:00 AM
-                                  </span>
-                                </>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="pro-detail">
-                            <h4>
-                              <a href="#">{user.agwid}</a>
-                            </h4>
-                            <div
-                              className="pro-bio"
+                          {/* Header: ID and Last Login */}
+                          <div
+                            className="d-flex justify-content-between align-items-center mb-3"
+                            style={{
+                              borderBottom: "1px dashed #ccc",
+                              paddingBottom: "8px",
+                            }}
+                          >
+                            <h5
                               style={{
-                                filter:
-                                  user.interestStatus === "accepted"
-                                    ? "none"
-                                    : "blur(5px)",
-                                userSelect:
-                                  user.interestStatus === "accepted"
-                                    ? "auto"
-                                    : "none",
-                                opacity:
-                                  user.interestStatus === "accepted" ? 1 : 0.6,
+                                color: "#C2185B",
+                                fontWeight: "bold",
+                                margin: 0,
+                                fontSize: "16px",
                               }}
                             >
-                              <span>{user.degree || "Not specified"}</span>
-                              <span>{user.jobType || "Not specified"}</span>
-                              <span>
-                                {user.age || "Not specified"} Years old
-                              </span>
-                              <span>
-                                Height: {user.height || "Not specified"}Cms
-                              </span>
+                              {user.agwid}
+                            </h5>
+                            <span
+                              style={{
+                                fontSize: "13px",
+                                color: "#888",
+                                fontStyle: "italic",
+                              }}
+                            >
+                              Last login:{" "}
+                              {user.lastLogin
+                                ? new Date(user.lastLogin).toLocaleDateString(
+                                    "en-GB",
+                                    {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                    },
+                                  )
+                                : "Recently"}
+                            </span>
+                          </div>
+
+                          <div className="row">
+                            {/* Left: Image */}
+                            <div
+                              className="col-md-3 col-sm-4 mb-3 mb-sm-0"
+                              style={{ margin: 0 }}
+                            >
+                              <div
+                                style={{
+                                  height: "160px",
+                                  overflow: "hidden",
+                                  borderRadius: "4px",
+                                  border: "1px solid #eee",
+                                }}
+                              >
+                                <UserCardImageSlider
+                                  user={user}
+                                  isAccepted={
+                                    user.interestStatus === "accepted"
+                                  }
+                                  height="100%"
+                                />
+                              </div>
                             </div>
-                            <div className="links">
-                              {user.interestStatus === "pending" ? (
-                                <span
-                                  className="cta cta-sendint"
-                                  style={{ cursor: "default", opacity: 0.8 }}
-                                >
-                                  Request Sent
-                                </span>
-                              ) : user.interestStatus === "accepted" ? (
-                                <span
-                                  className="cta cta-sendint"
+
+                            {/* Center: Details */}
+                            <div className="col-md-9 col-sm-8 d-flex flex-column">
+                              <div>
+                                <h4
                                   style={{
-                                    cursor: "default",
-                                    backgroundColor: "#4caf50",
-                                    borderColor: "#4caf50",
+                                    fontSize: "16px",
+                                    fontWeight: "600",
+                                    marginBottom: "8px",
+                                    color: "#333",
                                   }}
                                 >
-                                  Request Accepted
-                                </span>
-                              ) : (
-                                <a
-                                  href="#!"
-                                  className="cta cta-sendint"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#sendInter"
-                                  onClick={() => setSelectedUser(user)}
+                                  {[
+                                    user.motherTongue,
+                                    user.age && `${user.age} Yrs`,
+                                    user.height,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(", ")}
+                                </h4>
+
+                                <div
+                                  style={{
+                                    fontSize: "14px",
+                                    color: "#555",
+                                    lineHeight: "1.8",
+                                  }}
                                 >
-                                  Send interest
-                                </a>
-                              )}
-                              <span
-                                className="cta"
-                                onClick={() => shortListProfile(user)}
-                              >
-                                Short List
-                              </span>
-                              <a href={`/profile-more-details/${user._id}`}>
-                                View Profile
-                              </a>
+                                  <div className="mb-1">
+                                    {[
+                                      user.religion,
+                                      user.caste,
+                                      user.city,
+                                      user.state,
+                                      user.citizenOf,
+                                    ]
+                                      .filter((item) => item && item !== "NA")
+                                      .join(", ")}
+                                  </div>
+                                  <div className="mb-1">
+                                    {[
+                                      user.education || user.degree,
+                                      user.occupation || user.jobType,
+                                    ]
+                                      .filter(Boolean)
+                                      .join(", ")}
+                                  </div>
+                                  <div
+                                    style={{
+                                      color: "#777",
+                                      marginTop: "8px",
+                                      fontSize: "13px",
+                                      display: "-webkit-box",
+                                      WebkitLineClamp: 2,
+                                      WebkitBoxOrient: "vertical",
+                                      overflow: "hidden",
+                                    }}
+                                  >
+                                    {user.jobDetails
+                                      ? `${user.jobDetails} - `
+                                      : ""}
+                                    {user.aboutMe ||
+                                      "No description available."}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Bottom Right: Buttons */}
+                              <div className="d-flex justify-content-end gap-2 mt-3">
+                                <button
+                                  className="btn btn-sm text-white"
+                                  style={{
+                                    backgroundColor: "#00bcd5", // Cyan matching screenshot
+                                    border: "none",
+                                    borderRadius: "4px",
+                                    padding: "6px 15px",
+                                    fontWeight: "500",
+                                  }}
+                                  onClick={() =>
+                                    navigate(
+                                      `/profile-more-details/${user._id}`,
+                                      { state: user },
+                                    )
+                                  }
+                                >
+                                  View Profile
+                                </button>
+
+                                <button
+                                  className="btn btn-sm text-white"
+                                  style={{
+                                    backgroundColor: "#00bcd5", // Cyan matching screenshot
+                                    border: "none",
+                                    borderRadius: "4px",
+                                    padding: "6px 15px",
+                                    fontWeight: "500",
+                                  }}
+                                  onClick={() => shortListProfile(user)}
+                                >
+                                  Shortlist Profile
+                                </button>
+                              </div>
                             </div>
                           </div>
-                          <span
-                            className="enq-sav"
-                            data-toggle="tooltip"
-                            title="Click to save this profile."
-                          >
-                            <i
-                              className="fa fa-thumbs-o-up"
-                              aria-hidden="true"
-                            ></i>
-                          </span>
                         </div>
                       </li>
                     ))}
