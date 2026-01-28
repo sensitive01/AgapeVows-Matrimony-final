@@ -10,7 +10,7 @@ const UserSettingsPage = () => {
         <LayoutComponent />
       </div>
 
-      <div className="pt-16">
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
         <div className="db">
           <div
             className="container-fluid"

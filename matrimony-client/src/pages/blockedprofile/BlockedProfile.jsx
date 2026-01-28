@@ -32,7 +32,7 @@ const BlockedProfile = () => {
         if (response.status === 200) {
           // Remove the unblocked profile from the list
           setProfileData(
-            profileData.filter((profile) => profile._id !== profileId)
+            profileData.filter((profile) => profile._id !== profileId),
           );
           alert("Profile unblocked successfully!");
         } else {
@@ -198,7 +198,7 @@ const BlockedProfile = () => {
         <LayoutComponent />
       </div>
 
-      <div className="pt-16">
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
         <div className="db">
           <div
             className="container-fluid"

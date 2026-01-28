@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getUserProfile } from "../api/axiosService/userAuthService";
 import profImage from "../assets/images/blue-circle-with-white-user_78370-4707.avif";
 
-const UserSideBar = () => {
+const UserSideBar = ({ sidebarTop = "115px" }) => {
   const userId = localStorage.getItem("userId");
   const [userInfo, setUserInfo] = useState(null);
   const currentPath = window.location.pathname;
@@ -87,11 +87,8 @@ const UserSideBar = () => {
   const styles = {
     sidebarSticky: {
       position: "sticky",
-      top: "60px",
-      marginTop: "-40px",
-      width: "85%", // Reduced width from both sides
-      marginLeft: "auto", // Centered
-      marginRight: "auto", // Centered
+      top: sidebarTop,
+      width: "100%", // Restored width
       // height and overflow removed to eliminate scrolling and let it fit naturally
       background: "#fff",
       border: "1px solid #e9ecef",

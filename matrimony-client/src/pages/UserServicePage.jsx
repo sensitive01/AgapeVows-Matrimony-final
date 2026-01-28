@@ -1,13 +1,12 @@
 import React from "react";
-import Image1 from "../assets/images/couples/19.jpg"
-import Image2 from "../assets/images/couples/11.jpg"
-import Image3 from "../assets/images/couples/14.jpg"
-import Image4 from "../assets/images/couples/15.jpg"
-import Image5 from "../assets/images/couples/16.jpg"
-import Image6 from "../assets/images/couples/17.jpg"
-import Image7 from "../assets/images/couples/18.jpg"
-import Image8 from "../assets/images/couples/10.jpg"
-
+import Image1 from "../assets/images/couples/19.jpg";
+import Image2 from "../assets/images/couples/11.jpg";
+import Image3 from "../assets/images/couples/14.jpg";
+import Image4 from "../assets/images/couples/15.jpg";
+import Image5 from "../assets/images/couples/16.jpg";
+import Image6 from "../assets/images/couples/17.jpg";
+import Image7 from "../assets/images/couples/18.jpg";
+import Image8 from "../assets/images/couples/10.jpg";
 
 import LayoutComponent from "../components/layouts/LayoutComponent";
 
@@ -18,7 +17,7 @@ const UserServicePage = () => {
         <LayoutComponent />
       </div>
 
-      <div className="pt-16">
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
         <div className="pg-ser">
           <div className="inn">
             <ul>

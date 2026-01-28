@@ -9,6 +9,8 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import UserSideBar from "../components/UserSideBar";
 import LayoutComponent from "../components/layouts/LayoutComponent";
+import SearchableSelect from "../components/SearchableSelect";
+import { Country, State, City } from "country-state-city";
 
 // BasicInfomation Component (same as before)
 const BasicInfomation = ({
@@ -375,6 +377,7 @@ const FormInput = ({
   options,
   required,
   placeholder,
+  searchable = false,
 }) => (
   <div>
     <label
@@ -391,7 +394,15 @@ const FormInput = ({
         <span style={{ color: "#ef4444", marginLeft: "4px" }}>*</span>
       )}
     </label>
-    {type === "select" ? (
+    {type === "select" && searchable ? (
+      <SearchableSelect
+        name={name}
+        value={value}
+        onChange={onChange}
+        options={options}
+        placeholder={`Select ${label}`}
+      />
+    ) : type === "select" ? (
       <select
         name={name}
         value={value || ""}
@@ -682,6 +693,65 @@ const UserProfileEditPage = () => {
     "Yoga",
   ];
 
+  // Location selection state
+  const [selectedCountryCode, setSelectedCountryCode] = useState("");
+  const [selectedStateCode, setSelectedStateCode] = useState("");
+
+  // Get all countries
+  const allCountries = Country.getAllCountries();
+  const countryOptions = allCountries.map((country) => country.name);
+
+  // Get states for selected country
+  const stateOptions = selectedCountryCode
+    ? State.getStatesOfCountry(selectedCountryCode).map((state) => state.name)
+    : [];
+
+  // Get cities for selected state
+  const cityOptions =
+    selectedCountryCode && selectedStateCode
+      ? City.getCitiesOfState(selectedCountryCode, selectedStateCode).map(
+          (city) => city.name,
+        )
+      : [];
+
+  // Handle country change
+  const handleCountryChange = (e) => {
+    const countryName = e.target.value;
+    const country = allCountries.find((c) => c.name === countryName);
+    setSelectedCountryCode(country ? country.isoCode : "");
+    setSelectedStateCode("");
+    setFormData((prev) => ({
+      ...prev,
+      citizenOf: countryName,
+      state: "",
+      city: "",
+    }));
+    setHasUnsavedChanges(true);
+  };
+
+  // Handle state change
+  const handleStateChange = (e) => {
+    const stateName = e.target.value;
+    const states = State.getStatesOfCountry(selectedCountryCode);
+    const state = states.find((s) => s.name === stateName);
+    setSelectedStateCode(state ? state.isoCode : "");
+    setFormData((prev) => ({
+      ...prev,
+      state: stateName,
+      city: "",
+    }));
+    setHasUnsavedChanges(true);
+  };
+
+  // Handle city change
+  const handleCityChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      city: e.target.value,
+    }));
+    setHasUnsavedChanges(true);
+  };
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -815,6 +885,24 @@ const UserProfileEditPage = () => {
       fetchUserData();
     }
   }, [userId]);
+
+  // Initialize country and state codes when formData changes
+  useEffect(() => {
+    if (formData.citizenOf) {
+      const country = allCountries.find((c) => c.name === formData.citizenOf);
+      if (country) {
+        setSelectedCountryCode(country.isoCode);
+
+        if (formData.state) {
+          const states = State.getStatesOfCountry(country.isoCode);
+          const state = states.find((s) => s.name === formData.state);
+          if (state) {
+            setSelectedStateCode(state.isoCode);
+          }
+        }
+      }
+    }
+  }, [formData.citizenOf, formData.state, allCountries]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -1017,686 +1105,60 @@ const UserProfileEditPage = () => {
         <LayoutComponent />
       </div>
 
-      <div style={{ paddingTop: "50px", paddingBottom: "40px" }}>
-        <div
-          style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 20px" }}
-        >
-          {hasUnsavedChanges && (
-            <div
-              style={{
-                background: "#fef3c7",
-                border: "1px solid #f59e0b",
-                borderRadius: "6px",
-                padding: "12px 16px",
-                marginBottom: "16px",
-                fontSize: "14px",
-                color: "#92400e",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <i className="fa fa-exclamation-triangle"></i>
-              You have unsaved changes. Please submit the form to save your
-              changes.
-            </div>
-          )}
-
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
+        <div className="db">
           <div
-            style={{ display: "flex", gap: "24px", alignItems: "flex-start" }}
+            className="container-fluid"
+            style={{ paddingLeft: 0, paddingRight: 0 }}
           >
-            {/* Sidebar */}
-            <div
-              className="col-md-3 col-lg-2"
-              style={{ paddingLeft: 0, marginLeft: "0px" }}
-            >
-              <UserSideBar />
-            </div>
-            {/* Main Content */}
-            <div style={{ flex: 1 }}>
-              <form onSubmit={handleSubmit}>
-                {/* Profile Image Upload Section */}
-                <BasicInfomation
-                  profileImagePreview={profileImagePreview}
-                  handleProfileImageChange={handleProfileImageChange}
-                  handleAdditionalImagesChange={handleAdditionalImagesChange}
-                  additionalImagePreviews={additionalImagePreviews}
-                  removeAdditionalImage={removeAdditionalImage}
-                />
+            {hasUnsavedChanges && (
+              <div
+                style={{
+                  background: "#fef3c7",
+                  border: "1px solid #f59e0b",
+                  borderRadius: "6px",
+                  padding: "12px 16px",
+                  marginBottom: "16px",
+                  marginLeft: "15px",
+                  marginRight: "15px",
+                  fontSize: "14px",
+                  color: "#92400e",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <i className="fa fa-exclamation-triangle"></i>
+                You have unsaved changes. Please submit the form to save your
+                changes.
+              </div>
+            )}
 
-                {/* Basic Details Section */}
-                <FormSection title="Basic Details">
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "20px",
-                    }}
-                  >
-                    <FormInput
-                      label="Profile Created By"
-                      name="profileCreatedFor"
-                      type="select"
-                      value={formData.profileCreatedFor}
-                      onChange={handleInputChange}
-                      options={[
-                        "Self",
-                        "Son",
-                        "Daughter",
-                        "Brother",
-                        "Sister",
-                        "Friend",
-                        "Relative",
-                      ]}
-                    />
-                    <FormInput
-                      label="Name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                    />
-                    <FormInput
-                      label="Date of Birth"
-                      name="dateOfBirth"
-                      type="date"
-                      value={formData.dateOfBirth}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Age"
-                      name="age"
-                      value={formData.age}
-                      onChange={handleInputChange}
-                      placeholder="Calculated automatically"
-                    />
-                    <FormInput
-                      label="Body Type"
-                      name="bodyType"
-                      type="select"
-                      value={formData.bodyType}
-                      onChange={handleInputChange}
-                      options={["Slim", "Average", "Athletic", "Heavy"]}
-                    />
-                    <FormInput
-                      label="Physical Status"
-                      name="physicalStatus"
-                      type="select"
-                      value={formData.physicalStatus}
-                      onChange={handleInputChange}
-                      options={["Normal", "Physically Challenged"]}
-                    />
-                    <FormInput
-                      label="Complexion"
-                      name="complexion"
-                      type="select"
-                      value={formData.complexion}
-                      onChange={handleInputChange}
-                      options={[
-                        "Very Fair",
-                        "Fair",
-                        "Wheatish",
-                        "Dark",
-                        "Very Dark",
-                      ]}
-                    />
-                    <FormInput
-                      label="Height"
-                      name="height"
-                      type="select"
-                      value={formData.height}
-                      onChange={handleInputChange}
-                      options={[
-                        "5'4\" (163 cm)",
-                        "5'5\" (165 cm)",
-                        "5'6\" (168 cm)",
-                        "5'7\" (170 cm)",
-                        "5'8\" (173 cm)",
-                        "5'9\" (175 cm)",
-                        "5'10\" (178 cm)",
-                        "5'11\" (180 cm)",
-                      ]}
-                    />
-                    <FormInput
-                      label="Weight (kg)"
-                      name="weight"
-                      value={formData.weight}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Marital Status"
-                      name="maritalStatus"
-                      type="select"
-                      value={formData.maritalStatus}
-                      onChange={handleInputChange}
-                      options={[
-                        "Never Married",
-                        "Divorced",
-                        "Widowed",
-                        "Awaiting Divorce",
-                      ]}
-                    />
-                    {formData.maritalStatus &&
-                      formData.maritalStatus !== "Never Married" && (
-                        <>
-                          <FormInput
-                            label="Married Month & Year"
-                            name="marriedMonthYear"
-                            value={formData.marriedMonthYear}
-                            onChange={handleInputChange}
-                          />
-                          <FormInput
-                            label="Living Together Period"
-                            name="livingTogetherPeriod"
-                            value={formData.livingTogetherPeriod}
-                            onChange={handleInputChange}
-                          />
-                        </>
-                      )}
+            <div className="row" style={{ marginLeft: 0, marginRight: 0 }}>
+              {/* Sidebar - Left Column */}
+              <div
+                className="col-md-3 col-lg-2"
+                style={{ paddingLeft: 0, marginLeft: "0px" }}
+              >
+                <UserSideBar key="edit-sidebar-v4" />
+              </div>
+              {/* Main Content - Right Column */}
+              <div
+                className="col-md-9 col-lg-10"
+                style={{ paddingLeft: "20px", paddingRight: "15px" }}
+              >
+                <form onSubmit={handleSubmit}>
+                  {/* Profile Image Upload Section */}
+                  <BasicInfomation
+                    profileImagePreview={profileImagePreview}
+                    handleProfileImageChange={handleProfileImageChange}
+                    handleAdditionalImagesChange={handleAdditionalImagesChange}
+                    additionalImagePreviews={additionalImagePreviews}
+                    removeAdditionalImage={removeAdditionalImage}
+                  />
 
-                    {(formData.maritalStatus === "Divorced" ||
-                      formData.maritalStatus === "Awaiting Divorce") && (
-                      <>
-                        <FormInput
-                          label="Divorced Month & Year"
-                          name="divorcedMonthYear"
-                          value={formData.divorcedMonthYear}
-                          onChange={handleInputChange}
-                        />
-                        <div style={{ gridColumn: "1 / -1" }}>
-                          <FormInput
-                            label="Reason for Divorce"
-                            name="reasonForDivorce"
-                            type="textarea"
-                            value={formData.reasonForDivorce}
-                            onChange={handleInputChange}
-                          />
-                        </div>
-                      </>
-                    )}
-
-                    {formData.maritalStatus &&
-                      formData.maritalStatus !== "Never Married" && (
-                        <>
-                          <FormInput
-                            label="Child Status"
-                            name="childStatus"
-                            type="select"
-                            value={formData.childStatus}
-                            onChange={handleInputChange}
-                            options={[
-                              "No Children",
-                              "Have Children - Living Together",
-                              "Have Children - Not Living Together",
-                            ]}
-                          />
-                          <FormInput
-                            label="Number of Children"
-                            name="numberOfChildren"
-                            value={formData.numberOfChildren}
-                            onChange={handleInputChange}
-                          />
-                        </>
-                      )}
-                    <FormInput
-                      label="Eating Habits"
-                      name="eatingHabits"
-                      type="select"
-                      value={formData.eatingHabits}
-                      onChange={handleInputChange}
-                      options={["Vegetarian", "Non-Vegetarian", "Eggetarian"]}
-                    />
-                    <FormInput
-                      label="Drinking Habits"
-                      name="drinkingHabits"
-                      type="select"
-                      value={formData.drinkingHabits}
-                      onChange={handleInputChange}
-                      options={[
-                        "Never Drinks",
-                        "Drinks Socially",
-                        "Drinks Regularly",
-                      ]}
-                    />
-                    <FormInput
-                      label="Smoking Habits"
-                      name="smokingHabits"
-                      type="select"
-                      value={formData.smokingHabits}
-                      onChange={handleInputChange}
-                      options={[
-                        "Never Smokes",
-                        "Smokes Occasionally",
-                        "Smokes Regularly",
-                      ]}
-                    />
-                    <FormInput
-                      label="Mother Tongue"
-                      name="motherTongue"
-                      type="select"
-                      value={formData.motherTongue}
-                      onChange={handleInputChange}
-                      options={[
-                        "Malayalam",
-                        "Tamil",
-                        "Telugu",
-                        "Kannada",
-                        "Hindi",
-                        "English",
-                        "Konkani",
-                        "Marathi",
-                        "Bengali",
-                        "Gujarati",
-                        "Punjabi",
-                        "Urdu",
-                        "Oriya",
-                        "Assamese",
-                        "Tulu",
-                        "Other",
-                      ]}
-                    />
-                    <FormInput
-                      label="Caste"
-                      name="caste"
-                      type="select"
-                      value={formData.caste}
-                      onChange={handleInputChange}
-                      options={[
-                        "Doesn't wish to specify",
-                        "Latin Catholic",
-                        "Roman Catholic",
-                        "Syro Malabar",
-                        "Syro Malankara",
-                        "Knanaya Catholic",
-                        "CSI (Church of South India)",
-                        "Pentecostal",
-                        "Jacobite",
-                        "Orthodox",
-                        "Marthoma",
-                        "Protestant",
-                        "Anglican",
-                        "Baptist",
-                        "Methodist",
-                        "Presbyterian",
-                        "Seventh Day Adventist",
-                        "Assembly of God",
-                        "Brethren",
-                        "Other",
-                      ]}
-                    />
-                  </div>
-                </FormSection>
-
-                {/* Family Details Section */}
-                <FormSection title="Family Details">
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "20px",
-                    }}
-                  >
-                    <FormInput
-                      label="Father's Name"
-                      name="fathersName"
-                      value={formData.fathersName}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Mother's Name"
-                      name="mothersName"
-                      value={formData.mothersName}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Father's Occupation"
-                      name="fathersOccupation"
-                      value={formData.fathersOccupation}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Father's Profession"
-                      name="fathersProfession"
-                      value={formData.fathersProfession}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Mother's Occupation"
-                      name="mothersOccupation"
-                      value={formData.mothersOccupation}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Father's Native"
-                      name="fathersNative"
-                      value={formData.fathersNative}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Mother's Native"
-                      name="mothersNative"
-                      value={formData.mothersNative}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Family Value"
-                      name="familyValue"
-                      type="select"
-                      value={formData.familyValue}
-                      onChange={handleInputChange}
-                      options={[
-                        "Orthodox",
-                        "Traditional",
-                        "Moderate",
-                        "Liberal",
-                      ]}
-                    />
-                    <FormInput
-                      label="Family Type"
-                      name="familyType"
-                      type="select"
-                      value={formData.familyType}
-                      onChange={handleInputChange}
-                      options={["Joint Family", "Nuclear Family"]}
-                    />
-                    <FormInput
-                      label="Family Status"
-                      name="familyStatus"
-                      type="select"
-                      value={formData.familyStatus}
-                      onChange={handleInputChange}
-                      options={[
-                        "Middle Class",
-                        "Upper Middle Class",
-                        "High Class",
-                      ]}
-                    />
-                    <FormInput
-                      label="Residence Type"
-                      name="residenceType"
-                      type="select"
-                      value={formData.residenceType}
-                      onChange={handleInputChange}
-                      options={["Own House", "Rented House", "Company Lease"]}
-                    />
-                    <FormInput
-                      label="Number of Brothers"
-                      name="numberOfBrothers"
-                      value={formData.numberOfBrothers}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Number of Sisters"
-                      name="numberOfSisters"
-                      value={formData.numberOfSisters}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </FormSection>
-
-                {/* Religious Information Section */}
-                <FormSection title="Religious Information">
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "20px",
-                    }}
-                  >
-                    <FormInput
-                      label="Denomination"
-                      name="denomination"
-                      type="select"
-                      value={formData.denomination}
-                      onChange={handleInputChange}
-                      options={[
-                        "Catholic",
-                        "Protestant",
-                        "Orthodox",
-                        "Pentecostal",
-                        "Other",
-                      ]}
-                    />
-                    <FormInput
-                      label="Church"
-                      name="church"
-                      value={formData.church}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Church Activity"
-                      name="churchActivity"
-                      value={formData.churchActivity}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Pastor's Name"
-                      name="pastorsName"
-                      value={formData.pastorsName}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Spirituality"
-                      name="spirituality"
-                      type="select"
-                      value={formData.spirituality}
-                      onChange={handleInputChange}
-                      options={[
-                        "Very Religious",
-                        "Religious",
-                        "Moderately Religious",
-                        "Not Religious",
-                      ]}
-                    />
-                    <div style={{ gridColumn: "1 / -1" }}>
-                      <FormInput
-                        label="Religious Detail"
-                        name="religiousDetail"
-                        type="textarea"
-                        value={formData.religiousDetail}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                  </div>
-                </FormSection>
-
-                {/* Contact Information Section */}
-                <FormSection title="Contact Information">
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "20px",
-                    }}
-                  >
-                    <FormInput
-                      label="Mobile Number"
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      required
-                    />
-                    <FormInput
-                      label="Alternate Mobile Number"
-                      name="alternateMobile"
-                      type="tel"
-                      value={formData.alternateMobile}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                    />
-                    <FormInput
-                      label="Landline Number"
-                      name="landlineNumber"
-                      value={formData.landlineNumber}
-                      onChange={handleInputChange}
-                    />
-                    <div style={{ gridColumn: "1 / -1" }}>
-                      <FormInput
-                        label="Current Address"
-                        name="currentAddress"
-                        type="textarea"
-                        value={formData.currentAddress}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    <div style={{ gridColumn: "1 / -1" }}>
-                      <FormInput
-                        label="Permanent Address"
-                        name="permanentAddress"
-                        type="textarea"
-                        value={formData.permanentAddress}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    <FormInput
-                      label="City"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="State"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Pincode"
-                      name="pincode"
-                      value={formData.pincode}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Citizen Of"
-                      name="citizenOf"
-                      value={formData.citizenOf}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Contact Person Name"
-                      name="contactPersonName"
-                      value={formData.contactPersonName}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Relationship"
-                      name="relationship"
-                      value={formData.relationship}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </FormSection>
-
-                {/* Professional Information Section */}
-                <FormSection title="Professional Information">
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "20px",
-                    }}
-                  >
-                    <FormInput
-                      label="Education"
-                      name="education"
-                      value={formData.education}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Additional Education"
-                      name="additionalEducation"
-                      value={formData.additionalEducation}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="College"
-                      name="college"
-                      value={formData.college}
-                      onChange={handleInputChange}
-                    />
-                    <div style={{ gridColumn: "1 / -1" }}>
-                      <FormInput
-                        label="Education in Detail"
-                        name="educationDetail"
-                        type="textarea"
-                        value={formData.educationDetail}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    <FormInput
-                      label="Employment Type"
-                      name="employmentType"
-                      type="select"
-                      value={formData.employmentType}
-                      onChange={handleInputChange}
-                      options={[
-                        "Private Sector",
-                        "Government",
-                        "Self Employed",
-                        "Business",
-                        "Not Working",
-                      ]}
-                    />
-                    <FormInput
-                      label="Occupation"
-                      name="occupation"
-                      value={formData.occupation}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Position"
-                      name="position"
-                      value={formData.position}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Company Name"
-                      name="companyName"
-                      value={formData.companyName}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Annual Income"
-                      name="annualIncome"
-                      value={formData.annualIncome}
-                      onChange={handleInputChange}
-                      placeholder="e.g., 5-10 Lakhs"
-                    />
-                  </div>
-                </FormSection>
-
-                {/* Lifestyle Section with Checkboxes */}
-                <FormSection title="Lifestyle">
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr",
-                      gap: "20px",
-                    }}
-                  >
-                    {/* Hobbies as Checkboxes */}
-                    <div style={{ gridColumn: "1 / -1" }}>
-                      <CheckboxGroup
-                        label="Hobbies"
-                        name="hobbies"
-                        options={hobbiesOptions}
-                        selectedValues={
-                          Array.isArray(formData.hobbies)
-                            ? formData.hobbies
-                            : []
-                        }
-                        onChange={handleHobbiesChange}
-                      />
-                    </div>
-
+                  {/* Basic Details Section */}
+                  <FormSection title="Basic Details">
                     <div
                       style={{
                         display: "grid",
@@ -1705,359 +1167,1419 @@ const UserProfileEditPage = () => {
                       }}
                     >
                       <FormInput
-                        label="Interests"
-                        name="interests"
-                        value={formData.interests}
+                        label="Profile Created By"
+                        name="profileCreatedFor"
+                        type="select"
+                        value={formData.profileCreatedFor}
+                        onChange={handleInputChange}
+                        options={[
+                          "Self",
+                          "Son",
+                          "Daughter",
+                          "Brother",
+                          "Sister",
+                          "Friend",
+                          "Relative",
+                        ]}
+                      />
+                      <FormInput
+                        label="Name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                      />
+                      <FormInput
+                        label="Date of Birth"
+                        name="dateOfBirth"
+                        type="date"
+                        value={formData.dateOfBirth}
                         onChange={handleInputChange}
                       />
                       <FormInput
-                        label="Music"
-                        name="music"
-                        value={formData.music}
+                        label="Age"
+                        name="age"
+                        value={formData.age}
+                        onChange={handleInputChange}
+                        placeholder="Calculated automatically"
+                      />
+                      <FormInput
+                        label="Body Type"
+                        name="bodyType"
+                        type="select"
+                        value={formData.bodyType}
+                        onChange={handleInputChange}
+                        options={["Slim", "Average", "Athletic", "Heavy"]}
+                      />
+                      <FormInput
+                        label="Physical Status"
+                        name="physicalStatus"
+                        type="select"
+                        value={formData.physicalStatus}
+                        onChange={handleInputChange}
+                        options={["Normal", "Physically Challenged"]}
+                      />
+                      <FormInput
+                        label="Complexion"
+                        name="complexion"
+                        type="select"
+                        value={formData.complexion}
+                        onChange={handleInputChange}
+                        options={[
+                          "Very Fair",
+                          "Fair",
+                          "Wheatish",
+                          "Dark",
+                          "Very Dark",
+                        ]}
+                      />
+                      <FormInput
+                        label="Height"
+                        name="height"
+                        type="select"
+                        searchable={true}
+                        value={formData.height}
+                        onChange={handleInputChange}
+                        options={[
+                          "4ft",
+                          "4ft 1in",
+                          "4ft 2in",
+                          "4ft 3in",
+                          "4ft 4in",
+                          "4ft 5in",
+                          "4ft 6in",
+                          "4ft 7in",
+                          "4ft 8in",
+                          "4ft 9in",
+                          "4ft 10in",
+                          "4ft 11in",
+                          "5ft",
+                          "5ft 1in",
+                          "5ft 2in",
+                          "5ft 3in",
+                          "5ft 4in",
+                          "5ft 5in",
+                          "5ft 6in",
+                          "5ft 7in",
+                          "5ft 8in",
+                          "5ft 9in",
+                          "5ft 10in",
+                          "5ft 11in",
+                          "6ft",
+                          "6ft 1in",
+                          "6ft 2in",
+                          "6ft 3in",
+                          "6ft 4in",
+                          "6ft 5in",
+                          "6ft 6in",
+                          "6ft 7in",
+                          "6ft 8in",
+                          "6ft 9in",
+                          "6ft 10in",
+                          "6ft 11in",
+                          "7ft",
+                          "7ft 1in",
+                          "7ft 2in",
+                          "7ft 3in",
+                          "7ft 4in",
+                          "7ft 5in",
+                          "7ft 6in",
+                          "7ft 7in",
+                          "7ft 8in",
+                          "7ft 9in",
+                          "7ft 10in",
+                          "7ft 11in",
+                          "8ft",
+                        ]}
+                      />
+                      <FormInput
+                        label="Weight (kg)"
+                        name="weight"
+                        value={formData.weight}
                         onChange={handleInputChange}
                       />
                       <FormInput
-                        label="Favourite Reads"
-                        name="favouriteReads"
-                        value={formData.favouriteReads}
+                        label="Marital Status"
+                        name="maritalStatus"
+                        type="select"
+                        value={formData.maritalStatus}
+                        onChange={handleInputChange}
+                        options={[
+                          "Never Married",
+                          "Separated",
+                          "Divorced",
+                          "Widow / Widower",
+                          "Awaiting Divorce",
+                          "Annulled",
+                        ]}
+                      />
+                      {formData.maritalStatus &&
+                        formData.maritalStatus !== "Never Married" && (
+                          <>
+                            <FormInput
+                              label="Married Month & Year"
+                              name="marriedMonthYear"
+                              value={formData.marriedMonthYear}
+                              onChange={handleInputChange}
+                            />
+                            <FormInput
+                              label="Living Together Period"
+                              name="livingTogetherPeriod"
+                              value={formData.livingTogetherPeriod}
+                              onChange={handleInputChange}
+                            />
+                          </>
+                        )}
+
+                      {(formData.maritalStatus === "Divorced" ||
+                        formData.maritalStatus === "Awaiting Divorce") && (
+                        <>
+                          <FormInput
+                            label="Divorced Month & Year"
+                            name="divorcedMonthYear"
+                            value={formData.divorcedMonthYear}
+                            onChange={handleInputChange}
+                          />
+                          <div style={{ gridColumn: "1 / -1" }}>
+                            <FormInput
+                              label="Reason for Divorce"
+                              name="reasonForDivorce"
+                              type="textarea"
+                              value={formData.reasonForDivorce}
+                              onChange={handleInputChange}
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      {formData.maritalStatus &&
+                        formData.maritalStatus !== "Never Married" && (
+                          <>
+                            <FormInput
+                              label="Child Status"
+                              name="childStatus"
+                              type="select"
+                              value={formData.childStatus}
+                              onChange={handleInputChange}
+                              options={[
+                                "No Children",
+                                "Have Children - Living Together",
+                                "Have Children - Not Living Together",
+                              ]}
+                            />
+                            <FormInput
+                              label="Number of Children"
+                              name="numberOfChildren"
+                              value={formData.numberOfChildren}
+                              onChange={handleInputChange}
+                            />
+                          </>
+                        )}
+                      <FormInput
+                        label="Eating Habits"
+                        name="eatingHabits"
+                        type="select"
+                        value={formData.eatingHabits}
+                        onChange={handleInputChange}
+                        options={["Vegetarian", "Non-Vegetarian", "Eggetarian"]}
+                      />
+                      <FormInput
+                        label="Drinking Habits"
+                        name="drinkingHabits"
+                        type="select"
+                        value={formData.drinkingHabits}
+                        onChange={handleInputChange}
+                        options={[
+                          "Never Drinks",
+                          "Drinks Socially",
+                          "Drinks Regularly",
+                        ]}
+                      />
+                      <FormInput
+                        label="Smoking Habits"
+                        name="smokingHabits"
+                        type="select"
+                        value={formData.smokingHabits}
+                        onChange={handleInputChange}
+                        options={[
+                          "Never Smokes",
+                          "Smokes Occasionally",
+                          "Smokes Regularly",
+                        ]}
+                      />
+                      <FormInput
+                        label="Mother Tongue"
+                        name="motherTongue"
+                        type="select"
+                        searchable={true}
+                        value={formData.motherTongue}
+                        onChange={handleInputChange}
+                        options={[
+                          "Aka",
+                          "Arabic",
+                          "Arunachali",
+                          "Assamese",
+                          "Awadhi",
+                          "Bengali",
+                          "Bhojpuri",
+                          "Bhutia",
+                          "Bihari",
+                          "Brij",
+                          "Chatisgarhi",
+                          "Chinese",
+                          "Dogri",
+                          "English",
+                          "French",
+                          "Garhwali",
+                          "Garo",
+                          "Gujarati",
+                          "Haryanvi",
+                          "Himachali/Pahari",
+                          "Hindi",
+                          "Kanauji",
+                          "Kannada",
+                          "Kashmiri",
+                          "Khandesi",
+                          "Khasi",
+                          "Konkani",
+                          "Koshali",
+                          "Kumaoni",
+                          "Kutchi",
+                          "Ladacki",
+                          "Lepcha",
+                          "Magahi",
+                          "Maithili",
+                          "Malay",
+                          "Malayalam",
+                          "Manipuri",
+                          "Marathi",
+                          "Marwari",
+                          "Miji",
+                          "Mizo",
+                          "Monpa",
+                          "Nepali",
+                          "Odia",
+                          "Persian",
+                          "Punjabi",
+                          "Rajasthani",
+                          "Russian",
+                          "Sanskrit",
+                          "Santhali",
+                          "Sindhi",
+                          "Spanish",
+                          "Swedish",
+                          "Tagalog",
+                          "Tamil",
+                          "Telugu",
+                          "Tulu",
+                          "Urdu",
+                          "Other",
+                        ]}
+                      />
+                      <FormInput
+                        label="Caste"
+                        name="caste"
+                        type="select"
+                        searchable={true}
+                        value={formData.caste}
+                        onChange={handleInputChange}
+                        options={[
+                          "Doesn't wish to specify",
+                          "Latin Catholic",
+                          "Roman Catholic",
+                          "Syro Malabar",
+                          "Syro Malankara",
+                          "Knanaya Catholic",
+                          "CSI (Church of South India)",
+                          "Pentecostal",
+                          "Jacobite",
+                          "Orthodox",
+                          "Marthoma",
+                          "Protestant",
+                          "Anglican",
+                          "Baptist",
+                          "Methodist",
+                          "Presbyterian",
+                          "Seventh Day Adventist",
+                          "Assembly of God",
+                          "Brethren",
+                          "Other",
+                        ]}
+                      />
+                    </div>
+                  </FormSection>
+
+                  {/* Family Details Section */}
+                  <FormSection title="Family Details">
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, 1fr)",
+                        gap: "20px",
+                      }}
+                    >
+                      <FormInput
+                        label="Father's Name"
+                        name="fathersName"
+                        value={formData.fathersName}
                         onChange={handleInputChange}
                       />
                       <FormInput
-                        label="Favourite Cuisines"
-                        name="favouriteCuisines"
-                        value={formData.favouriteCuisines}
+                        label="Mother's Name"
+                        name="mothersName"
+                        value={formData.mothersName}
                         onChange={handleInputChange}
                       />
                       <FormInput
-                        label="Sports Activities"
-                        name="sportsActivities"
-                        value={formData.sportsActivities}
+                        label="Father's Occupation"
+                        name="fathersOccupation"
+                        value={formData.fathersOccupation}
                         onChange={handleInputChange}
                       />
                       <FormInput
-                        label="Dress Styles"
-                        name="dressStyles"
-                        value={formData.dressStyles}
+                        label="Father's Profession"
+                        name="fathersProfession"
+                        value={formData.fathersProfession}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Mother's Occupation"
+                        name="mothersOccupation"
+                        value={formData.mothersOccupation}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Father's Native"
+                        name="fathersNative"
+                        value={formData.fathersNative}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Mother's Native"
+                        name="mothersNative"
+                        value={formData.mothersNative}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Family Value"
+                        name="familyValue"
+                        type="select"
+                        value={formData.familyValue}
+                        onChange={handleInputChange}
+                        options={[
+                          "Orthodox",
+                          "Traditional",
+                          "Moderate",
+                          "Liberal",
+                        ]}
+                      />
+                      <FormInput
+                        label="Family Type"
+                        name="familyType"
+                        type="select"
+                        value={formData.familyType}
+                        onChange={handleInputChange}
+                        options={["Joint Family", "Nuclear Family"]}
+                      />
+                      <FormInput
+                        label="Family Status"
+                        name="familyStatus"
+                        type="select"
+                        value={formData.familyStatus}
+                        onChange={handleInputChange}
+                        options={[
+                          "Middle Class",
+                          "Upper Middle Class",
+                          "High Class",
+                        ]}
+                      />
+                      <FormInput
+                        label="Residence Type"
+                        name="residenceType"
+                        type="select"
+                        value={formData.residenceType}
+                        onChange={handleInputChange}
+                        options={["Own House", "Rented House", "Company Lease"]}
+                      />
+                      <FormInput
+                        label="Number of Brothers"
+                        name="numberOfBrothers"
+                        value={formData.numberOfBrothers}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Number of Sisters"
+                        name="numberOfSisters"
+                        value={formData.numberOfSisters}
                         onChange={handleInputChange}
                       />
                     </div>
-                  </div>
-                </FormSection>
+                  </FormSection>
 
-                {/* Social Media Section */}
-                <FormSection title="Social Media">
+                  {/* Religious Information Section */}
+                  <FormSection title="Religious Information">
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, 1fr)",
+                        gap: "20px",
+                      }}
+                    >
+                      <FormInput
+                        label="Denomination"
+                        name="denomination"
+                        type="select"
+                        searchable={true}
+                        value={formData.denomination}
+                        onChange={handleInputChange}
+                        options={[
+                          "ACI - Anglican Church Of India",
+                          "Adventist",
+                          "AG - Assembly of God",
+                          "Anglican",
+                          "Anglo Indian",
+                          "Apostolic",
+                          "Baptist",
+                          "Believers Church",
+                          "Brethren",
+                          "Catholic",
+                          "Catholic - Knanaya",
+                          "Catholic - Latin",
+                          "Catholic - Malankara",
+                          "Catholic - Roman",
+                          "Catholic - Syro Malabar",
+                          "Chaldean Syrian",
+                          "Charismatic",
+                          "Christian - Others",
+                          "Church Of Christ",
+                          "Church Of God",
+                          "CNI - Church Of North India",
+                          "Congregational",
+                          "CPM - Ceylon Pentecostal Mission",
+                          "CSI - Church Of South India",
+                          "Don't wish to specify",
+                          "Evangelist",
+                          "Independent Church",
+                          "Jacobite",
+                          "Jacobite - Knanaya",
+                          "Jehovah Shammah",
+                          "Jehovah's Witnesses",
+                          "Knanaya",
+                          "Knanaya Catholic",
+                          "Knanaya Jacobite",
+                          "Latin Catholic",
+                          "Lutheran",
+                          "Malankara Catholic",
+                          "Marthoma",
+                          "Methodist",
+                          "Moravian",
+                          "Muslim - Sunni",
+                          "Orthodox",
+                          "Orthodox - Knanaya",
+                          "Pentecost",
+                          "Presbyterian",
+                          "Protestant",
+                          "Reformed",
+                          "Revival",
+                          "Salvation Army",
+                          "Seventh-day Adventist",
+                          "St. Thomas Evangelical",
+                          "Syro Malabar",
+                          "Syrian Catholic",
+                          "TPM - The Pentecostal Mission",
+                          "Other",
+                        ]}
+                      />
+                      <FormInput
+                        label="Church"
+                        name="church"
+                        value={formData.church}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Church Activity"
+                        name="churchActivity"
+                        type="select"
+                        searchable={true}
+                        value={formData.churchActivity}
+                        onChange={handleInputChange}
+                        options={[
+                          "Church Choir",
+                          "Worship Leader",
+                          "Youth Fellowship",
+                          "Sunday School",
+                          "Music & Ministry",
+                          "Prayer Group",
+                          "Bible Study",
+                          "Evangelism",
+                          "Volunteer",
+                          "Other",
+                        ]}
+                      />
+                      <FormInput
+                        label="Pastor's Name"
+                        name="pastorsName"
+                        value={formData.pastorsName}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Spirituality"
+                        name="spirituality"
+                        type="select"
+                        value={formData.spirituality}
+                        onChange={handleInputChange}
+                        options={[
+                          "Very Religious",
+                          "Religious",
+                          "Moderately Religious",
+                          "Not Religious",
+                        ]}
+                      />
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <FormInput
+                          label="Religious Detail"
+                          name="religiousDetail"
+                          type="textarea"
+                          value={formData.religiousDetail}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                    </div>
+                  </FormSection>
+
+                  {/* Contact Information Section */}
+                  <FormSection title="Contact Information">
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, 1fr)",
+                        gap: "20px",
+                      }}
+                    >
+                      <FormInput
+                        label="Mobile Number"
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        required
+                      />
+                      <FormInput
+                        label="Alternate Mobile Number"
+                        name="alternateMobile"
+                        type="tel"
+                        value={formData.alternateMobile}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                      />
+                      <FormInput
+                        label="Landline Number"
+                        name="landlineNumber"
+                        value={formData.landlineNumber}
+                        onChange={handleInputChange}
+                      />
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <FormInput
+                          label="Current Address"
+                          name="currentAddress"
+                          type="textarea"
+                          value={formData.currentAddress}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <FormInput
+                          label="Permanent Address"
+                          name="permanentAddress"
+                          type="textarea"
+                          value={formData.permanentAddress}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <FormInput
+                        label="City"
+                        name="city"
+                        type="select"
+                        searchable={true}
+                        value={formData.city}
+                        onChange={handleCityChange}
+                        options={cityOptions}
+                      />
+                      <FormInput
+                        label="State"
+                        name="state"
+                        type="select"
+                        searchable={true}
+                        value={formData.state}
+                        onChange={handleStateChange}
+                        options={stateOptions}
+                      />
+                      <FormInput
+                        label="Pincode"
+                        name="pincode"
+                        value={formData.pincode}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Country"
+                        name="citizenOf"
+                        type="select"
+                        searchable={true}
+                        value={formData.citizenOf}
+                        onChange={handleCountryChange}
+                        options={countryOptions}
+                      />
+                      <FormInput
+                        label="Contact Person Name"
+                        name="contactPersonName"
+                        value={formData.contactPersonName}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Relationship"
+                        name="relationship"
+                        type="select"
+                        searchable={true}
+                        value={formData.relationship}
+                        onChange={handleInputChange}
+                        options={[
+                          "Father",
+                          "Mother",
+                          "Brother",
+                          "Sister",
+                          "Uncle",
+                          "Aunt",
+                          "Cousin",
+                          "Friend",
+                          "Self",
+                          "Other",
+                        ]}
+                      />
+                    </div>
+                  </FormSection>
+
+                  {/* Professional Information Section */}
+                  <FormSection title="Professional Information">
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, 1fr)",
+                        gap: "20px",
+                      }}
+                    >
+                      <FormInput
+                        label="Education"
+                        name="education"
+                        value={formData.education}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Additional Education"
+                        name="additionalEducation"
+                        value={formData.additionalEducation}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="College"
+                        name="college"
+                        value={formData.college}
+                        onChange={handleInputChange}
+                      />
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <FormInput
+                          label="Education in Detail"
+                          name="educationDetail"
+                          type="textarea"
+                          value={formData.educationDetail}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <FormInput
+                        label="Employment Type"
+                        name="employmentType"
+                        type="select"
+                        value={formData.employmentType}
+                        onChange={handleInputChange}
+                        options={[
+                          "Private Sector",
+                          "Government",
+                          "Self Employed",
+                          "Business",
+                          "Not Working",
+                        ]}
+                      />
+                      <FormInput
+                        label="Occupation"
+                        name="occupation"
+                        value={formData.occupation}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Position"
+                        name="position"
+                        value={formData.position}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Company Name"
+                        name="companyName"
+                        value={formData.companyName}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Annual Income"
+                        name="annualIncome"
+                        value={formData.annualIncome}
+                        onChange={handleInputChange}
+                        placeholder="e.g., 5-10 Lakhs"
+                      />
+                    </div>
+                  </FormSection>
+
+                  {/* Lifestyle Section with Checkboxes */}
+                  <FormSection title="Lifestyle">
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr",
+                        gap: "20px",
+                      }}
+                    >
+                      {/* Hobbies as Checkboxes */}
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <CheckboxGroup
+                          label="Hobbies"
+                          name="hobbies"
+                          options={hobbiesOptions}
+                          selectedValues={
+                            Array.isArray(formData.hobbies)
+                              ? formData.hobbies
+                              : []
+                          }
+                          onChange={handleHobbiesChange}
+                        />
+                      </div>
+
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(2, 1fr)",
+                          gap: "20px",
+                        }}
+                      >
+                        <FormInput
+                          label="Interests"
+                          name="interests"
+                          value={formData.interests}
+                          onChange={handleInputChange}
+                        />
+                        <FormInput
+                          label="Music"
+                          name="music"
+                          value={formData.music}
+                          onChange={handleInputChange}
+                        />
+                        <FormInput
+                          label="Favourite Reads"
+                          name="favouriteReads"
+                          value={formData.favouriteReads}
+                          onChange={handleInputChange}
+                        />
+                        <FormInput
+                          label="Favourite Cuisines"
+                          name="favouriteCuisines"
+                          value={formData.favouriteCuisines}
+                          onChange={handleInputChange}
+                        />
+                        <FormInput
+                          label="Sports Activities"
+                          name="sportsActivities"
+                          value={formData.sportsActivities}
+                          onChange={handleInputChange}
+                        />
+                        <FormInput
+                          label="Dress Styles"
+                          name="dressStyles"
+                          value={formData.dressStyles}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                    </div>
+                  </FormSection>
+
+                  {/* Partner Preferences - Basic & Religion */}
+                  <FormSection title="Partner Preferences - Basic & Religion">
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, 1fr)",
+                        gap: "20px",
+                      }}
+                    >
+                      <FormInput
+                        label="Partner Age From"
+                        name="partnerAgeFrom"
+                        value={formData.partnerAgeFrom}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Partner Age To"
+                        name="partnerAgeTo"
+                        value={formData.partnerAgeTo}
+                        onChange={handleInputChange}
+                      />
+                      <FormInput
+                        label="Partner Height"
+                        name="partnerHeight"
+                        value={formData.partnerHeight}
+                        onChange={handleInputChange}
+                        placeholder="e.g., 160-180 cm"
+                      />
+                      <FormInput
+                        label="Partner Marital Status"
+                        name="partnerMaritalStatus"
+                        type="select"
+                        searchable={true}
+                        value={formData.partnerMaritalStatus}
+                        onChange={handleInputChange}
+                        options={[
+                          "Never Married",
+                          "Divorced",
+                          "Separated",
+                          "Widow / Widower",
+                          "Awaiting Divorce",
+                          "Annulled",
+                          "Any",
+                        ]}
+                      />
+                      <FormInput
+                        label="Partner Mother Tongue"
+                        name="partnerMotherTongue"
+                        type="select"
+                        searchable={true}
+                        value={formData.partnerMotherTongue}
+                        onChange={handleInputChange}
+                        options={[
+                          "Aka",
+                          "Arabic",
+                          "Arunachali",
+                          "Assamese",
+                          "Awadhi",
+                          "Bengali",
+                          "Bhojpuri",
+                          "Bhutia",
+                          "Bihari",
+                          "Brij",
+                          "Chatisgarhi",
+                          "Chinese",
+                          "Dogri",
+                          "English",
+                          "French",
+                          "Garhwali",
+                          "Garo",
+                          "Gujarati",
+                          "Haryanvi",
+                          "Himachali/Pahari",
+                          "Hindi",
+                          "Kanauji",
+                          "Kannada",
+                          "Kashmiri",
+                          "Khandesi",
+                          "Khasi",
+                          "Konkani",
+                          "Koshali",
+                          "Kumaoni",
+                          "Kutchi",
+                          "Ladacki",
+                          "Lepcha",
+                          "Magahi",
+                          "Maithili",
+                          "Malay",
+                          "Malayalam",
+                          "Manipuri",
+                          "Marathi",
+                          "Marwari",
+                          "Miji",
+                          "Mizo",
+                          "Monpa",
+                          "Nepali",
+                          "Odia",
+                          "Persian",
+                          "Punjabi",
+                          "Rajasthani",
+                          "Russian",
+                          "Sanskrit",
+                          "Santhali",
+                          "Sindhi",
+                          "Spanish",
+                          "Swedish",
+                          "Tagalog",
+                          "Tamil",
+                          "Telugu",
+                          "Tulu",
+                          "Urdu",
+                          "Other",
+                          "Any",
+                        ]}
+                      />
+                      <FormInput
+                        label="Partner Caste"
+                        name="partnerCaste"
+                        type="select"
+                        searchable={true}
+                        value={formData.partnerCaste}
+                        onChange={handleInputChange}
+                        options={[
+                          "Doesn't wish to specify",
+                          "Latin Catholic",
+                          "Roman Catholic",
+                          "Syro Malabar",
+                          "Syro Malankara",
+                          "Knanaya Catholic",
+                          "CSI (Church of South India)",
+                          "Pentecostal",
+                          "Jacobite",
+                          "Orthodox",
+                          "Marthoma",
+                          "Protestant",
+                          "Anglican",
+                          "Baptist",
+                          "Methodist",
+                          "Presbyterian",
+                          "Seventh Day Adventist",
+                          "Assembly of God",
+                          "Brethren",
+                          "Other",
+                          "Any",
+                        ]}
+                      />
+                      <FormInput
+                        label="Partner Physical Status"
+                        name="partnerPhysicalStatus"
+                        type="select"
+                        value={formData.partnerPhysicalStatus}
+                        onChange={handleInputChange}
+                        options={["Normal", "Physically Challenged", "Any"]}
+                      />
+                      <FormInput
+                        label="Partner Eating Habits"
+                        name="partnerEatingHabits"
+                        type="select"
+                        value={formData.partnerEatingHabits}
+                        onChange={handleInputChange}
+                        options={[
+                          "Vegetarian",
+                          "Non-Vegetarian",
+                          "Eggetarian",
+                          "Any",
+                        ]}
+                      />
+                      <FormInput
+                        label="Partner Drinking Habits"
+                        name="partnerDrinkingHabits"
+                        type="select"
+                        value={formData.partnerDrinkingHabits}
+                        onChange={handleInputChange}
+                        options={[
+                          "Never Drinks",
+                          "Drinks Socially",
+                          "Drinks Regularly",
+                          "Any",
+                        ]}
+                      />
+                      <FormInput
+                        label="Partner Smoking Habits"
+                        name="partnerSmokingHabits"
+                        type="select"
+                        value={formData.partnerSmokingHabits}
+                        onChange={handleInputChange}
+                        options={[
+                          "Never Smokes",
+                          "Smokes Occasionally",
+                          "Smokes Regularly",
+                          "Any",
+                        ]}
+                      />
+                      <FormInput
+                        label="Partner Denomination"
+                        name="partnerDenomination"
+                        type="select"
+                        searchable={true}
+                        value={formData.partnerDenomination}
+                        onChange={handleInputChange}
+                        options={[
+                          "ACI - Anglican Church Of India",
+                          "Adventist",
+                          "AG - Assembly of God",
+                          "Anglican",
+                          "Anglo Indian",
+                          "Apostolic",
+                          "Baptist",
+                          "Believers Church",
+                          "Brethren",
+                          "Catholic",
+                          "Catholic - Knanaya",
+                          "Catholic - Latin",
+                          "Catholic - Malankara",
+                          "Catholic - Roman",
+                          "Catholic - Syro Malabar",
+                          "Chaldean Syrian",
+                          "Charismatic",
+                          "Christian - Others",
+                          "Church Of Christ",
+                          "Church Of God",
+                          "CNI - Church Of North India",
+                          "Congregational",
+                          "CPM - Ceylon Pentecostal Mission",
+                          "CSI - Church Of South India",
+                          "Don't wish to specify",
+                          "Evangelist",
+                          "Independent Church",
+                          "Jacobite",
+                          "Jacobite - Knanaya",
+                          "Jehovah Shammah",
+                          "Jehovah's Witnesses",
+                          "Knanaya",
+                          "Knanaya Catholic",
+                          "Knanaya Jacobite",
+                          "Latin Catholic",
+                          "Lutheran",
+                          "Malankara Catholic",
+                          "Marthoma",
+                          "Methodist",
+                          "Moravian",
+                          "Muslim - Sunni",
+                          "Orthodox",
+                          "Orthodox - Knanaya",
+                          "Pentecost",
+                          "Presbyterian",
+                          "Protestant",
+                          "Reformed",
+                          "Revival",
+                          "Salvation Army",
+                          "Seventh-day Adventist",
+                          "St. Thomas Evangelical",
+                          "Syro Malabar",
+                          "Syrian Catholic",
+                          "TPM - The Pentecostal Mission",
+                          "Other",
+                          "Any",
+                        ]}
+                      />
+                      <FormInput
+                        label="Partner Spirituality"
+                        name="partnerSpirituality"
+                        type="select"
+                        value={formData.partnerSpirituality}
+                        onChange={handleInputChange}
+                        options={[
+                          "Very Religious",
+                          "Religious",
+                          "Moderately Religious",
+                          "Not Religious",
+                          "Any",
+                        ]}
+                      />
+                    </div>
+                  </FormSection>
+
+                  {/* Partner Preferences - Professional */}
+                  <FormSection title="Partner Preferences - Professional">
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, 1fr)",
+                        gap: "20px",
+                      }}
+                    >
+                      <FormInput
+                        label="Partner Education"
+                        name="partnerEducation"
+                        type="select"
+                        searchable={true}
+                        value={formData.partnerEducation}
+                        onChange={handleInputChange}
+                        options={[
+                          "B.Arch",
+                          "B.Com",
+                          "B.Ed",
+                          "B.Pharm",
+                          "B.Sc",
+                          "B.Tech",
+                          "BA",
+                          "BBA",
+                          "BCA",
+                          "BDS",
+                          "BHM",
+                          "BAMS",
+                          "BHMS",
+                          "BSw",
+                          "LLB",
+                          "M.Arch",
+                          "M.Com",
+                          "M.Ed",
+                          "M.Pharm",
+                          "M.Sc",
+                          "M.Tech",
+                          "MA",
+                          "MBA",
+                          "MCA",
+                          "MDS",
+                          "MHM",
+                          "MSW",
+                          "LLM",
+                          "MBBS",
+                          "MD",
+                          "MS",
+                          "Ph.D",
+                          "Diploma",
+                          "Polytechnic",
+                          "Trade School",
+                          "Higher Secondary / Plus Two",
+                          "SSLC / 10th",
+                          "Other",
+                          "Any",
+                        ]}
+                      />
+                      <FormInput
+                        label="Partner Employment Type"
+                        name="partnerEmploymentType"
+                        type="select"
+                        searchable={true}
+                        value={formData.partnerEmploymentType}
+                        onChange={handleInputChange}
+                        options={[
+                          "Private Sector",
+                          "Government",
+                          "Self Employed",
+                          "Business",
+                          "Not Working",
+                          "Any",
+                        ]}
+                      />
+                      <FormInput
+                        label="Partner Occupation"
+                        name="partnerOccupation"
+                        type="select"
+                        searchable={true}
+                        value={formData.partnerOccupation}
+                        onChange={handleInputChange}
+                        options={[
+                          "Accountant",
+                          "Actor",
+                          "Administrative Professional",
+                          "Advertising Professional",
+                          "Agri-Business Professional",
+                          "Air Hostess / Flight Attendant",
+                          "Architect",
+                          "Artist",
+                          "Auditor",
+                          "Banking Professional",
+                          "Beautician",
+                          "Biologist / Botanist",
+                          "Business",
+                          "Chartered Accountant",
+                          "Civil Engineer",
+                          "Clerical Official",
+                          "Commercial Pilot",
+                          "Company Secretary",
+                          "Computer Professional",
+                          "Consultant",
+                          "Contractor",
+                          "Cost Accountant",
+                          "Creative Person",
+                          "Customer Support Professional",
+                          "Defense Employee",
+                          "Dentist",
+                          "Designer",
+                          "Doctor",
+                          "Economist",
+                          "Engineer",
+                          "Engineer (Mechanical)",
+                          "Engineer (Project)",
+                          "Entertainment Professional",
+                          "Event Manager",
+                          "Executive",
+                          "Factory Worker",
+                          "Farmer",
+                          "Fashion Designer",
+                          "Finance Professional",
+                          "Flight Attendant",
+                          "Government Employee",
+                          "Graphic Designer",
+                          "Health Care Professional",
+                          "Hotel Management Professional",
+                          "HR Professional",
+                          "Human Resources Professional",
+                          "Indian Administrative Services (IAS)",
+                          "Indian Foreign Services (IFS)",
+                          "Indian Police Services (IPS)",
+                          "Interior Designer",
+                          "Investment Professional",
+                          "IT Professional",
+                          "Journalist",
+                          "Lawyer",
+                          "Lecturer",
+                          "Legal Professional",
+                          "Manager",
+                          "Marketing Professional",
+                          "Media Professional",
+                          "Medical Professional",
+                          "Merchant Naval Officer",
+                          "Microbiologist",
+                          "Military",
+                          "Model",
+                          "Musician",
+                          "Nurse",
+                          "Nutritionist",
+                          "Occupational Therapist",
+                          "Optician",
+                          "Pharmacist",
+                          "Photographer",
+                          "Physical Therapist",
+                          "Physician",
+                          "Pilot",
+                          "Police",
+                          "Politician",
+                          "Professor",
+                          "Psychologist",
+                          "Public Relations Professional",
+                          "Real Estate Professional",
+                          "Researcher",
+                          "Retired",
+                          "Sales Professional",
+                          "Scientist",
+                          "Secretary",
+                          "Security Professional",
+                          "Self Employed",
+                          "Social Worker",
+                          "Software Consultant",
+                          "Software Engineer",
+                          "Sportsman",
+                          "Student",
+                          "Teacher",
+                          "Technician",
+                          "Training Professional",
+                          "Transportation Professional",
+                          "Veterinary Doctor",
+                          "Volunteer",
+                          "Writer",
+                          "Zoologist",
+                          "Not Working",
+                          "Any",
+                        ]}
+                      />
+                      <FormInput
+                        label="Partner Annual Income"
+                        name="partnerAnnualIncome"
+                        value={formData.partnerAnnualIncome}
+                        onChange={handleInputChange}
+                        placeholder="e.g., 5-10 Lakhs"
+                      />
+                    </div>
+                  </FormSection>
+
+                  {/* Partner Preferences - Location */}
+                  <FormSection title="Partner Preferences - Location">
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, 1fr)",
+                        gap: "20px",
+                      }}
+                    >
+                      <FormInput
+                        label="Partner Country"
+                        name="partnerCountry"
+                        value={formData.partnerCountry}
+                        onChange={handleInputChange}
+                        placeholder="Any"
+                      />
+                      <FormInput
+                        label="Partner State"
+                        name="partnerState"
+                        value={formData.partnerState}
+                        onChange={handleInputChange}
+                        placeholder="Any"
+                      />
+                      <FormInput
+                        label="Partner Residing District"
+                        name="partnerDistrict"
+                        value={formData.partnerDistrict}
+                        onChange={handleInputChange}
+                        placeholder="Any"
+                      />
+                    </div>
+                  </FormSection>
+
+                  {/* Submit Button */}
                   <div
                     style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "20px",
-                    }}
-                  >
-                    <FormInput
-                      label="WhatsApp"
-                      name="whatsapp"
-                      value={formData.whatsapp}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Facebook"
-                      name="facebook"
-                      value={formData.facebook}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Instagram"
-                      name="instagram"
-                      value={formData.instagram}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="X (Twitter)"
-                      name="x"
-                      value={formData.x}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="YouTube"
-                      name="youtube"
-                      value={formData.youtube}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="LinkedIn"
-                      name="linkedin"
-                      value={formData.linkedin}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </FormSection>
-
-                {/* Partner Preferences - Basic & Religion */}
-                <FormSection title="Partner Preferences - Basic & Religion">
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "20px",
-                    }}
-                  >
-                    <FormInput
-                      label="Partner Age From"
-                      name="partnerAgeFrom"
-                      value={formData.partnerAgeFrom}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Partner Age To"
-                      name="partnerAgeTo"
-                      value={formData.partnerAgeTo}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Partner Height"
-                      name="partnerHeight"
-                      value={formData.partnerHeight}
-                      onChange={handleInputChange}
-                      placeholder="e.g., 160-180 cm"
-                    />
-                    <FormInput
-                      label="Partner Marital Status"
-                      name="partnerMaritalStatus"
-                      type="select"
-                      value={formData.partnerMaritalStatus}
-                      onChange={handleInputChange}
-                      options={["Never Married", "Divorced", "Widowed", "Any"]}
-                    />
-                    <FormInput
-                      label="Partner Mother Tongue"
-                      name="partnerMotherTongue"
-                      value={formData.partnerMotherTongue}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Partner Caste"
-                      name="partnerCaste"
-                      value={formData.partnerCaste}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Partner Physical Status"
-                      name="partnerPhysicalStatus"
-                      type="select"
-                      value={formData.partnerPhysicalStatus}
-                      onChange={handleInputChange}
-                      options={["Normal", "Physically Challenged", "Any"]}
-                    />
-                    <FormInput
-                      label="Partner Eating Habits"
-                      name="partnerEatingHabits"
-                      type="select"
-                      value={formData.partnerEatingHabits}
-                      onChange={handleInputChange}
-                      options={[
-                        "Vegetarian",
-                        "Non-Vegetarian",
-                        "Eggetarian",
-                        "Any",
-                      ]}
-                    />
-                    <FormInput
-                      label="Partner Drinking Habits"
-                      name="partnerDrinkingHabits"
-                      type="select"
-                      value={formData.partnerDrinkingHabits}
-                      onChange={handleInputChange}
-                      options={[
-                        "Never Drinks",
-                        "Drinks Socially",
-                        "Drinks Regularly",
-                        "Any",
-                      ]}
-                    />
-                    <FormInput
-                      label="Partner Smoking Habits"
-                      name="partnerSmokingHabits"
-                      type="select"
-                      value={formData.partnerSmokingHabits}
-                      onChange={handleInputChange}
-                      options={[
-                        "Never Smokes",
-                        "Smokes Occasionally",
-                        "Smokes Regularly",
-                        "Any",
-                      ]}
-                    />
-                    <FormInput
-                      label="Partner Denomination"
-                      name="partnerDenomination"
-                      type="select"
-                      value={formData.partnerDenomination}
-                      onChange={handleInputChange}
-                      options={[
-                        "Catholic",
-                        "Protestant",
-                        "Orthodox",
-                        "Pentecostal",
-                        "Other",
-                        "Any",
-                      ]}
-                    />
-                    <FormInput
-                      label="Partner Spirituality"
-                      name="partnerSpirituality"
-                      type="select"
-                      value={formData.partnerSpirituality}
-                      onChange={handleInputChange}
-                      options={[
-                        "Very Religious",
-                        "Religious",
-                        "Moderately Religious",
-                        "Not Religious",
-                        "Any",
-                      ]}
-                    />
-                  </div>
-                </FormSection>
-
-                {/* Partner Preferences - Professional */}
-                <FormSection title="Partner Preferences - Professional">
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "20px",
-                    }}
-                  >
-                    <FormInput
-                      label="Partner Education"
-                      name="partnerEducation"
-                      value={formData.partnerEducation}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Partner Employment Type"
-                      name="partnerEmploymentType"
-                      type="select"
-                      value={formData.partnerEmploymentType}
-                      onChange={handleInputChange}
-                      options={[
-                        "Private Sector",
-                        "Government",
-                        "Self Employed",
-                        "Business",
-                        "Not Working",
-                        "Any",
-                      ]}
-                    />
-                    <FormInput
-                      label="Partner Occupation"
-                      name="partnerOccupation"
-                      value={formData.partnerOccupation}
-                      onChange={handleInputChange}
-                    />
-                    <FormInput
-                      label="Partner Annual Income"
-                      name="partnerAnnualIncome"
-                      value={formData.partnerAnnualIncome}
-                      onChange={handleInputChange}
-                      placeholder="e.g., 5-10 Lakhs"
-                    />
-                  </div>
-                </FormSection>
-
-                {/* Partner Preferences - Location */}
-                <FormSection title="Partner Preferences - Location">
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "20px",
-                    }}
-                  >
-                    <FormInput
-                      label="Partner Country"
-                      name="partnerCountry"
-                      value={formData.partnerCountry}
-                      onChange={handleInputChange}
-                      placeholder="Any"
-                    />
-                    <FormInput
-                      label="Partner State"
-                      name="partnerState"
-                      value={formData.partnerState}
-                      onChange={handleInputChange}
-                      placeholder="Any"
-                    />
-                    <FormInput
-                      label="Partner Residing District"
-                      name="partnerDistrict"
-                      value={formData.partnerDistrict}
-                      onChange={handleInputChange}
-                      placeholder="Any"
-                    />
-                  </div>
-                </FormSection>
-
-                {/* Submit Button */}
-                <div
-                  style={{
-                    background: "#fff",
-                    padding: "20px 24px",
-                    borderRadius: "8px",
-                    marginTop: "24px",
-                    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: "12px",
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => window.history.back()}
-                    disabled={isSubmitting}
-                    style={{
-                      padding: "12px 32px",
                       background: "#fff",
-                      color: "#374151",
-                      border: "2px solid #d1d5db",
-                      borderRadius: "6px",
-                      fontSize: "16px",
-                      fontWeight: "600",
-                      cursor: isSubmitting ? "not-allowed" : "pointer",
-                      transition: "all 0.2s ease",
+                      padding: "20px 24px",
+                      borderRadius: "8px",
+                      marginTop: "24px",
+                      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      gap: "12px",
                     }}
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    style={{
-                      padding: "12px 32px",
-                      background: isSubmitting ? "#9ca3af" : "#667eea",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "6px",
-                      fontSize: "16px",
-                      fontWeight: "600",
-                      cursor: isSubmitting ? "not-allowed" : "pointer",
-                      transition: "all 0.2s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isSubmitting) {
-                        e.target.style.background = "#5568d3";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSubmitting) {
-                        e.target.style.background = "#667eea";
-                      }
-                    }}
-                  >
-                    {isSubmitting ? "Submitting..." : "Save Changes"}
-                  </button>
-                </div>
-              </form>
+                    <button
+                      type="button"
+                      onClick={() => window.history.back()}
+                      disabled={isSubmitting}
+                      style={{
+                        padding: "12px 32px",
+                        background: "#fff",
+                        color: "#374151",
+                        border: "2px solid #d1d5db",
+                        borderRadius: "6px",
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        cursor: isSubmitting ? "not-allowed" : "pointer",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      style={{
+                        padding: "12px 32px",
+                        background: isSubmitting ? "#9ca3af" : "#667eea",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "6px",
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        cursor: isSubmitting ? "not-allowed" : "pointer",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isSubmitting) {
+                          e.target.style.background = "#5568d3";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSubmitting) {
+                          e.target.style.background = "#667eea";
+                        }
+                      }}
+                    >
+                      {isSubmitting ? "Submitting..." : "Save Changes"}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>

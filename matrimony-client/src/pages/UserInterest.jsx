@@ -70,7 +70,7 @@ const UserInterest = () => {
       const response = await handleChangeInterestStatus(
         userId,
         profileId,
-        status
+        status,
       );
 
       if (response.status === 200) {
@@ -80,7 +80,7 @@ const UserInterest = () => {
       } else {
         showNotification(
           "error",
-          "Failed to accept the request. Please try again."
+          "Failed to accept the request. Please try again.",
         );
       }
     } catch (error) {
@@ -94,7 +94,7 @@ const UserInterest = () => {
       const response = await handleChangeInterestStatus(
         userId,
         profileId,
-        status
+        status,
       );
 
       if (response.status === 200) {
@@ -104,7 +104,7 @@ const UserInterest = () => {
       } else {
         showNotification(
           "error",
-          "Failed to reject the request. Please try again."
+          "Failed to reject the request. Please try again.",
         );
       }
     } catch (error) {
@@ -118,8 +118,9 @@ const UserInterest = () => {
 
     return (
       <div
-        className={`alert ${notification.type === "success" ? "alert-success" : "alert-danger"
-          } alert-dismissible fade show`}
+        className={`alert ${
+          notification.type === "success" ? "alert-success" : "alert-danger"
+        } alert-dismissible fade show`}
         role="alert"
       >
         {notification.message}
@@ -258,7 +259,7 @@ const UserInterest = () => {
         <LayoutComponent />
       </div>
 
-      <div className="pt-16">
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
         <div className="db">
           <div
             className="container-fluid"
@@ -322,8 +323,9 @@ const UserInterest = () => {
                         <ul className="nav nav-tabs" role="tablist">
                           <li className="nav-item">
                             <button
-                              className={`nav-link ${activeTab === "pending" ? "active" : ""
-                                }`}
+                              className={`nav-link ${
+                                activeTab === "pending" ? "active" : ""
+                              }`}
                               type="button"
                               onClick={() => handleTabChange("pending")}
                             >
@@ -332,8 +334,9 @@ const UserInterest = () => {
                           </li>
                           <li className="nav-item">
                             <button
-                              className={`nav-link ${activeTab === "accepted" ? "active" : ""
-                                }`}
+                              className={`nav-link ${
+                                activeTab === "accepted" ? "active" : ""
+                              }`}
                               type="button"
                               onClick={() => handleTabChange("accepted")}
                             >
@@ -342,8 +345,9 @@ const UserInterest = () => {
                           </li>
                           <li className="nav-item">
                             <button
-                              className={`nav-link ${activeTab === "rejected" ? "active" : ""
-                                }`}
+                              className={`nav-link ${
+                                activeTab === "rejected" ? "active" : ""
+                              }`}
                               type="button"
                               onClick={() => handleTabChange("rejected")}
                             >

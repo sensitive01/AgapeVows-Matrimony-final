@@ -13,7 +13,7 @@ const ShortListedProfile = () => {
   const [activeTab, setActiveTab] = useState("byYou");
   const [profileDataByYou, setProfileDataByYou] = useState([]);
   const [profileDataWhoShortlisted, setProfileDataWhoShortlisted] = useState(
-    []
+    [],
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,10 +33,10 @@ const ShortListedProfile = () => {
         // Assuming the API returns both types of data
         // If you have separate endpoints, call them separately
         setProfileDataByYou(
-          response.data.data.shortlistedByYou || response.data.data || []
+          response.data.data.shortlistedByYou || response.data.data || [],
         );
         setProfileDataWhoShortlisted(
-          response.data.data.whoShortlistedYou || []
+          response.data.data.whoShortlistedYou || [],
         );
       } else {
         setError("Failed to fetch shortlisted profiles");
@@ -141,7 +141,7 @@ const ShortListedProfile = () => {
         <LayoutComponent />
       </div>
 
-      <div className="pt-16">
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
         <div className="db">
           <div
             className="container-fluid"
@@ -169,8 +169,9 @@ const ShortListedProfile = () => {
                         <ul className="nav nav-tabs" role="tablist">
                           <li className="nav-item" role="presentation">
                             <button
-                              className={`nav-link ${activeTab === "byYou" ? "active" : ""
-                                }`}
+                              className={`nav-link ${
+                                activeTab === "byYou" ? "active" : ""
+                              }`}
                               onClick={() => setActiveTab("byYou")}
                               type="button"
                               role="tab"
@@ -181,8 +182,9 @@ const ShortListedProfile = () => {
                           </li>
                           <li className="nav-item" role="presentation">
                             <button
-                              className={`nav-link ${activeTab === "whoShortlisted" ? "active" : ""
-                                }`}
+                              className={`nav-link ${
+                                activeTab === "whoShortlisted" ? "active" : ""
+                              }`}
                               onClick={() => setActiveTab("whoShortlisted")}
                               type="button"
                               role="tab"
@@ -198,18 +200,20 @@ const ShortListedProfile = () => {
                         <div className="tab-content">
                           {/* Shortlisted By You Tab */}
                           <div
-                            className={`tab-pane fade ${activeTab === "byYou" ? "show active" : ""
-                              }`}
+                            className={`tab-pane fade ${
+                              activeTab === "byYou" ? "show active" : ""
+                            }`}
                           >
                             {renderProfileList(profileDataByYou)}
                           </div>
 
                           {/* Who Shortlisted You Tab */}
                           <div
-                            className={`tab-pane fade ${activeTab === "whoShortlisted"
-                              ? "show active"
-                              : ""
-                              }`}
+                            className={`tab-pane fade ${
+                              activeTab === "whoShortlisted"
+                                ? "show active"
+                                : ""
+                            }`}
                           >
                             {renderProfileList(profileDataWhoShortlisted)}
                           </div>

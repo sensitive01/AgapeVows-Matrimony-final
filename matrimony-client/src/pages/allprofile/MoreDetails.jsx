@@ -632,7 +632,7 @@ const MoreDetails = () => {
         <LayoutComponent />
       </div>
 
-      <div className="pt-16">
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
         <div className="profi-pg-container">
           <div className="profi-pg profi-ban">
             <div className="profile-image-sticky">

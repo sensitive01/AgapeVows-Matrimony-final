@@ -32,7 +32,7 @@ const IgnoredProfile = () => {
         if (response.status === 200) {
           // Remove the unignored profile from the list
           setProfileData(
-            profileData.filter((profile) => profile._id !== profileId)
+            profileData.filter((profile) => profile._id !== profileId),
           );
           alert("Profile unignored successfully!");
         } else {
@@ -198,7 +198,7 @@ const IgnoredProfile = () => {
         <LayoutComponent />
       </div>
 
-      <div className="pt-16">
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
         <div className="db">
           <div
             className="container-fluid"

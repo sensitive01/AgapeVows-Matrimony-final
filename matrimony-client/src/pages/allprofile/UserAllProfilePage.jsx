@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
 import CopyRights from "../../components/CopyRights";
 import LayoutComponent from "../../components/layouts/LayoutComponent";
-import { fetchAllUserProfiles, fetchAllUserProfilesHome } from "../../api/axiosService/userAuthService";
+import {
+  fetchAllUserProfiles,
+  fetchAllUserProfilesHome,
+} from "../../api/axiosService/userAuthService";
 import ShowInterest from "./ShowInterest";
 
 const UserAllProfilePage = () => {
@@ -127,7 +130,7 @@ const UserAllProfilePage = () => {
         <LayoutComponent />
       </div>
 
-      <div className="pt-16">
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
         <div className="all-pro-head">
           <div className="container">
             <div className="row">
@@ -141,7 +144,8 @@ const UserAllProfilePage = () => {
         </div>
         <div className="fil-mob fil-mob-act">
           <h4>
-            Profile filters <i className="fa fa-filter" aria-hidden="true"></i>{" "}
+            Profile filters{" "}
+            <i className="fa fa-filter" aria-hidden="true"></i>{" "}
           </h4>
         </div>
       </div>

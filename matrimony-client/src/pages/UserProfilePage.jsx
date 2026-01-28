@@ -131,7 +131,7 @@ const UserProfilePage = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="pt-16">
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
         <div className="db">
           <div
             className="container-fluid"

@@ -9,7 +9,7 @@ const BridalMakeup = () => {
         <LayoutComponent />
       </div>
 
-      <div className="pt-32">
+      <div style={{ paddingTop: "115px" }}>
         <section>
           <div className="container py-5">
             <div className="row">

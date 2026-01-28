@@ -2497,7 +2497,6 @@ table td {
 .db {
   float: left;
   width: 100%;
-  padding: 80px 0px 85px 0px;
   margin-top: var(--mtop);
 }
 

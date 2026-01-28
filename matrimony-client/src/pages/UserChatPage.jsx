@@ -224,16 +224,16 @@ const UserChatPage = () => {
   // Profile data for ChatUi
   const profileData = selectedChat
     ? {
-      userName: selectedChat.participant.name,
-      profileImage: selectedChat.participant.profileImage || profile1,
-      receiverId: selectedChat.participant._id,
-      isOnline: onlineUsers.includes(selectedChat.participant._id),
-    }
+        userName: selectedChat.participant.name,
+        profileImage: selectedChat.participant.profileImage || profile1,
+        receiverId: selectedChat.participant._id,
+        isOnline: onlineUsers.includes(selectedChat.participant._id),
+      }
     : {
-      userName: "User",
-      profileImage: profile1,
-      isOnline: false,
-    };
+        userName: "User",
+        profileImage: profile1,
+        isOnline: false,
+      };
 
   if (loading) {
     return (
@@ -242,8 +242,8 @@ const UserChatPage = () => {
           <LayoutComponent />
         </div>
         <div
-          className="pt-16 d-flex justify-content-center align-items-center"
-          style={{ minHeight: "50vh" }}
+          className="d-flex justify-content-center align-items-center"
+          style={{ minHeight: "50vh", paddingTop: "115px" }}
         >
           <div>Loading chats...</div>
         </div>
@@ -257,7 +257,7 @@ const UserChatPage = () => {
         <LayoutComponent />
       </div>
 
-      <div className="pt-16">
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
         <div className="db">
           <div
             className="container-fluid"
@@ -310,21 +310,21 @@ const UserChatPage = () => {
                                   />
                                   {/* Online indicator */}
                                   {onlineUsers.includes(
-                                    chat.participant._id
+                                    chat.participant._id,
                                   ) && (
-                                      <div
-                                        style={{
-                                          position: "absolute",
-                                          bottom: "2px",
-                                          right: "2px",
-                                          width: "12px",
-                                          height: "12px",
-                                          backgroundColor: "#4CAF50",
-                                          borderRadius: "50%",
-                                          border: "2px solid white",
-                                        }}
-                                      />
-                                    )}
+                                    <div
+                                      style={{
+                                        position: "absolute",
+                                        bottom: "2px",
+                                        right: "2px",
+                                        width: "12px",
+                                        height: "12px",
+                                        backgroundColor: "#4CAF50",
+                                        borderRadius: "50%",
+                                        border: "2px solid white",
+                                      }}
+                                    />
+                                  )}
                                 </div>
                                 <div className="db-chat-bio">
                                   <h5>{chat.participant.name}</h5>
@@ -336,7 +336,7 @@ const UserChatPage = () => {
                                   <div className="time">
                                     <span className="timer">
                                       {formatLastMessageTime(
-                                        chat?.lastMessage?.timestamp || ""
+                                        chat?.lastMessage?.timestamp || "",
                                       )}
                                     </span>
                                     {/* You can add unread count here if available in your API */}

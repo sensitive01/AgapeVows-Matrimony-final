@@ -1,28 +1,22 @@
-/* Existing imports */
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowLeft } from "lucide-react";
+import { Search, ArrowLeft, ChevronDown } from "lucide-react";
 import MainLayout from "./agapeows-components/layout/MainLayout";
+
+import { Country, State, City } from "country-state-city";
 
 import { getUserProfile } from "../api/axiosService/userAuthService";
 
-/**
- * Global Search Page
- * Plus Search by AGWID ID
- */
-
-// Helper to generate height options (in 6-inch increments)
 const generateHeightOptions = () => {
   const options = [];
   for (let ft = 4; ft <= 7; ft++) {
-    options.push({
-      value: `${ft}.0`,
-      label: `${ft}ft`,
-    });
-    options.push({
-      value: `${ft}.6`,
-      label: `${ft}ft 6in`,
-    });
+    for (let inch = 0; inch <= 11; inch++) {
+      options.push({
+        value: `${ft}.${inch}`,
+        label: inch === 0 ? `${ft}ft` : `${ft}ft ${inch}in`,
+      });
+    }
   }
   options.push({ value: "8.0", label: "8ft" });
   return options;
@@ -40,61 +34,410 @@ const CASTES = [
   "Other",
 ];
 const DENOMINATIONS = [
-  "Orthodox",
-  "Jacobite",
-  "Marthoma",
-  "Pentecost",
+  "ACI - Anglican Church Of India",
+  "Adventist",
+  "AG - Assembly of God",
+  "Anglican",
+  "Anglo Indian",
+  "Apostolic",
+  "Baptist",
+  "Believers Church",
+  "Brethren",
   "Catholic",
-  "CSI",
+  "Catholic - Knanaya",
+  "Catholic - Latin",
+  "Catholic - Malankara",
+  "Catholic - Roman",
+  "Catholic - Syro Malabar",
+  "Chaldean Syrian",
+  "Charismatic",
+  "Christian - Others",
+  "Church Of Christ",
+  "Church Of God",
+  "CNI - Church Of North India",
+  "Congregational",
+  "CPM - Ceylon Pentecostal Mission",
+  "CSI - Church Of South India",
+  "Don't wish to specify",
+  "Evangelist",
+  "Independent Church",
+  "Jacobite",
+  "Jacobite - Knanaya",
+  "Jehovah Shammah",
+  "Jehovah's Witnesses",
+  "Knanaya",
+  "Knanaya Catholic",
+  "Knanaya Jacobite",
+  "Latin Catholic",
+  "Lutheran",
+  "Malankara Catholic",
+  "Marthoma",
+  "Methodist",
+  "Moravian",
+  "Muslim - Sunni",
+  "Orthodox",
+  "Orthodox - Knanaya",
+  "Pentecost",
+  "Presbyterian",
+  "Protestant",
+  "Reformed",
+  "Revival",
+  "Salvation Army",
+  "Seventh-day Adventist",
+  "St. Thomas Evangelical",
+  "Syro Malabar",
+  "Syrian Catholic",
+  "TPM - The Pentecostal Mission",
   "Other",
 ];
 const MOTHER_TONGUES = [
-  "Malayalam",
+  "Aka",
+  "Arabic",
+  "Arunachali",
+  "Assamese",
+  "Awadhi",
+  "Bengali",
+  "Bhojpuri",
+  "Bhutia",
+  "Bihari",
+  "Brij",
+  "Chatisgarhi",
+  "Chinese",
+  "Dogri",
   "English",
-  "Tamil",
+  "French",
+  "Garhwali",
+  "Garo",
+  "Gujarati",
+  "Haryanvi",
+  "Himachali/Pahari",
   "Hindi",
+  "Kanauji",
   "Kannada",
+  "Kashmiri",
+  "Khandesi",
+  "Khasi",
+  "Konkani",
+  "Koshali",
+  "Kumaoni",
+  "Kutchi",
+  "Ladacki",
+  "Lepcha",
+  "Magahi",
+  "Maithili",
+  "Malay",
+  "Malayalam",
+  "Manipuri",
+  "Marathi",
+  "Marwari",
+  "Miji",
+  "Mizo",
+  "Monpa",
+  "Nepali",
+  "Odia",
+  "Persian",
+  "Punjabi",
+  "Rajasthani",
+  "Russian",
+  "Sanskrit",
+  "Santhali",
+  "Sindhi",
+  "Spanish",
+  "Swedish",
+  "Tagalog",
+  "Tamil",
   "Telugu",
+  "Tulu",
+  "Urdu",
   "Other",
 ];
 const EDUCATIONS = [
+  "B.Arch",
+  "B.Com",
+  "B.Ed",
+  "B.Pharm",
+  "B.Sc",
   "B.Tech",
+  "BA",
+  "BBA",
+  "BCA",
+  "BDS",
+  "BHM",
+  "BAMS",
+  "BHMS",
+  "BSw",
+  "LLB",
+  "M.Arch",
+  "M.Com",
+  "M.Ed",
+  "M.Pharm",
+  "M.Sc",
+  "M.Tech",
+  "MA",
+  "MBA",
+  "MCA",
+  "MDS",
+  "MHM",
+  "MSW",
+  "LLM",
   "MBBS",
-  "Degree",
-  "Masters",
+  "MD",
+  "MS",
   "Ph.D",
   "Diploma",
-  "Plus Two",
-  "SSLC",
+  "Polytechnic",
+  "Trade School",
+  "Higher Secondary / Plus Two",
+  "SSLC / 10th",
+  "Other",
 ];
 const OCCUPATIONS = [
-  "Software Engineer",
-  "Doctor",
-  "Teacher",
+  "Accountant",
+  "Actor",
+  "Administrative Professional",
+  "Advertising Professional",
+  "Agri-Business Professional",
+  "Air Hostess / Flight Attendant",
+  "Architect",
+  "Artist",
+  "Auditor",
+  "Banking Professional",
+  "Beautician",
+  "Biologist / Botanist",
   "Business",
-  "Nurse",
+  "Chartered Accountant",
+  "Civil Engineer",
+  "Clerical Official",
+  "Commercial Pilot",
+  "Company Secretary",
+  "Computer Professional",
+  "Consultant",
+  "Contractor",
+  "Cost Accountant",
+  "Creative Person",
+  "Customer Support Professional",
+  "Defense Employee",
+  "Dentist",
+  "Designer",
+  "Doctor",
+  "Economist",
   "Engineer",
+  "Engineer (Mechanical)",
+  "Engineer (Project)",
+  "Entertainment Professional",
+  "Event Manager",
+  "Executive",
+  "Factory Worker",
+  "Farmer",
+  "Fashion Designer",
+  "Finance Professional",
+  "Flight Attendant",
+  "Government Employee",
+  "Graphic Designer",
+  "Health Care Professional",
+  "Hotel Management Professional",
+  "HR Professional",
+  "Human Resources Professional",
+  "Indian Administrative Services (IAS)",
+  "Indian Foreign Services (IFS)",
+  "Indian Police Services (IPS)",
+  "Interior Designer",
+  "Investment Professional",
+  "IT Professional",
+  "Journalist",
+  "Lawyer",
+  "Lecturer",
+  "Legal Professional",
+  "Manager",
+  "Marketing Professional",
+  "Media Professional",
+  "Medical Professional",
+  "Merchant Naval Officer",
+  "Microbiologist",
+  "Military",
+  "Model",
+  "Musician",
+  "Nurse",
+  "Nutritionist",
+  "Occupational Therapist",
+  "Optician",
+  "Pharmacist",
+  "Photographer",
+  "Physical Therapist",
+  "Physician",
+  "Pilot",
+  "Police",
+  "Politician",
+  "Professor",
+  "Psychologist",
+  "Public Relations Professional",
+  "Real Estate Professional",
+  "Researcher",
+  "Retired",
+  "Sales Professional",
+  "Scientist",
+  "Secretary",
+  "Security Professional",
+  "Self Employed",
+  "Social Worker",
+  "Software Consultant",
+  "Software Engineer",
+  "Sportsman",
   "Student",
+  "Teacher",
+  "Technician",
+  "Training Professional",
+  "Transportation Professional",
+  "Veterinary Doctor",
+  "Volunteer",
+  "Writer",
+  "Zoologist",
   "Not Working",
-];
-const COUNTRIES = ["India", "USA", "UK", "Canada", "UAE", "Australia"];
-const STATES = [
-  "Kerala",
-  "Tamil Nadu",
-  "Karnataka",
-  "Maharashtra",
-  "Delhi",
-  "Texas",
-  "Dubai",
-  "London",
-]; // Mixed sample
-const DISTRICTS = [
-  "Ernakulam",
-  "Trivandrum",
-  "Kozhikode",
-  "Thrissur",
-  "Kottayam",
   "Other",
+];
+
+const CustomSelect = ({ options, value, onChange, placeholder, className }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const dropdownRef = useRef(null);
+  const inputRef = useRef(null);
+
+  // Helper to determine if options are objects
+  const isObject = options.length > 0 && typeof options[0] === "object";
+
+  const filteredOptions = options.filter((option) => {
+    const label = isObject ? option.label : option;
+    return label.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  // Find label for currently selected value
+  const getDisplayValue = () => {
+    if (!value) return placeholder;
+    if (isObject) {
+      const selectedOption = options.find((opt) => opt.value === value);
+      return selectedOption ? selectedOption.label : value;
+    }
+    return value;
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+        setSearchTerm("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  return (
+    <div className={`relative ${className}`} ref={dropdownRef}>
+      <div
+        className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-white cursor-pointer flex justify-between items-center outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+        onClick={() => setIsOpen(!isOpen)}
+        style={{ minHeight: "38px" }}
+      >
+        <span className={value ? "text-gray-900" : "text-gray-500"}>
+          {getDisplayValue()}
+        </span>
+        <ChevronDown className="w-4 h-4 text-gray-500" />
+      </div>
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+          <div className="p-2 sticky top-0 bg-white border-b border-gray-100">
+            <input
+              ref={inputRef}
+              type="text"
+              className="w-full border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:border-purple-500"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onKeyDown={(e) => e.stopPropagation()}
+            />
+          </div>
+          <div
+            className="px-3 py-2 text-sm hover:bg-purple-50 cursor-pointer text-gray-700 font-medium border-b border-gray-100"
+            onClick={() => {
+              onChange("");
+              setIsOpen(false);
+              setSearchTerm("");
+            }}
+          >
+            Select
+          </div>
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((option) => {
+              const optValue = isObject ? option.value : option;
+              const optLabel = isObject ? option.label : option;
+              const isSelected = value === optValue;
+
+              return (
+                <div
+                  key={optValue}
+                  className={`px-3 py-2 text-sm hover:bg-purple-50 cursor-pointer text-gray-700 ${isSelected ? "bg-purple-50 text-purple-700 font-medium" : ""}`}
+                  onClick={() => {
+                    onChange(optValue);
+                    setIsOpen(false);
+                    setSearchTerm("");
+                  }}
+                >
+                  {optLabel}
+                </div>
+              );
+            })
+          ) : (
+            <div className="px-3 py-2 text-sm text-gray-500 text-center">
+              No results found
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const AGE_FROM_OPTIONS = [...Array(43)].map((_, i) => (18 + i).toString());
+const AGE_TO_OPTIONS = [...Array(53)].map((_, i) => (18 + i).toString());
+
+const INCOME_OPTIONS = [
+  { value: "0.5", label: "50 Thousands" },
+  { value: "1", label: "1 Lakh" },
+  { value: "2", label: "2 Lakhs" },
+  { value: "3", label: "3 Lakhs" },
+  { value: "4", label: "4 Lakhs" },
+  { value: "5", label: "5 Lakhs" },
+  { value: "6", label: "6 Lakhs" },
+  { value: "7", label: "7 Lakhs" },
+  { value: "8", label: "8 Lakhs" },
+  { value: "9", label: "9 Lakhs" },
+  { value: "10", label: "10 Lakhs" },
+  { value: "12", label: "12 Lakhs" },
+  { value: "14", label: "14 Lakhs" },
+  { value: "16", label: "16 Lakhs" },
+  { value: "18", label: "18 Lakhs" },
+  { value: "20", label: "20 Lakhs" },
+  { value: "25", label: "25 Lakhs" },
+  { value: "30", label: "30 Lakhs" },
+  { value: "35", label: "35 Lakhs" },
+  { value: "40", label: "40 Lakhs" },
+  { value: "50", label: "50 Lakhs" },
+  { value: "60", label: "60 Lakhs" },
+  { value: "70", label: "70 Lakhs" },
+  { value: "80", label: "80 Lakhs" },
+  { value: "90", label: "90 Lakhs" },
+  { value: "100", label: "1 Crore" },
+  { value: "101", label: "1 Crore+" },
 ];
 
 const GlobalSearchModal = () => {
@@ -134,52 +477,6 @@ const GlobalSearchModal = () => {
     numberOfChildren: "", // Added for child status
     childrenStatus: "",
   });
-
-  const handleMaritalStatusChange = (status) => {
-    setFormData((prev) => {
-      let newStatus = [...(prev.maritalStatus || [])];
-
-      if (status === "Any") {
-        if (newStatus.includes("Any")) {
-          // If Any is already there and clicked, deselect all? Or just remove Any?
-          // Usually toggle. If unchecking Any, clear all.
-          return { ...prev, maritalStatus: [] };
-        } else {
-          // Select Any, clear others or selecting Any implies all?
-          // Requirement: "When 'Any' option is selected, all other option should be selected automatically and blocked."
-          // So we will just set ["Any", "Never Married", "Separated", ...]
-          const allStatuses = [
-            "Any",
-            "Never Married",
-            "Separated",
-            "Divorced",
-            "Widow / Widower",
-            "Awaiting Divorce",
-            "Annulled",
-          ];
-          return { ...prev, maritalStatus: allStatuses };
-        }
-      } else {
-        // Normal toggle
-        if (newStatus.includes("Any")) {
-          // If Any is selected, others are blocked. So do nothing or user has to uncheck Any first.
-          // Implied "blocked" means user cannot uncheck them individually while Any is active?
-          // Or clicking them removes Any?
-          // "Blocked" usually means disabled UI.
-          // If I try to change a specific one while Any is on, I should probably do nothing or uncheck Any.
-          // Let's assume user must uncheck Any to change others.
-          return prev;
-        }
-
-        if (newStatus.includes(status)) {
-          newStatus = newStatus.filter((s) => s !== status);
-        } else {
-          newStatus.push(status);
-        }
-        return { ...prev, maritalStatus: newStatus };
-      }
-    });
-  };
 
   const handlePhysicalStatusChange = (status) => {
     setFormData((prev) => {
@@ -239,8 +536,41 @@ const GlobalSearchModal = () => {
     fetchData();
   }, [userId]);
 
+  // Dynamic Location Options
+  const allCountries = Country.getAllCountries().map((c) => ({
+    value: c.isoCode,
+    label: c.name,
+  }));
+
+  const allStates = formData.country
+    ? State.getStatesOfCountry(formData.country).map((s) => ({
+        value: s.isoCode,
+        label: s.name,
+      }))
+    : [];
+
+  const allCities =
+    formData.country && formData.state
+      ? City.getCitiesOfState(formData.country, formData.state).map((c) => ({
+          value: c.name,
+          label: c.name,
+        }))
+      : [];
+
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const updates = { [field]: value };
+
+      // Cascading resets for location
+      if (field === "country") {
+        updates.state = "";
+        updates.districtCity = "";
+      } else if (field === "state") {
+        updates.districtCity = "";
+      }
+
+      return { ...prev, ...updates };
+    });
   };
 
   const handleSearch = () => {
@@ -368,33 +698,25 @@ const GlobalSearchModal = () => {
                               Age
                             </label>
                             <div className="flex items-center gap-2 w-full md:w-2/3">
-                              <select
-                                className="form-select w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                                value={formData.ageFrom}
-                                onChange={(e) =>
-                                  handleInputChange("ageFrom", e.target.value)
+                              <CustomSelect
+                                className="w-full"
+                                options={AGE_FROM_OPTIONS}
+                                value={formData.ageFrom.toString()}
+                                onChange={(val) =>
+                                  handleInputChange("ageFrom", val)
                                 }
-                              >
-                                {[...Array(40)].map((_, i) => (
-                                  <option key={i} value={18 + i}>
-                                    {18 + i}
-                                  </option>
-                                ))}
-                              </select>
+                                placeholder="From"
+                              />
                               <span className="text-xs">To</span>
-                              <select
-                                className="form-select w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                                value={formData.ageTo}
-                                onChange={(e) =>
-                                  handleInputChange("ageTo", e.target.value)
+                              <CustomSelect
+                                className="w-full"
+                                options={AGE_TO_OPTIONS}
+                                value={formData.ageTo.toString()}
+                                onChange={(val) =>
+                                  handleInputChange("ageTo", val)
                                 }
-                              >
-                                {[...Array(40)].map((_, i) => (
-                                  <option key={i} value={21 + i}>
-                                    {21 + i}
-                                  </option>
-                                ))}
-                              </select>
+                                placeholder="To"
+                              />
                               <span className="text-xs text-gray-500 hidden sm:inline">
                                 Years
                               </span>
@@ -405,17 +727,45 @@ const GlobalSearchModal = () => {
                             <label className="w-full md:w-1/3 text-gray-700 font-medium text-xs md:text-sm">
                               Marital Status
                             </label>
-                            <input
-                              type="text"
-                              className="w-full md:w-2/3 border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                              placeholder="Select"
-                              value={formData.maritalStatus}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  "maritalStatus",
-                                  e.target.value,
-                                )
+                            <CustomSelect
+                              className="w-full md:w-2/3"
+                              options={[
+                                "Any",
+                                "Never Married",
+                                "Separated",
+                                "Divorced",
+                                "Widow / Widower",
+                                "Awaiting Divorce",
+                                "Annulled",
+                              ]}
+                              value={
+                                Array.isArray(formData.maritalStatus)
+                                  ? formData.maritalStatus[0]
+                                  : formData.maritalStatus
                               }
+                              onChange={(val) => {
+                                if (val === "Any") {
+                                  const allStatuses = [
+                                    "Any",
+                                    "Never Married",
+                                    "Separated",
+                                    "Divorced",
+                                    "Widow / Widower",
+                                    "Awaiting Divorce",
+                                    "Annulled",
+                                  ];
+                                  handleInputChange(
+                                    "maritalStatus",
+                                    allStatuses,
+                                  );
+                                } else {
+                                  handleInputChange(
+                                    "maritalStatus",
+                                    val ? [val] : [],
+                                  );
+                                }
+                              }}
+                              placeholder="Select"
                             />
                           </div>
 
@@ -423,17 +773,14 @@ const GlobalSearchModal = () => {
                             <label className="w-full md:w-1/3 text-gray-700 font-medium text-xs md:text-sm">
                               Denomination
                             </label>
-                            <input
-                              type="text"
-                              className="w-full md:w-2/3 border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                              placeholder="Select"
+                            <CustomSelect
+                              className="w-full md:w-2/3"
+                              options={DENOMINATIONS}
                               value={formData.denomination}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  "denomination",
-                                  e.target.value,
-                                )
+                              onChange={(val) =>
+                                handleInputChange("denomination", val)
                               }
+                              placeholder="Select"
                             />
                           </div>
                         </div>
@@ -449,33 +796,25 @@ const GlobalSearchModal = () => {
                                 Age
                               </label>
                               <div className="flex items-center gap-2 w-full md:w-2/3">
-                                <select
-                                  className="w-full border border-gray-300 rounded p-2 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none"
-                                  value={formData.ageFrom}
-                                  onChange={(e) =>
-                                    handleInputChange("ageFrom", e.target.value)
+                                <CustomSelect
+                                  className="w-full"
+                                  options={AGE_FROM_OPTIONS}
+                                  value={formData.ageFrom.toString()}
+                                  onChange={(val) =>
+                                    handleInputChange("ageFrom", val)
                                   }
-                                >
-                                  {[...Array(40)].map((_, i) => (
-                                    <option key={i} value={18 + i}>
-                                      {18 + i}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="From"
+                                />
                                 <span className="text-sm">To</span>
-                                <select
-                                  className="w-full border border-gray-300 rounded p-2 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none"
-                                  value={formData.ageTo}
-                                  onChange={(e) =>
-                                    handleInputChange("ageTo", e.target.value)
+                                <CustomSelect
+                                  className="w-full"
+                                  options={AGE_TO_OPTIONS}
+                                  value={formData.ageTo.toString()}
+                                  onChange={(val) =>
+                                    handleInputChange("ageTo", val)
                                   }
-                                >
-                                  {[...Array(40)].map((_, i) => (
-                                    <option key={i} value={21 + i}>
-                                      {21 + i}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="To"
+                                />
                                 <span className="text-xs md:text-sm text-gray-500 hidden sm:inline">
                                   Years
                                 </span>
@@ -488,41 +827,25 @@ const GlobalSearchModal = () => {
                                 Height
                               </label>
                               <div className="flex items-center gap-2 w-full md:w-2/3">
-                                <select
-                                  className="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                <CustomSelect
+                                  className="w-full"
+                                  options={heightOptions}
                                   value={formData.heightFrom}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "heightFrom",
-                                      e.target.value,
-                                    )
+                                  onChange={(val) =>
+                                    handleInputChange("heightFrom", val)
                                   }
-                                >
-                                  <option value="">Select</option>
-                                  {heightOptions.map((opt) => (
-                                    <option key={opt.value} value={opt.value}>
-                                      {opt.label}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="Select"
+                                />
                                 <span className="text-xs">To</span>
-                                <select
-                                  className="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                <CustomSelect
+                                  className="w-full"
+                                  options={heightOptions}
                                   value={formData.heightTo}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "heightTo",
-                                      e.target.value,
-                                    )
+                                  onChange={(val) =>
+                                    handleInputChange("heightTo", val)
                                   }
-                                >
-                                  <option value="">Select</option>
-                                  {heightOptions.map((opt) => (
-                                    <option key={opt.value} value={opt.value}>
-                                      {opt.label}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="Select"
+                                />
                               </div>
                             </div>
 
@@ -531,33 +854,26 @@ const GlobalSearchModal = () => {
                               <label className="w-full md:w-1/3 text-gray-700 font-medium text-xs md:text-sm">
                                 Mother Tongue
                               </label>
-                              <select
-                                className="w-full md:w-2/3 border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                              <CustomSelect
+                                className="w-full md:w-2/3"
+                                options={MOTHER_TONGUES}
                                 value={formData.motherTongue}
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    "motherTongue",
-                                    e.target.value,
-                                  )
+                                onChange={(val) =>
+                                  handleInputChange("motherTongue", val)
                                 }
-                              >
-                                <option value="">Select</option>
-                                {MOTHER_TONGUES.map((opt) => (
-                                  <option key={opt} value={opt}>
-                                    {opt}
-                                  </option>
-                                ))}
-                              </select>
+                                placeholder="Select"
+                              />
                             </div>
                           </div>
 
-                          {/* Marital Status Checkboxes */}
-                          <div className="flex flex-col md:flex-row items-start mt-4 gap-2 md:gap-0">
-                            <label className="w-full md:w-1/6 text-gray-700 font-medium pt-0 md:pt-1 text-xs md:text-sm">
+                          {/* Marital Status */}
+                          <div className="flex flex-col md:flex-row items-center mt-4 gap-2 md:gap-0">
+                            <label className="w-full md:w-1/3 text-gray-700 font-medium text-xs md:text-sm">
                               Marital Status
                             </label>
-                            <div className="w-full md:w-5/6 flex flex-wrap gap-3 md:gap-4 pt-0 md:pt-1">
-                              {[
+                            <CustomSelect
+                              className="w-full md:w-2/3"
+                              options={[
                                 "Any",
                                 "Never Married",
                                 "Separated",
@@ -565,31 +881,36 @@ const GlobalSearchModal = () => {
                                 "Widow / Widower",
                                 "Awaiting Divorce",
                                 "Annulled",
-                              ].map((status) => (
-                                <label
-                                  key={status}
-                                  className={`flex items-center gap-2 cursor-pointer ${formData.maritalStatus.includes("Any") && status !== "Any" ? "opacity-50" : ""}`}
-                                >
-                                  <input
-                                    type="checkbox"
-                                    className="rounded text-purple-600 focus:ring-purple-500 h-4 w-4"
-                                    checked={(
-                                      formData.maritalStatus || []
-                                    ).includes(status)}
-                                    onChange={() =>
-                                      handleMaritalStatusChange(status)
-                                    }
-                                    disabled={
-                                      formData.maritalStatus.includes("Any") &&
-                                      status !== "Any"
-                                    }
-                                  />
-                                  <span className="text-gray-700 text-xs md:text-sm">
-                                    {status}
-                                  </span>
-                                </label>
-                              ))}
-                            </div>
+                              ]}
+                              value={
+                                Array.isArray(formData.maritalStatus)
+                                  ? formData.maritalStatus[0]
+                                  : formData.maritalStatus
+                              }
+                              onChange={(val) => {
+                                if (val === "Any") {
+                                  const allStatuses = [
+                                    "Any",
+                                    "Never Married",
+                                    "Separated",
+                                    "Divorced",
+                                    "Widow / Widower",
+                                    "Awaiting Divorce",
+                                    "Annulled",
+                                  ];
+                                  handleInputChange(
+                                    "maritalStatus",
+                                    allStatuses,
+                                  );
+                                } else {
+                                  handleInputChange(
+                                    "maritalStatus",
+                                    val ? [val] : [],
+                                  );
+                                }
+                              }}
+                              placeholder="Select"
+                            />
                           </div>
 
                           {/* Child Status - Conditional Display */}
@@ -657,83 +978,64 @@ const GlobalSearchModal = () => {
                               <label className="text-gray-700 font-medium text-xs md:text-sm">
                                 Caste
                               </label>
-                              <select
-                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                              <CustomSelect
+                                className="w-full"
+                                options={CASTES}
                                 value={formData.caste}
-                                onChange={(e) =>
-                                  handleInputChange("caste", e.target.value)
+                                onChange={(val) =>
+                                  handleInputChange("caste", val)
                                 }
-                              >
-                                <option value="">Select</option>
-                                {CASTES.map((opt) => (
-                                  <option key={opt} value={opt}>
-                                    {opt}
-                                  </option>
-                                ))}
-                              </select>
+                                placeholder="Select"
+                              />
                             </div>
 
                             <div className="flex flex-col gap-2">
                               <label className="text-gray-700 font-medium text-xs md:text-sm">
                                 Denomination
                               </label>
-                              <select
-                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                              <CustomSelect
+                                className="w-full"
+                                options={DENOMINATIONS}
                                 value={formData.denomination}
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    "denomination",
-                                    e.target.value,
-                                  )
+                                onChange={(val) =>
+                                  handleInputChange("denomination", val)
                                 }
-                              >
-                                <option value="">Select</option>
-                                {DENOMINATIONS.map((opt) => (
-                                  <option key={opt} value={opt}>
-                                    {opt}
-                                  </option>
-                                ))}
-                              </select>
+                                placeholder="Select"
+                              />
                             </div>
 
                             <div className="flex flex-col gap-2">
                               <label className="text-gray-700 font-medium text-xs md:text-sm">
                                 Education
                               </label>
-                              <select
-                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                              <CustomSelect
+                                className="w-full"
+                                options={EDUCATIONS}
                                 value={formData.education}
-                                onChange={(e) =>
-                                  handleInputChange("education", e.target.value)
+                                onChange={(val) =>
+                                  handleInputChange("education", val)
                                 }
-                              >
-                                <option value="">Select</option>
-                                {EDUCATIONS.map((opt) => (
-                                  <option key={opt} value={opt}>
-                                    {opt}
-                                  </option>
-                                ))}
-                              </select>
+                                placeholder="Select"
+                              />
                             </div>
 
                             <div className="flex flex-col gap-2">
                               <label className="text-gray-700 font-medium text-xs md:text-sm">
                                 Country
                               </label>
-                              <select
-                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                              <CustomSelect
+                                className="w-full"
+                                options={allCountries}
                                 value={formData.country}
-                                onChange={(e) =>
-                                  handleInputChange("country", e.target.value)
+                                onChange={(val) =>
+                                  handleInputChange("country", val)
                                 }
-                              >
-                                <option value="">Select</option>
-                                {COUNTRIES.map((opt) => (
-                                  <option key={opt} value={opt}>
-                                    {opt}
-                                  </option>
-                                ))}
-                              </select>
+                                placeholder="Select"
+                              />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                              {/* Advanced Search uses Country, State, District/City logic */}
                             </div>
                           </div>
                         </div>
@@ -751,36 +1053,25 @@ const GlobalSearchModal = () => {
                                   Age
                                 </label>
                                 <div className="flex items-center gap-2">
-                                  <select
-                                    className="flex-1 border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                                    value={formData.ageFrom}
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        "ageFrom",
-                                        e.target.value,
-                                      )
+                                  <CustomSelect
+                                    className="flex-1"
+                                    options={AGE_FROM_OPTIONS}
+                                    value={formData.ageFrom.toString()}
+                                    onChange={(val) =>
+                                      handleInputChange("ageFrom", val)
                                     }
-                                  >
-                                    {[...Array(40)].map((_, i) => (
-                                      <option key={i} value={18 + i}>
-                                        {18 + i}
-                                      </option>
-                                    ))}
-                                  </select>
+                                    placeholder="From"
+                                  />
                                   <span className="text-xs">To</span>
-                                  <select
-                                    className="flex-1 border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                                    value={formData.ageTo}
-                                    onChange={(e) =>
-                                      handleInputChange("ageTo", e.target.value)
+                                  <CustomSelect
+                                    className="flex-1"
+                                    options={AGE_TO_OPTIONS}
+                                    value={formData.ageTo.toString()}
+                                    onChange={(val) =>
+                                      handleInputChange("ageTo", val)
                                     }
-                                  >
-                                    {[...Array(40)].map((_, i) => (
-                                      <option key={i} value={21 + i}>
-                                        {21 + i}
-                                      </option>
-                                    ))}
-                                  </select>
+                                    placeholder="To"
+                                  />
                                   <span className="text-xs text-gray-500 hidden sm:inline">
                                     Years
                                   </span>
@@ -793,41 +1084,25 @@ const GlobalSearchModal = () => {
                                   Height
                                 </label>
                                 <div className="flex items-center gap-2">
-                                  <select
-                                    className="flex-1 border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                  <CustomSelect
+                                    className="w-full"
+                                    options={heightOptions}
                                     value={formData.heightFrom}
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        "heightFrom",
-                                        e.target.value,
-                                      )
+                                    onChange={(val) =>
+                                      handleInputChange("heightFrom", val)
                                     }
-                                  >
-                                    <option value="">Select</option>
-                                    {heightOptions.map((opt) => (
-                                      <option key={opt.value} value={opt.value}>
-                                        {opt.label}
-                                      </option>
-                                    ))}
-                                  </select>
+                                    placeholder="Select"
+                                  />
                                   <span className="text-xs">To</span>
-                                  <select
-                                    className="flex-1 border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                  <CustomSelect
+                                    className="w-full"
+                                    options={heightOptions}
                                     value={formData.heightTo}
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        "heightTo",
-                                        e.target.value,
-                                      )
+                                    onChange={(val) =>
+                                      handleInputChange("heightTo", val)
                                     }
-                                  >
-                                    <option value="">Select</option>
-                                    {heightOptions.map((opt) => (
-                                      <option key={opt.value} value={opt.value}>
-                                        {opt.label}
-                                      </option>
-                                    ))}
-                                  </select>
+                                    placeholder="Select"
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -838,23 +1113,15 @@ const GlobalSearchModal = () => {
                                 <label className="text-gray-700 font-medium text-xs md:text-sm">
                                   Mother Tongue
                                 </label>
-                                <select
-                                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                <CustomSelect
+                                  className="w-full"
+                                  options={MOTHER_TONGUES}
                                   value={formData.motherTongue}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "motherTongue",
-                                      e.target.value,
-                                    )
+                                  onChange={(val) =>
+                                    handleInputChange("motherTongue", val)
                                   }
-                                >
-                                  <option value="">Select</option>
-                                  {MOTHER_TONGUES.map((opt) => (
-                                    <option key={opt} value={opt}>
-                                      {opt}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="Select"
+                                />
                               </div>
 
                               {/* Caste */}
@@ -862,20 +1129,15 @@ const GlobalSearchModal = () => {
                                 <label className="text-gray-700 font-medium text-xs md:text-sm">
                                   Caste
                                 </label>
-                                <select
-                                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                <CustomSelect
+                                  className="w-full"
+                                  options={CASTES}
                                   value={formData.caste}
-                                  onChange={(e) =>
-                                    handleInputChange("caste", e.target.value)
+                                  onChange={(val) =>
+                                    handleInputChange("caste", val)
                                   }
-                                >
-                                  <option value="">Select</option>
-                                  {CASTES.map((opt) => (
-                                    <option key={opt} value={opt}>
-                                      {opt}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="Select"
+                                />
                               </div>
                             </div>
 
@@ -884,23 +1146,15 @@ const GlobalSearchModal = () => {
                               <label className="text-gray-700 font-medium text-xs md:text-sm">
                                 Denomination
                               </label>
-                              <select
-                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                              <CustomSelect
+                                className="w-full"
+                                options={DENOMINATIONS}
                                 value={formData.denomination}
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    "denomination",
-                                    e.target.value,
-                                  )
+                                onChange={(val) =>
+                                  handleInputChange("denomination", val)
                                 }
-                              >
-                                <option value="">Select</option>
-                                {DENOMINATIONS.map((opt) => (
-                                  <option key={opt} value={opt}>
-                                    {opt}
-                                  </option>
-                                ))}
-                              </select>
+                                placeholder="Select"
+                              />
                             </div>
 
                             {/* Marital Status */}
@@ -908,8 +1162,9 @@ const GlobalSearchModal = () => {
                               <label className="text-gray-700 font-medium text-xs md:text-sm">
                                 Marital Status
                               </label>
-                              <div className="flex flex-wrap gap-3 md:gap-4">
-                                {[
+                              <CustomSelect
+                                className="w-full"
+                                options={[
                                   "Any",
                                   "Never Married",
                                   "Separated",
@@ -917,32 +1172,36 @@ const GlobalSearchModal = () => {
                                   "Widow / Widower",
                                   "Awaiting Divorce",
                                   "Annulled",
-                                ].map((status) => (
-                                  <label
-                                    key={status}
-                                    className={`flex items-center gap-2 cursor-pointer ${formData.maritalStatus.includes("Any") && status !== "Any" ? "opacity-50" : ""}`}
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      className="rounded text-purple-600 focus:ring-purple-500 h-4 w-4"
-                                      checked={(
-                                        formData.maritalStatus || []
-                                      ).includes(status)}
-                                      onChange={() =>
-                                        handleMaritalStatusChange(status)
-                                      }
-                                      disabled={
-                                        formData.maritalStatus.includes(
-                                          "Any",
-                                        ) && status !== "Any"
-                                      }
-                                    />
-                                    <span className="text-gray-700 text-xs md:text-sm">
-                                      {status}
-                                    </span>
-                                  </label>
-                                ))}
-                              </div>
+                                ]}
+                                value={
+                                  Array.isArray(formData.maritalStatus)
+                                    ? formData.maritalStatus[0]
+                                    : formData.maritalStatus
+                                }
+                                onChange={(val) => {
+                                  if (val === "Any") {
+                                    const allStatuses = [
+                                      "Any",
+                                      "Never Married",
+                                      "Separated",
+                                      "Divorced",
+                                      "Widow / Widower",
+                                      "Awaiting Divorce",
+                                      "Annulled",
+                                    ];
+                                    handleInputChange(
+                                      "maritalStatus",
+                                      allStatuses,
+                                    );
+                                  } else {
+                                    handleInputChange(
+                                      "maritalStatus",
+                                      val ? [val] : [],
+                                    );
+                                  }
+                                }}
+                                placeholder="Select"
+                              />
                             </div>
                           </div>
 
@@ -998,45 +1257,29 @@ const GlobalSearchModal = () => {
                                 <label className="text-gray-700 font-medium text-xs md:text-sm">
                                   Education
                                 </label>
-                                <select
-                                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                <CustomSelect
+                                  className="w-full"
+                                  options={EDUCATIONS}
                                   value={formData.education}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "education",
-                                      e.target.value,
-                                    )
+                                  onChange={(val) =>
+                                    handleInputChange("education", val)
                                   }
-                                >
-                                  <option value="">Select</option>
-                                  {EDUCATIONS.map((opt) => (
-                                    <option key={opt} value={opt}>
-                                      {opt}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="Select"
+                                />
                               </div>
                               <div className="flex flex-col gap-2">
                                 <label className="text-gray-700 font-medium text-xs md:text-sm">
                                   Occupation
                                 </label>
-                                <select
-                                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                <CustomSelect
+                                  className="w-full"
+                                  options={OCCUPATIONS}
                                   value={formData.occupation}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "occupation",
-                                      e.target.value,
-                                    )
+                                  onChange={(val) =>
+                                    handleInputChange("occupation", val)
                                   }
-                                >
-                                  <option value="">Select</option>
-                                  {OCCUPATIONS.map((opt) => (
-                                    <option key={opt} value={opt}>
-                                      {opt}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="Select"
+                                />
                               </div>
                             </div>
                             <div className="flex flex-col gap-2">
@@ -1044,37 +1287,27 @@ const GlobalSearchModal = () => {
                                 Annual Income
                               </label>
                               <div className="flex items-center gap-2">
-                                <select
-                                  className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                <CustomSelect
+                                  className="flex-1"
+                                  options={INCOME_OPTIONS}
                                   value={formData.annualIncomeFrom}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "annualIncomeFrom",
-                                      e.target.value,
-                                    )
+                                  onChange={(val) =>
+                                    handleInputChange("annualIncomeFrom", val)
                                   }
-                                >
-                                  <option value="">Any</option>
-                                  <option value="1">1 LPA</option>
-                                  <option value="5">5 LPA</option>
-                                </select>
+                                  placeholder="Any"
+                                />
                                 <span className="text-xs text-gray-500">
                                   To
                                 </span>
-                                <select
-                                  className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                <CustomSelect
+                                  className="flex-1"
+                                  options={INCOME_OPTIONS}
                                   value={formData.annualIncomeTo}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "annualIncomeTo",
-                                      e.target.value,
-                                    )
+                                  onChange={(val) =>
+                                    handleInputChange("annualIncomeTo", val)
                                   }
-                                >
-                                  <option value="">Any</option>
-                                  <option value="10">10 LPA</option>
-                                  <option value="20">20 LPA</option>
-                                </select>
+                                  placeholder="Any"
+                                />
                               </div>
                             </div>
                           </div>
@@ -1091,61 +1324,43 @@ const GlobalSearchModal = () => {
                                 <label className="text-gray-700 font-medium text-xs md:text-sm">
                                   Country
                                 </label>
-                                <select
-                                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                <CustomSelect
+                                  className="w-full"
+                                  options={allCountries}
                                   value={formData.country}
-                                  onChange={(e) =>
-                                    handleInputChange("country", e.target.value)
+                                  onChange={(val) =>
+                                    handleInputChange("country", val)
                                   }
-                                >
-                                  <option value="">Select</option>
-                                  {COUNTRIES.map((opt) => (
-                                    <option key={opt} value={opt}>
-                                      {opt}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="Select"
+                                />
                               </div>
                               <div className="flex flex-col gap-2">
                                 <label className="text-gray-700 font-medium text-xs md:text-sm">
                                   State
                                 </label>
-                                <select
-                                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                <CustomSelect
+                                  className="w-full"
+                                  options={allStates}
                                   value={formData.state}
-                                  onChange={(e) =>
-                                    handleInputChange("state", e.target.value)
+                                  onChange={(val) =>
+                                    handleInputChange("state", val)
                                   }
-                                >
-                                  <option value="">Select</option>
-                                  {STATES.map((opt) => (
-                                    <option key={opt} value={opt}>
-                                      {opt}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="Select"
+                                />
                               </div>
                               <div className="flex flex-col gap-2">
                                 <label className="text-gray-700 font-medium text-xs md:text-sm">
                                   District/City
                                 </label>
-                                <select
-                                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                                <CustomSelect
+                                  className="w-full"
+                                  options={allCities}
                                   value={formData.districtCity}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "districtCity",
-                                      e.target.value,
-                                    )
+                                  onChange={(val) =>
+                                    handleInputChange("districtCity", val)
                                   }
-                                >
-                                  <option value="">Select</option>
-                                  {DISTRICTS.map((opt) => (
-                                    <option key={opt} value={opt}>
-                                      {opt}
-                                    </option>
-                                  ))}
-                                </select>
+                                  placeholder="Select"
+                                />
                               </div>
                             </div>
                           </div>

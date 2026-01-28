@@ -55,7 +55,7 @@ const UserCardImageSlider = ({ user, isAccepted }) => {
       e.stopPropagation();
     }
     setCurrentImageIndex((prev) =>
-      prev === 0 ? allImages.length - 1 : prev - 1
+      prev === 0 ? allImages.length - 1 : prev - 1,
     );
   };
 
@@ -72,7 +72,11 @@ const UserCardImageSlider = ({ user, isAccepted }) => {
       <div style={{ position: "relative", width: "100%", height: "220px" }}>
         <div
           onClick={openZoom}
-          style={{ display: "block", height: "100%", cursor: isAccepted ? "pointer" : "default" }}
+          style={{
+            display: "block",
+            height: "100%",
+            cursor: isAccepted ? "pointer" : "default",
+          }}
         >
           <img
             src={allImages[currentImageIndex]}
@@ -317,7 +321,7 @@ const UserSearchResult = () => {
         setLoading(false);
       }
     },
-    [state]
+    [state],
   );
 
   // Initial data fetch
@@ -359,7 +363,7 @@ const UserSearchResult = () => {
     const timeoutId = setTimeout(() => {
       // Only call API if at least one filter has a value
       const hasActiveFilters = Object.values(filters).some(
-        (value) => value !== "" && value !== "all"
+        (value) => value !== "" && value !== "all",
       );
 
       if (hasActiveFilters) {
@@ -477,7 +481,7 @@ const UserSearchResult = () => {
         <LayoutComponent />
       </div>
 
-      <div className="pt-16">
+      <div style={{ paddingTop: "115px", paddingBottom: "40px" }}>
         <div className="all-pro-head">
           <div className="container">
             <div className="row">
@@ -491,7 +495,8 @@ const UserSearchResult = () => {
         </div>
         <div className="fil-mob fil-mob-act">
           <h4>
-            Profile filters <i className="fa fa-filter" aria-hidden="true"></i>{" "}
+            Profile filters{" "}
+            <i className="fa fa-filter" aria-hidden="true"></i>{" "}
           </h4>
         </div>
       </div>
@@ -501,8 +506,7 @@ const UserSearchResult = () => {
           <div className="container">
             <div className="row">
               {/* Left Sidebar Filter - Removed as per user request */}
-              <div className="d-none col-md-3 fil-mob-view">
-              </div>
+              <div className="d-none col-md-3 fil-mob-view"></div>
               <div className="col-md-12">
                 <div className="short-all">
                   <div className="short-lhs">
@@ -553,15 +557,34 @@ const UserSearchResult = () => {
                 )}
 
                 <div className="all-list-sh">
-                  <ul style={viewType === "grid" ? { display: "flex", flexWrap: "wrap", margin: "0 -10px" } : {}}>
+                  <ul
+                    style={
+                      viewType === "grid"
+                        ? {
+                            display: "flex",
+                            flexWrap: "wrap",
+                            margin: "0 -10px",
+                          }
+                        : {}
+                    }
+                  >
                     {users.map((user) => (
                       <li
                         key={user._id}
-                        style={viewType === "grid" ? { width: "50%", padding: "0 10px", marginBottom: "20px" } : { width: "100%", marginBottom: "20px" }}
+                        style={
+                          viewType === "grid"
+                            ? {
+                                width: "50%",
+                                padding: "0 10px",
+                                marginBottom: "20px",
+                              }
+                            : { width: "100%", marginBottom: "20px" }
+                        }
                       >
                         <div
-                          className={`all-pro-box ${Math.random() > 0.5 ? "user-avil-onli" : ""
-                            }`}
+                          className={`all-pro-box ${
+                            Math.random() > 0.5 ? "user-avil-onli" : ""
+                          }`}
                           data-useravil={
                             Math.random() > 0.5 ? "avilyes" : "avilno"
                           }
@@ -570,14 +593,18 @@ const UserSearchResult = () => {
                           }
                         >
                           <div className="pro-img">
-                            <UserCardImageSlider user={user} isAccepted={user.interestStatus === 'accepted'} />
+                            <UserCardImageSlider
+                              user={user}
+                              isAccepted={user.interestStatus === "accepted"}
+                            />
                             <div
                               className="pro-ave"
                               title="User currently available"
                             >
                               <span
-                                className={`pro-ave-${Math.random() > 0.5 ? "yes" : "no"
-                                  }`}
+                                className={`pro-ave-${
+                                  Math.random() > 0.5 ? "yes" : "no"
+                                }`}
                               ></span>
                             </div>
                             <div className="pro-avl-status">
@@ -602,9 +629,16 @@ const UserSearchResult = () => {
                             <div
                               className="pro-bio"
                               style={{
-                                filter: user.interestStatus === 'accepted' ? "none" : "blur(5px)",
-                                userSelect: user.interestStatus === 'accepted' ? "auto" : "none",
-                                opacity: user.interestStatus === 'accepted' ? 1 : 0.6
+                                filter:
+                                  user.interestStatus === "accepted"
+                                    ? "none"
+                                    : "blur(5px)",
+                                userSelect:
+                                  user.interestStatus === "accepted"
+                                    ? "auto"
+                                    : "none",
+                                opacity:
+                                  user.interestStatus === "accepted" ? 1 : 0.6,
                               }}
                             >
                               <span>{user.degree || "Not specified"}</span>
@@ -627,7 +661,11 @@ const UserSearchResult = () => {
                               ) : user.interestStatus === "accepted" ? (
                                 <span
                                   className="cta cta-sendint"
-                                  style={{ cursor: "default", backgroundColor: "#4caf50", borderColor: "#4caf50" }}
+                                  style={{
+                                    cursor: "default",
+                                    backgroundColor: "#4caf50",
+                                    borderColor: "#4caf50",
+                                  }}
                                 >
                                   Request Accepted
                                 </span>
@@ -680,241 +718,235 @@ const UserSearchResult = () => {
             </div>
           </div>
         </div>
-      </section >
+      </section>
 
       {/* Send Interest Modal */}
-      {
-        selectedUser && (
-          <ShowInterest
-            selectedUser={selectedUser}
-            userId={userId}
-            onSuccess={() => {
-              setUsers(prevUsers =>
-                prevUsers.map(u =>
-                  u._id === selectedUser._id
-                    ? { ...u, interestStatus: 'pending' }
-                    : u
-                )
-              );
-            }}
-          />
-        )
-      }
+      {selectedUser && (
+        <ShowInterest
+          selectedUser={selectedUser}
+          userId={userId}
+          onSuccess={() => {
+            setUsers((prevUsers) =>
+              prevUsers.map((u) =>
+                u._id === selectedUser._id
+                  ? { ...u, interestStatus: "pending" }
+                  : u,
+              ),
+            );
+          }}
+        />
+      )}
 
       {/* Enhanced Chat Box */}
-      {
-        isChatOpen && selectedUser && (
+      {isChatOpen && selectedUser && (
+        <div
+          className="chatbox"
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            width: "350px",
+            height: "500px",
+            backgroundColor: "#fff",
+            borderRadius: "8px",
+            boxShadow: "0 0 20px rgba(0,0,0,0.2)",
+            display: "flex",
+            flexDirection: "column",
+            zIndex: 1000,
+            overflow: "hidden",
+          }}
+        >
           <div
-            className="chatbox"
+            className="chat-header"
             style={{
-              position: "fixed",
-              bottom: "20px",
-              right: "20px",
-              width: "350px",
-              height: "500px",
-              backgroundColor: "#fff",
-              borderRadius: "8px",
-              boxShadow: "0 0 20px rgba(0,0,0,0.2)",
+              padding: "15px",
+              backgroundColor: "#f8f9fa",
+              borderBottom: "1px solid #eee",
               display: "flex",
-              flexDirection: "column",
-              zIndex: 1000,
-              overflow: "hidden",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            <div
-              className="chat-header"
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img
+                src={selectedUser.profileImage || "images/default-profile.jpg"}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  marginRight: "10px",
+                }}
+                alt={selectedUser.userName}
+              />
+              <h4 style={{ margin: 0 }}>{selectedUser.userName}</h4>
+            </div>
+            <span
+              className="comm-msg-pop-clo"
+              onClick={closeChat}
               style={{
-                padding: "15px",
-                backgroundColor: "#f8f9fa",
-                borderBottom: "1px solid #eee",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                cursor: "pointer",
+                fontSize: "20px",
+                color: "#999",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <img
-                  src={selectedUser.profileImage || "images/default-profile.jpg"}
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    marginRight: "10px",
-                  }}
-                  alt={selectedUser.userName}
-                />
-                <h4 style={{ margin: 0 }}>{selectedUser.userName}</h4>
-              </div>
-              <span
-                className="comm-msg-pop-clo"
-                onClick={closeChat}
+              <i className="fa fa-times" aria-hidden="true"></i>
+            </span>
+          </div>
+
+          <div
+            className="chat-messages"
+            style={{
+              flex: 1,
+              padding: "15px",
+              overflowY: "auto",
+            }}
+          >
+            {chatMessages.length === 0 ? (
+              <div
+                className="chat-welcome"
                 style={{
-                  cursor: "pointer",
-                  fontSize: "20px",
+                  textAlign: "center",
                   color: "#999",
+                  marginTop: "50%",
                 }}
               >
-                <i className="fa fa-times" aria-hidden="true"></i>
-              </span>
-            </div>
-
-            <div
-              className="chat-messages"
-              style={{
-                flex: 1,
-                padding: "15px",
-                overflowY: "auto",
-              }}
-            >
-              {chatMessages.length === 0 ? (
+                Start a new conversation with {selectedUser.userName}
+              </div>
+            ) : (
+              chatMessages.map((msg, index) => (
                 <div
-                  className="chat-welcome"
+                  key={index}
                   style={{
-                    textAlign: "center",
-                    color: "#999",
-                    marginTop: "50%",
+                    marginBottom: "10px",
+                    textAlign: msg.sender === "me" ? "right" : "left",
                   }}
                 >
-                  Start a new conversation with {selectedUser.userName}
-                </div>
-              ) : (
-                chatMessages.map((msg, index) => (
                   <div
-                    key={index}
                     style={{
-                      marginBottom: "10px",
+                      display: "inline-block",
+                      padding: "8px 12px",
+                      borderRadius:
+                        msg.sender === "me"
+                          ? "18px 18px 0 18px"
+                          : "18px 18px 18px 0",
+                      backgroundColor:
+                        msg.sender === "me" ? "#007bff" : "#f1f1f1",
+                      color: msg.sender === "me" ? "#fff" : "#333",
+                      maxWidth: "80%",
+                    }}
+                  >
+                    {msg.message}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      color: "#999",
+                      marginTop: "4px",
                       textAlign: msg.sender === "me" ? "right" : "left",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "inline-block",
-                        padding: "8px 12px",
-                        borderRadius:
-                          msg.sender === "me"
-                            ? "18px 18px 0 18px"
-                            : "18px 18px 18px 0",
-                        backgroundColor:
-                          msg.sender === "me" ? "#007bff" : "#f1f1f1",
-                        color: msg.sender === "me" ? "#fff" : "#333",
-                        maxWidth: "80%",
-                      }}
-                    >
-                      {msg.message}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        color: "#999",
-                        marginTop: "4px",
-                        textAlign: msg.sender === "me" ? "right" : "left",
-                      }}
-                    >
-                      {new Date(msg.timestamp).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
+                    {new Date(msg.timestamp).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </div>
-                ))
-              )}
-            </div>
-
-            <div
-              className="chat-input"
-              style={{
-                padding: "10px",
-                borderTop: "1px solid #eee",
-                backgroundColor: "#f8f9fa",
-              }}
-            >
-              <form onSubmit={handleChatSend} style={{ display: "flex" }}>
-                <input
-                  type="text"
-                  value={chatMessage}
-                  onChange={(e) => setChatMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    border: "1px solid #ddd",
-                    borderRadius: "20px",
-                    outline: "none",
-                  }}
-                  required
-                />
-                <button
-                  type="submit"
-                  style={{
-                    marginLeft: "10px",
-                    padding: "10px 15px",
-                    backgroundColor: "#007bff",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "20px",
-                    cursor: "pointer",
-                  }}
-                >
-                  <i className="fa fa-paper-plane" aria-hidden="true"></i>
-                </button>
-              </form>
-            </div>
+                </div>
+              ))
+            )}
           </div>
-        )
-      }
+
+          <div
+            className="chat-input"
+            style={{
+              padding: "10px",
+              borderTop: "1px solid #eee",
+              backgroundColor: "#f8f9fa",
+            }}
+          >
+            <form onSubmit={handleChatSend} style={{ display: "flex" }}>
+              <input
+                type="text"
+                value={chatMessage}
+                onChange={(e) => setChatMessage(e.target.value)}
+                placeholder="Type a message..."
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  border: "1px solid #ddd",
+                  borderRadius: "20px",
+                  outline: "none",
+                }}
+                required
+              />
+              <button
+                type="submit"
+                style={{
+                  marginLeft: "10px",
+                  padding: "10px 15px",
+                  backgroundColor: "#007bff",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "20px",
+                  cursor: "pointer",
+                }}
+              >
+                <i className="fa fa-paper-plane" aria-hidden="true"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Active Chats Indicator */}
-      {
-        activeChats.length > 0 && !isChatOpen && (
-          <div
+      {activeChats.length > 0 && !isChatOpen && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            backgroundColor: "#007bff",
+            color: "#fff",
+            width: "50px",
+            height: "50px",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            boxShadow: "0 0 10px rgba(0,0,0,0.2)",
+            zIndex: 999,
+          }}
+          onClick={() => setIsChatOpen(true)}
+        >
+          <i
+            className="fa fa-comments"
+            aria-hidden="true"
+            style={{ fontSize: "20px" }}
+          ></i>
+          <span
             style={{
-              position: "fixed",
-              bottom: "20px",
-              right: "20px",
-              backgroundColor: "#007bff",
+              position: "absolute",
+              top: "-5px",
+              right: "-5px",
+              backgroundColor: "red",
               color: "#fff",
-              width: "50px",
-              height: "50px",
               borderRadius: "50%",
+              width: "20px",
+              height: "20px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              cursor: "pointer",
-              boxShadow: "0 0 10px rgba(0,0,0,0.2)",
-              zIndex: 999,
+              fontSize: "12px",
             }}
-            onClick={() => setIsChatOpen(true)}
           >
-            <i
-              className="fa fa-comments"
-              aria-hidden="true"
-              style={{ fontSize: "20px" }}
-            ></i>
-            <span
-              style={{
-                position: "absolute",
-                top: "-5px",
-                right: "-5px",
-                backgroundColor: "red",
-                color: "#fff",
-                borderRadius: "50%",
-                width: "20px",
-                height: "20px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "12px",
-              }}
-            >
-              {activeChats.length}
-            </span>
-          </div>
-        )
-      }
+            {activeChats.length}
+          </span>
+        </div>
+      )}
 
       <Footer />
       <CopyRights />
-    </div >
+    </div>
   );
 };
 
